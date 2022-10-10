@@ -3,7 +3,6 @@
 	<head>
 		{{-- META DATA --}}
 		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta name="description" content="{{ env('APP_DESC') }}">
 
@@ -44,7 +43,7 @@
 		<script type="text/javascript" id="for-js-disabled-js">$('head').append('<style id="for-js-disabled">#js-disabled { display: none; }</style>');$(document).ready(function() {$('#js-disabled').remove();$('#for-js-disabled').remove();$('#for-js-disabled-js').remove();});</script>
 
 		{{-- TITLE --}}
-		<title>@yield('title') - Municipality of Taytay, Rizal</title>
+		<title>@yield('title') - Party Color</title>
 	</head>
 
 	<body style="max-height: 100vh; heigh: 100vh;" class="overflow-y-hidden">
@@ -73,6 +72,7 @@
 		<div class="d-flex flex-column min-vh-100 js-only">
 			<!-- HEADER -->
 			<header class="header dark-shadow">
+				@include('components.admin.header')
 			</header>
 
 			<!-- CONTENTS -->
@@ -80,6 +80,7 @@
 				<div class="container-fluid d-flex flex-column flex-grow-1 px-0">
 					<div class="d-flex flex-d-row flex-grow-1 position-relative h-100" style="overflow: hidden;">
 						{{-- SIDEBAR --}}
+						@include('components.admin.sidebar')
 						
 						{{-- CONTENT --}}
 						<div class="container-fluid content flex-fill" style="margin: 0;">
