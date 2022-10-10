@@ -20,5 +20,13 @@ Route::get('/{path?}', 'PageController@index')
 	->where('path', '^((?!admin).)*$')
 	->name('home');
 
-Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function() {
+Route::group(['prefix' => 'admin'], function() {
+	Route::get('/logout', 'PageController@fallback')->name('logout');
+
+	Route::get('/', 'PageController@redirectToDashboard')->name('admin.redirectToDashboard');
+	Route::get('/dashboard', 'PageController@dashboard')->name('admin.dashboard');
+	
+	Route::group(['prefix' => 'permissions'], function() {
+		Route::get('/', 'PageController@redirectToDashboard')->name('admin.permissions.index');
+	});
 });
