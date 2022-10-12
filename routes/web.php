@@ -25,8 +25,16 @@ Route::group(['prefix' => 'admin'], function() {
 
 	Route::get('/', 'PageController@redirectToDashboard')->name('admin.redirectToDashboard');
 	Route::get('/dashboard', 'PageController@dashboard')->name('admin.dashboard');
+
+	Route::group(['prefix' => 'users'], function() {
+		Route::get('/', 'UserController@index')->name('admin.users.index');
+	});
 	
 	Route::group(['prefix' => 'permissions'], function() {
-		Route::get('/', 'PageController@redirectToDashboard')->name('admin.permissions.index');
+		Route::get('/', 'PermissionController@index')->name('admin.permissions.index');
+	});
+
+	Route::group(['prefix' => 'settings'], function() {
+		Route::get('/', 'SettingsController@index')->name('admin.settings.index');
 	});
 });

@@ -11,18 +11,17 @@
 			{{-- Navbar contents --}}
 			<div class="navbar-collapse" id="navbar">
 				<div class="ml-auto">
-					<img src="{{-- Auth::user()->getAvatar() --}}" class="circular-border" width='30' height='30' draggable='false' alt="User" data-fallback-img="{{-- Auth::user()->getAvatar(true) --}}"/>
 					<label>
 						<div class="dropdown">
-							<a href='' role="button" class="nav-link dropdown-toggle text-dark dynamic-size-lg-h6" style="font-size: 1.25rem;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<a href='#' role="button" class="nav-link dropdown-toggle text-dark dynamic-size-lg-h6" style="font-size: 1.25rem;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 								{{-- Auth::user()->getName() --}}
 								名前
 							</a>
 
 							<div class="dropdown-menu dropdown-menu-right">
-								<a class="dropdown-item" href="{{ route('home') }}">View Page</a>
+								<a class="dropdown-item" href="{{ route('home') }}">ページを見る</a>
 								<div class="dropdown-divider"></div>
-								<a class="dropdown-item" href="{{ route('logout') }}">Sign out</a>
+								<a class="dropdown-item" href="{{ route('logout') }}">サインアウト</a>
 							</div>
 						</div>
 					</label>

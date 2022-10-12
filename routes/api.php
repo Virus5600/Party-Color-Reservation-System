@@ -15,5 +15,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+	return $request->user();
 });
+
+// (Admin) Search box request
+Route::post('/admin-search', 'ApiController@adminSearch')->name('adminSearch');

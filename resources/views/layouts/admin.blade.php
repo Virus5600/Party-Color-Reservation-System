@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}">
+<html lang="ja-JP">
 	<head>
 		{{-- META DATA --}}
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta name="description" content="{{ env('APP_DESC') }}">
+		<meta http-equiv="Content-Language" content="ja-JP" />
 
 		{{-- SITE META --}}
 		<meta name="type" content="website">
