@@ -1,0 +1,10 @@
+.avatar {
+	min-width: 10rem!important;
+	min-height: 10rem!important;
+	max-height: 10rem!important;
+	cursor: pointer!important;
+}
+
+img.avatar {
+	object-position: center;
+}

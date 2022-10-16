@@ -1,7 +1,7 @@
 @php($etcInput = isset($etcInput) ? $etcInput : null)
 
 <div class="col-12 col-md-6 text-center text-md-right my-2 my-md-auto d-flex">
-	<form method="POST" action="{{ route('adminSearch') }}" enctype="multipart/form-data" id="admin-search" class="form m-auto">
+	<form method="POST" action="{{ route('adminSearch', [Auth::user()->id]) }}" enctype="multipart/form-data" id="admin-search" class="form m-auto">
 		{{ csrf_field() }}
 		<input type='hidden' name="type" value='{{ $type }}' />
 		
