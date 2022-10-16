@@ -6,11 +6,13 @@ use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
+	// FALLBACK
 	protected function fallback() {
 		return redirect()
 			->route('home');
 	}
 
+	// USER PAGES
 	protected function index() {
 		return view('index');
 	}

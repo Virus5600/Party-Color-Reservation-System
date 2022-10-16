@@ -19,4 +19,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 // (Admin) Search box request
-Route::post('/admin-search', 'ApiController@adminSearch')->name('adminSearch');
+Route::post('/admin-search/{id}', 'ApiController@adminSearch')->name('adminSearch');

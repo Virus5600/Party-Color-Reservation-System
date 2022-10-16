@@ -4,8 +4,6 @@ use Illuminate\Database\Seeder;
 
 use App\User;
 
-use Hash;
-
 class UsersTableSeeder extends Seeder
 {
 	/**
@@ -16,10 +14,11 @@ class UsersTableSeeder extends Seeder
 	public function run()
 	{
 		User::create([
-			'name' => 'アドミン',
+			'first_name' => 'アドミン',
+			'last_name' => 'アカウント',
 			'email' => 'privatelaravelmailtester@gmail.com',
 			'password' => Hash::make('admin'),
-			'email_verified_at' => \Carbon\Carbon::now();
+			'type_id' => 1
 		]);
 	}
 }
