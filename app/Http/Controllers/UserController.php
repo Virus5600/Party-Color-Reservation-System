@@ -38,6 +38,11 @@ class UserController extends Controller
 	protected function authenticate(Request $req) {
 		$user = User::where('email', '=', $req->email)->first();
 
+		if ($user == null)
+			return redirect()
+				->back()
+				->with('flash_error', 'Wrong email/password!');
+
 		$authenticated = false;
 		if (!$user->locked) {
 			$authenticated = Auth::attempt([
