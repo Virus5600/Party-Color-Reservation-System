@@ -42,8 +42,8 @@
 			<tbody id="table-content">
 				@forelse ($permissions as $p)
 				<tr class="enlarge-on-hover">
-					<td class="text-center align-middle mx-auto font-weight-bold">@{{ $p->name }}</td>
-					<td class="text-center align-middle mx-auto">@{{ $p->allUsers()->count() }}</td>
+					<td class="text-center align-middle mx-auto font-weight-bold">{{ $p->name }}</td>
+					<td class="text-center align-middle mx-auto">{{ $p->allUsers()->count() }}</td>
 
 					<td class="align-middle">
 						<div class="dropdown ">
