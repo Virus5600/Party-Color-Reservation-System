@@ -233,6 +233,15 @@
 	border-radius: 50%;
 }
 
+textarea.not-resizable {
+	resize: none;
+}
+
+/* CUSTOM BOOTSTRAP CLASSES */
+.border-secondary-light {
+	border-color: #ced4da;
+}
+
 /* ANIMATION RELATED */
 .enlarge-on-hover {
 	position: relative;
