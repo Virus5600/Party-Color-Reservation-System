@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Oct 16, 2022 at 12:10 PM
+-- Generation Time: Oct 16, 2022 at 01:06 PM
 -- Server version: 5.7.36
 -- PHP Version: 7.4.26
 
@@ -84,20 +84,20 @@ CREATE TABLE IF NOT EXISTS `permissions` (
 --
 
 INSERT INTO `permissions` (`id`, `parent_permission`, `name`, `slug`, `created_at`, `updated_at`) VALUES
-(1, NULL, 'Users Tab Access', 'users_tab_access', '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(2, 1, 'Users Tab Create', 'users_tab_create', '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(3, 1, 'Users Tab Edit', 'users_tab_edit', '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(4, 1, 'Users Tab Permissions', 'users_tab_permissions', '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(5, 1, 'Users Tab Delete', 'users_tab_delete', '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(6, 1, 'Users Tab Perma Delete', 'users_tab_perma_delete', '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(7, NULL, 'Reservations Tab Access', 'reservations_tab_access', '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(8, 7, 'Reservations Tab Respond', 'reservations_tab_respond', '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(9, 7, 'Reservations Tab Delete', 'reservations_tab_delete', '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(10, 7, 'Reservations Tab Perma Delete', 'reservations_tab_perma_delete', '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(11, NULL, 'Permissions Tab Access', 'permissions_tab_access', '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(12, 11, 'Permissions Tab Manage', 'permissions_tab_manage', '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(13, NULL, 'Settings Tab Access', 'settings_tab_access', '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(14, 13, 'Settings Tab Edit', 'settings_tab_edit', '2022-10-16 03:08:34', '2022-10-16 03:08:34');
+(1, NULL, 'Users Tab Access', 'users_tab_access', '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(2, 1, 'Users Tab Create', 'users_tab_create', '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(3, 1, 'Users Tab Edit', 'users_tab_edit', '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(4, 1, 'Users Tab Permissions', 'users_tab_permissions', '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(5, 1, 'Users Tab Delete', 'users_tab_delete', '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(6, 1, 'Users Tab Perma Delete', 'users_tab_perma_delete', '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(7, NULL, 'Reservations Tab Access', 'reservations_tab_access', '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(8, 7, 'Reservations Tab Respond', 'reservations_tab_respond', '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(9, 7, 'Reservations Tab Delete', 'reservations_tab_delete', '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(10, 7, 'Reservations Tab Perma Delete', 'reservations_tab_perma_delete', '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(11, NULL, 'Permissions Tab Access', 'permissions_tab_access', '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(12, 11, 'Permissions Tab Manage', 'permissions_tab_manage', '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(13, NULL, 'Settings Tab Access', 'settings_tab_access', '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(14, 13, 'Settings Tab Edit', 'settings_tab_edit', '2022-10-16 04:51:21', '2022-10-16 04:51:21');
 
 -- --------------------------------------------------------
 
@@ -122,12 +122,12 @@ CREATE TABLE IF NOT EXISTS `settings` (
 --
 
 INSERT INTO `settings` (`id`, `name`, `value`, `is_file`, `created_at`, `updated_at`) VALUES
-(1, 'web-logo', 'party_color.png', 1, '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(2, 'web-name', 'Municipality of Taytay, Rizal', 0, '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(3, 'web-desc', 'The official website of Taytay Municipal', 0, '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(4, 'address', 'Don Hilario Avenue, Club Manila East Compound, Barangay San Juan Taytay, Rizal 1920 Philippines', 0, '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(5, 'contacts', '8 284-4771, 8 286-6149, 8 284-4770', 0, '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(6, 'email', 'privatelaravelmailtester@gmail.com', 0, '2022-10-16 03:08:34', '2022-10-16 03:08:34');
+(1, 'web-logo', 'party_color.png', 1, '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(2, 'web-name', 'Party Color', 0, '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(3, 'web-desc', 'Party Color website that offers reservation for barbecue plan, promos etc', 0, '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(4, 'address', '2-2-12 Nakahara Building 3F Tsuboya Naha city Okinawa, Japan', 0, '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(5, 'contacts', '080-3980-4560', 0, '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(6, 'email', 'partycolor3f@gmail.com', 0, '2022-10-16 04:51:21', '2022-10-16 04:51:21');
 
 -- --------------------------------------------------------
 
@@ -150,9 +150,9 @@ CREATE TABLE IF NOT EXISTS `types` (
 --
 
 INSERT INTO `types` (`id`, `name`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, 'Master Admin', NULL, '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(2, 'Manager', NULL, '2022-10-16 03:08:34', '2022-10-16 03:08:34'),
-(3, 'Staff', NULL, '2022-10-16 03:08:34', '2022-10-16 03:08:34');
+(1, 'Master Admin', NULL, '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(2, 'Manager', NULL, '2022-10-16 04:51:21', '2022-10-16 04:51:21'),
+(3, 'Staff', NULL, '2022-10-16 04:51:21', '2022-10-16 04:51:21');
 
 -- --------------------------------------------------------
 
@@ -167,26 +167,6 @@ CREATE TABLE IF NOT EXISTS `type_permissions` (
   KEY `type_permissions_type_id_foreign` (`type_id`),
   KEY `type_permissions_permission_id_foreign` (`permission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
-
---
--- Dumping data for table `type_permissions`
---
-
-INSERT INTO `type_permissions` (`type_id`, `permission_id`) VALUES
-(1, 1),
-(1, 2),
-(1, 3),
-(1, 4),
-(1, 5),
-(1, 6),
-(1, 7),
-(1, 8),
-(1, 9),
-(1, 10),
-(1, 11),
-(1, 12),
-(1, 13),
-(1, 14);
 
 -- --------------------------------------------------------
 
@@ -216,14 +196,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`),
   KEY `users_type_id_foreign` (`type_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `first_name`, `middle_name`, `last_name`, `suffix`, `email`, `avatar`, `type_id`, `login_attempts`, `locked`, `locked_by`, `password`, `last_auth`, `remember_token`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, 'アドミン', NULL, 'アカウント', NULL, 'privatelaravelmailtester@gmail.com', 'default.png', 1, 0, 0, NULL, '$2y$10$FfJHt6gAAP.dN5ufBpPf5em5k7RfDKRP008RLjRHY5NmnQFx9s2vW', '2022-10-16 19:44:23', NULL, NULL, '2022-10-16 03:08:35', '2022-10-16 03:44:23');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
 
