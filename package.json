@@ -29,5 +29,8 @@
         "summernote": "^0.8.20",
         "sweetalert2": "^10.16.9",
         "webpack-cli": "^4.10.0"
+    },
+    "engines": {
+        "node": ">=0.4"
     }
 }
