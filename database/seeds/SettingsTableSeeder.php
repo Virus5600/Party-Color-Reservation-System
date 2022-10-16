@@ -21,27 +21,27 @@ class SettingsTableSeeder extends Seeder
 
 		Settings::create([
 			'name' => 'web-name',
-			'value' => 'Municipality of Taytay, Rizal'
+			'value' => 'Party Color'
 		]);
 
 		Settings::create([
 			'name' => 'web-desc',
-			'value' => 'The official website of Taytay Municipal'
+			'value' => 'Party Color website that offers reservation for barbecue plan, promos etc'
 		]);
 
 		Settings::create([
 			'name' => 'address',
-			'value' => 'Don Hilario Avenue, Club Manila East Compound, Barangay San Juan Taytay, Rizal 1920 Philippines'
+			'value' => '2-2-12 Nakahara Building 3F Tsuboya Naha city Okinawa, Japan'
 		]);
 
 		Settings::create([
 			'name' => 'contacts',
-			'value' => '8 284-4771, 8 286-6149, 8 284-4770'
+			'value' => '080-3980-4560'
 		]);
 
 		Settings::create([
 			'name' => 'email',
-			'value' => 'privatelaravelmailtester@gmail.com'
+			'value' => 'partycolor3f@gmail.com'
 		]);
 	}
 }
