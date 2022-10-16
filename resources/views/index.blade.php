@@ -40,7 +40,6 @@
 	<body>
 		<div id="example"></div>
 		
-		<script type="text/javascript" src="{{ asset('js/app.js') }}" onerror="this.remove();"></script>
-		<script type="text/javascript" src="{{ secure_asset('js/app.js') }}" onerror="this.remove();"></script>
+		<script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
 	</body>
 </html>
