@@ -3,7 +3,7 @@
 	<div class="container-fluid">
 		{{-- Branding --}}
 		<a class="navbar-brand m-0 py-0" href="{{route('admin.dashboard')}}" style="height: auto;">
-			{{-- <img src="{{ asset('uploads/settings/taytay_seal.png') }}" style="max-height: 3.25rem;" class="m-0 p-0" alt="Smile Taytay Dashboard" data-fallback-img="{{ asset('uploads/departments/default.png') }}" /> --}}
+			<img src="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}" style="max-height: 3.25rem;" class="m-0 p-0" alt="Smile Taytay Dashboard" data-fallback-img="{{ asset('uploads/settings/default.png') }}" />
 			パーティーカラー
 		</a>
 
@@ -14,8 +14,7 @@
 					<label>
 						<div class="dropdown">
 							<a href='#' role="button" class="nav-link dropdown-toggle text-dark dynamic-size-lg-h6" style="font-size: 1.25rem;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								{{-- Auth::user()->getName() --}}
-								名前
+								{{ Auth::user()->getName() }}
 							</a>
 
 							<div class="dropdown-menu dropdown-menu-right">
