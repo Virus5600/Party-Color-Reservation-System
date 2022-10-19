@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-use App\TypePermissions;
+use App\TypePermission;
 
 class TypePermissionsTableSeeder extends Seeder
 {
@@ -15,7 +15,7 @@ class TypePermissionsTableSeeder extends Seeder
 	{	
 		// Master Admin
 		for ($i = 1; $i <= 14; $i++)
-			TypePermissions::insert([
+			TypePermission::insert([
 				'type_id' => 1,
 				'permission_id' => $i
 			]);
