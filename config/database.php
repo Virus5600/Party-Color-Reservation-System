@@ -37,6 +37,7 @@ return [
 
 		'mysql_test' => [
 			'driver' => 'mysql',
+			'url' => env('DATABASE_URL'),
 			'host' => env('DB_HOST', '127.0.0.1'),
 			'port' => env('DB_PORT', '3306'),
 			'database' => env('DB_DATABASE', 'forge'),
@@ -46,6 +47,7 @@ return [
 			'charset' => 'utf8mb4',
 			'collation' => 'utf8mb4_unicode_ci',
 			'prefix' => '',
+			'prefix_indexes' => true,
 			'strict' => true,
 			'engine' => 'InnoDB ROW_FORMAT=DYNAMIC',
 			'max_allowed_packet' => '5M',
