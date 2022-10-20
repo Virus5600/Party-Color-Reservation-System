@@ -34,9 +34,9 @@ $(document).ready(() => {
 		html = `
 		<div class="row">
 			<div class="col-12 my-2">
-				<label class="form-label d-none" for="password">Password</label>
+				<label class="form-label d-none" for="password">パスワード</label>
 				<div class="input-group">
-					<input class="form-control border-secondary border-right-0" type="password" name="password" id="password" aria-label="Password" aria-describedby="toggle-show-password" placeholder="Password" />
+					<input class="form-control border-secondary border-right-0" type="password" name="password" id="password" aria-label="Password" aria-describedby="toggle-show-password" placeholder="パスワード" />
 					<div class="input-group-append">
 						<button type="button" class="btn bg-white border-secondary border-left-0 toggle-show-password" aria-label="Show Password" data-target="#password">
 							<i class="fas fa-eye d-none" id="show"></i>
@@ -47,9 +47,9 @@ $(document).ready(() => {
 			</div>
 
 			<div class="col-12 my-2">
-				<label class="form-label d-none" for="confirm_password">Old Password</label>
+				<label class="form-label d-none" for="confirm_password">パスワードの確認</label>
 				<div class="input-group">
-					<input class="form-control border-secondary border-right-0" type="password" name="confirm_password" id="confirm_password" aria-label="Confirm Password" aria-describedby="toggle-show-password" placeholder="Confirm Password" />
+					<input class="form-control border-secondary border-right-0" type="password" name="confirm_password" id="confirm_password" aria-label="Confirm Password" aria-describedby="toggle-show-password" placeholder="パスワードの確認" />
 					<div class="input-group-append">
 						<button type="button" class="btn bg-white border-secondary border-left-0 toggle-show-password" aria-label="Show Password" data-target="#confirm_password">
 							<i class="fas fa-eye d-none" id="show"></i>
@@ -58,18 +58,14 @@ $(document).ready(() => {
 					</div>
 				</div>
 			</div>
-
-			<div class="form-check col-12">
-				<input type="checkbox" name="notify_affected" id="notify_affected" ${ data.notify ? "checked" : "" }>
-				<label class="form-label" for="is_departamental_account">Notify affected user?</label>
-			</div>
 		</div>
 		`;
 
 		Swal.fire({
-			title: `Change Password for<br><b>${data.name}</b>`,
+			title: `<b>${data.name}</b>のパスワードの変更`,
 			html: html,
-			confirmButtonText: 'Update',
+			confirmButtonText: '提出する',
+			cancelButtonText: 'キャンセル',
 			showCancelButton: true,
 			focusConfirm: false,
 			allowOutsideClick: false,
@@ -90,12 +86,9 @@ $(document).ready(() => {
 					Swal.showValidationMessage(`Password does not match`);
 				}
 
-				data.notify = $('#notify_affected').prop('checked');
-
 				return {
 					password: p,
-					confirm_password: cp,
-					notify: data.notify
+					confirm_password: cp
 				}
 			}
 		}).then((response) => {
@@ -109,8 +102,7 @@ $(document).ready(() => {
 				$.post(data.targetURI, {
 					_token: $('meta[name="csrf-token"]').attr('content'),
 					password: response.value.password,
-					password_confirmation: response.value.confirm_password,
-					notify_user: response.value.notify
+					password_confirmation: response.value.confirm_password
 				}).done((dataR) => {
 					if (dataR.type == 'validation_error') {
 						obj.attr('data-scp', JSON.stringify(data)).trigger('click');

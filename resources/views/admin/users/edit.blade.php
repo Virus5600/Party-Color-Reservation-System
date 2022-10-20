@@ -1,0 +1,148 @@
+@extends('layouts.admin')
+
+@section('title', 'ユーザーズ')
+
+@section('content')
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12 col-md mt-3">
+			<div class="row">
+				{{-- Header --}}
+				<div class="col-12">
+					<h1>
+						<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.users.index')}}');" class="text-dark text-decoration-none font-weight-normal">
+							<i class="fas fa-chevron-left mr-2"></i>ユーザーズ
+						</a>
+					</h1>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<hr class="hr-thick">
+
+	<div class="row">
+		<div class="col-12 col-md-11 col-lg-10 mx-auto">
+			<div class="card dark-shadow mb-5" id="inner-content">
+				<div class="card-body">
+					<form method="POST" action="{{ route('admin.users.update', [$user->id]) }}" enctype="multipart/form-data" class="form">
+						{{ csrf_field() }}
+
+						<div class="row">
+							{{-- AVATAR --}}
+							<div class="col-12 col-lg-6 mx-auto">
+								<div class="image-input-scope" id="avatar-scope" data-settings="#image-input-settings" data-fallback-img="{{ asset('uploads/users/default.png') }}">
+									{{-- FILE IMAGE --}}
+									<div class="form-group text-center image-input collapse show avatar_holder" id="avatar-image-input-wrapper">
+										<label class="form-label font-weight-bold" for="avatar">ユーザーズイメージ</label><br>
+										<div class="hover-cam mx-auto avatar circular-border overflow-hidden">
+											<img src="{{ $user->getAvatar($user->is_avatar_link) }}" class="hover-zoom img-fluid avatar" id="avatar-file-container" alt="User Avatar" data-default-src="{{ $user->getAvatar(true) }}">
+											<span class="icon text-center image-input-float" id="avatar" tabindex="0">
+												<i class="fas fa-camera text-white hover-icon-2x"></i>
+											</span>
+										</div>
+										<input type="file" class="d-none" accept=".jpg,.jpeg,.png,.webp" data-target-image-container="#avatar-file-container" data-target-name-container="#avatar-name" {{ $user->is_avatar_link ? '' : 'name=avatar' }} >
+										<h6 id="avatar-name" class="text-truncate w-50 mx-auto" data-default-name="{{ $user->getAvatar($user->is_avatar_link, false) }}">{{ $user->getAvatar($user->is_avatar_link, false) }}</h6>
+										<small class="text-muted pb-0 mb-0">
+											<b>初認された形式：</b>
+											<br>JPEG, JPG, PNG, WEBP
+										</small><br>
+										<small class="text-muted pt-0 mt-0"><b>最大サイズ：</b> 5MB</small>
+									</div>
+								</div>
+
+								{{-- LOGO ERROR --}}
+								<div class="text-center">
+									<span style="color: #FC1838">{{$errors->first('avatar')}}</span>
+								</div>
+
+								{{-- OPTIONS --}}
+								<div class="text-center" id="image-input-settings">
+									{{-- REMOVE IMAGE --}}
+									<button type="button" class="btn btn-secondary image-input-reset" data-target="#avatar-scope" data-target-url="{{ route('removeImage') }}" data-category="user" data-id="{{ $user->id }}">
+										イメージを削除する
+									</button>
+								</div>
+							</div>
+
+							<div class="col-12 col-lg-6">
+								<div class="row">
+									{{-- FIRST NAME --}}
+									<div class="form-group col-6">
+										<label class="form-label" for="first_name">名</label>
+										<input type="text" id="first_name" name="first_name" class="form-control" placeholder="名" value="{{ $user->first_name }}" />
+										<span class="text-danger small">{{$errors->first('first_name')}}</span>
+									</div>
+
+									{{-- MIDDLE NAME --}}
+									<div class="form-group col-6">
+										<label class="form-label" for="middle_name">ミドル・ネーム</label>
+										<input type="text" id="middle_name" name="middle_name" class="form-control" placeholder="ミドル・ネーム" value="{{ $user->middle_name }}" />
+										<span class="text-danger small">{{$errors->first('middle_name')}}</span>
+									</div>
+
+									{{-- LAST NAME --}}
+									<div class="form-group col-6">
+										<label class="form-label" for="last_name">姓</label>
+										<input type="text" id="last_name" name="last_name" class="form-control" placeholder="姓" value="{{ $user->last_name }}" />
+										<span class="text-danger small">{{$errors->first('last_name')}}</span>
+									</div>
+
+									{{-- SUFFIX --}}
+									<div class="form-group col-6">
+										<label class="form-label" for="suffix">サフィックス</label>
+										<input type="text" id="suffix" name="suffix" class="form-control" placeholder="サフィックス" value="{{ $user->suffix }}" />
+										<span class="text-danger small">{{$errors->first('suffix')}}</span>
+									</div>
+
+									{{-- EMAIL --}}
+									<div class="form-group col-12">
+										<label class="form-label" for="email">Ｅメール</label>
+										<input type="email" id="email" name="email" class="form-control" placeholder="Ｅメール" value="{{ $user->email }}" />
+										<span class="text-danger small">{{$errors->first('email')}}</span>
+									</div>
+
+									{{-- USER TYPE --}}
+									<div class="form-group col-12">
+										<label class="form-label" for="type">ユーザーズタイプ</label>
+										<br>
+										<select class="form-control selectpicker" name="type" id="type" data-live-search="true" title="User's role or user type">
+											@foreach($types as $t)
+												@if ($t->id >= Auth::user()->type->id)
+												<option value="{{ $t->id }}" {{ $t->id == $user->type->id ? 'selected' : '' }} aria-label="{{ $t->name }}">{{ $t->name }}</option>
+												@endif
+											@endforeach
+										</select>
+										<span class="text-danger small">{{$errors->first('type')}}</span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-6 mx-auto ml-lg-auto d-flex flex-row">
+								<button class="btn btn-success ml-auto" type="submit" data-action="update">提出する</button>
+								<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.users.index')}}');" class="btn btn-danger ml-3 mr-auto">キャンセル</a>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+@endsection
+
+@section('css')
+<link rel="stylesheet" type="text/css" href="{{ asset('css/util/image-input.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('css/util/custom-switch.css') }}" />
+@endsection
+
+@section('scripts')
+<script type="text/javascript" src="{{ asset('js/util/confirm-leave.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/util/disable-on-submit.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/util/image-input.js') }}"></script>
+@if ($user->is_avatar_link)
+<script type="text/javascript" id="collapse-trigger">$(document).ready(() => {$('#is-avatar-link').click();});</script>
+@endif
+@endsection

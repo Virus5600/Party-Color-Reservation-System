@@ -9,7 +9,7 @@
 			<div class="row">
 				{{-- Header --}}
 				<div class="col-12 col-md-4 text-center text-md-left">
-					<h1>Users</h1>
+					<h1>ユーザーズ</h1>
 				</div>
 
 				{{-- Controls --}}
@@ -20,7 +20,7 @@
 						<div class="col-12 col-md text-center text-md-right ml-md-auto">
 							<div class="btn-group-toggle" data-toggle="buttons">
 								<label class="btn btn-secondary {{ $show_softdeletes == 1 ? 'active' : '' }}" for="show_softdeletes">
-									<input type="checkbox" value="0" id="show_softdeletes" autocomplete="off" {{ $show_softdeletes == 1 ? 'checked' : '' }}> Show Soft Deleted
+									<input type="checkbox" value="0" id="show_softdeletes" autocomplete="off" {{ $show_softdeletes == 1 ? 'checked' : '' }}> 削除されたを表示する
 								</label>
 							</div>
 						</div>
@@ -29,7 +29,7 @@
 						{{-- ADD --}}
 						@if (Auth::user()->hasPermission('users_tab_create'))
 						<div class="col-12 col-md text-center text-md-right ml-md-auto">
-							<a href="{{ route('admin.users.create') }}" class="btn btn-success m-auto"><i class="fa fa-plus-circle mr-2"></i>Add User</a>
+							<a href="{{ route('admin.users.create') }}" class="btn btn-success m-auto"><i class="fa fa-plus-circle mr-2"></i>ユーザ追加</a>
 						</div>
 						@endif
 
@@ -46,10 +46,10 @@
 		<table class="table table-striped my-0">
 			<thead>
 				<tr>
-					<th class="text-center">Avatar</th>
-					<th class="text-center">Name</th>
-					<th class="text-center">User Type</th>
-					<th class="text-center">Email</th>
+					<th class="text-center">ユーザーズイメージ</th>
+					<th class="text-center">名前</th>
+					<th class="text-center">ユーザーズタイプ</th>
+					<th class="text-center">Eメール</th>
 					<th class="text-center"></th>
 				</tr>
 			</thead>
@@ -81,30 +81,30 @@
 					<td class="align-middle">
 						<div class="dropdown ">
 							<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="dropdown{{$u->id}}" aria-haspopup="true" aria-expanded="false">
-								Actions
+								アクション
 							</button>
 
 							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown{{$u->id}}">
 								{{-- EDIT --}}
 								@if (Auth::user()->hasPermission('users_tab_edit'))
-								<a href="@{{ route('admin.users.edit', [$u->id]) }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>
+								<a href="{{ route('admin.users.edit', [$u->id]) }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>編集</a>
 								@endif
 
 								{{-- PERMISSIONS --}}
 								@if (Auth::user()->hasPermission('users_tab_permissions'))
-								<a href="@{{ route('admin.users.manage-permissions', [$u->id]) }}" class="dropdown-item"><i class="fas fa-user-lock mr-2"></i>Manage Permissions</a>
+								<a href="{{ route('admin.users.manage-permissions', [$u->id]) }}" class="dropdown-item"><i class="fas fa-user-lock mr-2"></i>権限の管理</a>
 								@endif
 								
 								{{-- CHANGE PASSWORD (EDIT) --}}
 								@if (Auth::user()->hasPermission('users_tab_edit') || Auth::user()->id == $u->id)
 								<a href="javascript:void(0);" class="dropdown-item change-password" id="scp-{{ $u->id }}">
-									<i class="fas fa-lock mr-2"></i>Change Password
+									<i class="fas fa-lock mr-2"></i>パスワードの変更
 									<script type="text/javascript">
 										$(document).ready(() => {
 											let data = `{
 												"preventDefault": true,
 												"name": "{{ $u->getName() }}",
-												"targetURI": "@{{ route('admin.users.change-password', [$u->id]) }}",
+												"targetURI": "{{ route('admin.users.change-password', [$u->id]) }}",
 												"notify": true,
 												"for": "#tr-{{ $u->id }}"
 											}`;
@@ -118,15 +118,15 @@
 								{{-- DELETE --}}
 								@if (Auth::user()->hasPermission('users_tab_delete'))
 									@if ($u->deleted_at == null)
-									<a href="@{{ route('admin.users.delete', [$u->id]) }}" class="dropdown-item"><i class="fas fa-trash mr-2"></i>Delete</a>
+									<a href="@{{ route('admin.users.delete', [$u->id]) }}" class="dropdown-item"><i class="fas fa-trash mr-2"></i>削除</a>
 									@else
-									<a href="@{{ route('admin.users.restore', [$u->id]) }}" class="dropdown-item"><i class="fas fa-recycle mr-2"></i>Restore</a>
+									<a href="@{{ route('admin.users.restore', [$u->id]) }}" class="dropdown-item"><i class="fas fa-recycle mr-2"></i>戻す</a>
 									@endif
 								@endif
 
 								{{-- PERMANENT DELETE --}}
 								@if (Auth::user()->hasPermission('users_tab_perma_delete'))
-								<a href="@{{ route('admin.users.permaDelete', [$u->id]) }}" class="dropdown-item"><i class="fas fa-fire-alt mr-2"></i>Delete Permanently</a>
+								<a href="@{{ route('admin.users.permaDelete', [$u->id]) }}" class="dropdown-item"><i class="fas fa-fire-alt mr-2"></i>完全に削除する</a>
 								@endif
 							</div>
 						</div>
@@ -134,13 +134,17 @@
 				</tr>
 				@empty
 				<tr>
-					<td class="text-center" colspan="5">Nothing to display~</td>
+					<td class="text-center" colspan="5">展示するものが何も～</td>
 				</tr>
 				@endforelse
 			</tbody>
 		</table>
 	</div>
 </div>
+@endsection
+
+@section('meta')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
 @section('scripts')
