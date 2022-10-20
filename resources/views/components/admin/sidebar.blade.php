@@ -8,14 +8,37 @@
 		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.dashboard') }}" aria-hidden="false" aria-label="Dashboard"><i class="fas fa-tachometer-alt mr-2"></i>ダッシュボード</a>
 		@endif
 
+		{{-- RESERVATION --}}
+		@if (\Request::is('admin/reservation*'))
+		<span class="bg-secondary text-white"><i class="fas fa-calendar-alt mr-2"></i>予約</span>
+		@else
+		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.dashboard') }}" aria-hidden="false" aria-label="Reservation"><i class="fas fa-calendar-alt mr-2"></i>予約</a>
+		@endif
+
+		{{-- INVENTORY --}}
+		@if (\Request::is('admin/inventory*'))
+		<span class="bg-secondary text-white"><i class="fas fa-boxes mr-2"></i>在庫</span>
+		@else
+		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.dashboard') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-boxes mr-2"></i>在庫</a>
+		@endif
+
+		{{-- ANNOUNCEMENT --}}
+		@if (\Request::is('admin/announcement*'))
+		<span class="bg-secondary text-white"><i class="fas fa-bullhorn mr-2"></i>発表</span>
+		@else
+		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.dashboard') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-bullhorn mr-2"></i>発表</a>
+		@endif
+
 		{{-- ADMIN SETTING AREA --}}
 		<hr class="w-100 custom-hr">
 
 		{{-- USERS --}}
-		@if (\Request::is('admin/users*'))
-		<span class="bg-secondary text-white"><i class="fas fa-user-alt mr-2"></i>ユーザーズ</span>
-		@else
-		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.users.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-user-alt mr-2"></i>ユーザーズ</a>
+		@if (Auth::user()->hasPermission('users_tab_access'))
+			@if (\Request::is('admin/users*'))
+			<span class="bg-secondary text-white"><i class="fas fa-user-alt mr-2"></i>ユーザーズ</span>
+			@else
+			<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.users.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-user-alt mr-2"></i>ユーザーズ</a>
+			@endif
 		@endif
 
 		{{-- PERMISSIONS --}}
@@ -26,10 +49,12 @@
 		@endif
 
 		{{-- SETTINGS --}}
-		@if (\Request::is('admin/settings*'))
-		<span class="bg-secondary text-white"><i class="fas fa-cog mr-2"></i>設定</span>
-		@else
-		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.settings.index') }}" aria-hidden="false" aria-label="Settings"><i class="fas fa-cog mr-2"></i>設定</a>
+		@if (Auth::user()->hasPermission('settings_tab_access'))
+			@if (\Request::is('admin/settings*'))
+			<span class="bg-secondary text-white"><i class="fas fa-cog mr-2"></i>設定</span>
+			@else
+			<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.settings.index') }}" aria-hidden="false" aria-label="Settings"><i class="fas fa-cog mr-2"></i>設定</a>
+			@endif
 		@endif
 
 		{{-- SIGNOUT --}}

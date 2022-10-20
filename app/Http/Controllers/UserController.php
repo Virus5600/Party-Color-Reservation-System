@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 use App\Permission;
@@ -129,150 +130,402 @@ class UserController extends Controller
 
 	protected function create() {
 		$types = Type::get();
-		$password = str_random(25);
+		$password = Str::random(25);
 
-		// return view('admin.users.create', [
-		// 	'departments' => $types,
-		// 	'password' => $password
-		// ]);
+		return view('admin.users.create', [
+			'types' => $types,
+			'password' => $password
+		]);
 	}
 
-	// protected function store(Request $req) {
-	// 	// If the isAvatarLink is not checked, set it to 0 since php returns nothing if a boolean is god damn false...
-	// 	if (!$req->has('is_avatar_link'))
-	// 		$req->request->set('is_avatar_link', '0');
+	protected function store(Request $req) {
+		$validator = Validator::make($req->all(), [
+			'first_name' => array('required', 'string', 'max:255'),
+			'middle_name' => array('string', 'max:255', 'nullable'),
+			'last_name' => array('required', 'string', 'max:255'),
+			'email' => 'required|email|string|max:255',
+			'type' => 'required|numeric|exists:types,id',
+			'password' => 'required|string|min:8|max:255',
+			'avatar' => 'max:5120|mimes:jpeg,jpg,png,webp|nullable',
+		], [
+			'first_name.required' => 'The first or given name is required',
+			'first_name.string' => 'First names are only composed of string',
+			'first_name.max' => 'First names must not exceed 255 characters',
+			'middle_name.string' => 'Middle names are only composed of string',
+			'middle_name.max' => 'Middle names must not exceed 255 characters',
+			'last_name.required' => 'The last name is required',
+			'last_name.string' => 'Last names are only composed of string',
+			'last_name.max' => 'Last names must not exceed 255 characters',
+			'email.required' => 'The email for this user is required',
+			'email.email' => 'Invalid email address',
+			'email.string' => 'Inavlid email address',
+			'email.max' => 'Emails must not exceed 255 characters',
+			'type.required' => 'Please select the department where the user works under',
+			'type.numeric' => 'Please refrain from modifying the form',
+			'type.exists' => 'Unknown department',
+			'password.required' => 'Password is required',
+			'password.string' => 'Password should be a string of characters',
+			'password.min' => 'A minimum of 8 characters is the allowed limit for passwords',
+			'password.max' => 'A maximum of 255 characters is the allowed limit for passwords',
+			'avatar.max' => 'Image should be below 5MB',
+			'avatar.mimes' => 'Selected file doesn\'t match the allowed image formats',
+		]);
 
-	// 	if (!$req->has('is_departamental_account'))
-	// 		$req->request->set('is_departamental_account', '0');
+		if ($validator->fails()) {
+			return redirect()
+				->back()
+				->withErrors($validator)
+				->withInput();
+		}
 
-	// 	$hasErrors = false;
-	// 	$validator = Validator::make($req->all(), [
-	// 		'first_name' => array('required', 'regex:/([a-zA-Z])|(\s)/', 'max:255'),
-	// 		'middle_name' => array('regex:/([a-zA-Z])|(\s)/', 'max:255', 'nullable'),
-	// 		'last_name' => array('required', 'regex:/([a-zA-Z])|(\s)/', 'max:255'),
-	// 		'email' => 'required|email|string|max:255',
-	// 		'department' => 'required|numeric|exists:departments,id',
-	// 		'password' => 'required|string|min:8|max:255'
-	// 	], [
-	// 		'first_name.required' => 'The first or given name is required',
-	// 		'first_name.regex' => 'First names are only composed of alphabets only',
-	// 		'first_name.max' => 'First names must not exceed 255 characters',
-	// 		'middle_name.regex' => 'Middle names are only composed of alphabets only',
-	// 		'middle_name.max' => 'Middle names must not exceed 255 characters',
-	// 		'last_name.required' => 'The last name is required',
-	// 		'last_name.regex' => 'Last names are only composed of alphabets only',
-	// 		'last_name.max' => 'Last names must not exceed 255 characters',
-	// 		'email.required' => 'The email for this user is required',
-	// 		'email.email' => 'Invalid email address',
-	// 		'email.string' => 'Inavlid email address',
-	// 		'email.max' => 'Emails must not exceed 255 characters',
-	// 		'department.required' => 'Please select the department where the user works under',
-	// 		'department.numeric' => 'Please refrain from modifying the form',
-	// 		'department.exists' => 'Unknown department',
-	// 		'password.required' => 'Password is required',
-	// 		'password.string' => 'Password should be a string of characters',
-	// 		'password.min' => 'A minimum of 8 characters is the allowed limit for passwords',
-	// 		'password.max' => 'A maximum of 255 characters is the allowed limit for passwords'
-	// 	]);
-	// 	$hasErrors = $validator->fails();
+		try {
+			DB::beginTransaction();
 
-	// 	if ($req->is_avatar_link) {
-	// 		$imgValidator = Validator::make($req->all(), [
-	// 			'avatar' => 'max:255|nullable',
-	// 		], [
-	// 			'avatar.max' => 'URL length must not exceed 255 characters',
-	// 			'avatar.url' => 'Invlid URL',
-	// 		]);
+			// FILE HANDLING
+			// If a new avatar is coming
+			$avatar = 'default.png';
+			if ($req->exists('avatar')) {
+				// Store the image
+				$destination = 'uploads/users';
+				$fileType = $req->file('avatar')->getClientOriginalExtension();
+				$avatar = $req->first_name . '-' . $req->last_name . "-DP." . $fileType;
+				$req->file('avatar')->move($destination, $avatar);
 
-	// 		if ($imgValidator->fails()) {
-	// 			$hasErrors = true;
-	// 			$validator->messages()->merge($imgValidator->messages());
-	// 		}
-	// 	}
-	// 	else {
-	// 		$imgValidator = Validator::make($req->all(), [
-	// 			'avatar' => 'max:5120|mimes:jpeg,jpg,png,webp|nullable',
-	// 		], [
-	// 			'avatar.max' => 'Image should be below 5MB',
-	// 			'avatar.mimes' => 'Selected file doesn\'t match the allowed image formats',
-	// 		]);
+				// Save the file name to the table
+				$avatar = $avatar;
+			}
 
-	// 		if ($imgValidator->fails()) {
-	// 			$hasErrors = true;
-	// 			$validator->messages()->merge($imgValidator->messages());
-	// 		}
-	// 	}
+			$user = User::create([
+				'first_name' => $req->first_name,
+				'middle_name' => $req->middle_name,
+				'last_name' => $req->last_name,
+				'suffix' => $req->suffix,
+				'is_avatar_link' => $req->is_avatar_link ? 1 : 0,
+				'avatar' => $avatar,
+				'email' => $req->email,
+				'password' => Hash::make($req->password),
+				'type_id' => $req->type
+			]);
 
-	// 	if ($hasErrors) {
-	// 		return redirect()
-	// 			->back()
-	// 			->withErrors($validator)
-	// 			->withInput();
-	// 	}
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
 
-	// 	try {
-	// 		DB::beginTransaction();
+			return redirect()
+				->route('admin.users.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
 
-	// 		$avatar = 'default.png';
-	// 		// FILE HANDLING
-	// 		// If a new avatar is coming
-	// 		if ($req->exists('avatar')) {
-	// 			// If the new avatar is a file
-	// 			if (!$req->is_avatar_link) {
-	// 				// Proceed with the usual storing of files
-	// 				$destination = 'uploads/users';
-	// 				$fileType = $req->file('avatar')->getClientOriginalExtension();
-	// 				$avatar = $req->first_name . '-' . $req->last_name . "-DP." . $fileType;
-	// 				$req->file('avatar')->move($destination, $avatar);
+		return redirect()
+			->route('admin.users.index')
+			->with('flash_success', 'Successfully added "' . trim($user->getName()) . '"');
+	}
 
-	// 				// Save the file name to the table
-	// 				$avatar = $avatar;
-	// 			}
-	// 			// If the new avatar is a link, just slap that link to the table
-	// 			else {
-	// 				$avatar = $req->avatar;
-	// 			}
-	// 		}
+	protected function edit($id) {
+		$user = User::find($id);
+		$types = Type::get();
 
-	// 		$user = User::create([
-	// 			'first_name' => $req->first_name,
-	// 			'middle_name' => $req->middle_name,
-	// 			'last_name' => $req->last_name,
-	// 			'suffix' => $req->suffix,
-	// 			'is_avatar_link' => $req->is_avatar_link ? 1 : 0,
-	// 			'avatar' => $avatar,
-	// 			'email' => $req->email,
-	// 			'department_id' => $req->department,
-	// 			'is_departamental_account' => $req->is_departamental_account ? 1 : 0,
-	// 			'password' => Hash::make($req->password)
-	// 		]);
+		if ($user == null) {
+			return redirect()
+				->route('admin.users.index')
+				->with('flash_error', 'The account either does not exists or is already deleted.');
+		}
 
-	// 		$recipients = array(Auth::user()->email, $user->email);
+		return view('admin.users.edit', [
+			'user' => $user,
+			'types' => $types
+		]);
+	}
 
-	// 		foreach ($recipients as $r) {
-	// 			Mail::send(
-	// 				'templates.emails.account_creation',
-	// 				['email' => $r, 'req' => $req],
-	// 				function ($m) use ($r) {
-	// 					$m->to($r, $r)
-	// 						->from('mis@taytayrizal.gov.ph')
-	// 						->subject('Account Creation');
-	// 				}
-	// 			);
-	// 		}
+	protected function update(Request $req, $id) {
+		$user = User::find($id);
 
-	// 		DB::commit();
-	// 	} catch (Exception $e) {
-	// 		DB::rollback();
-	// 		Log::error($e);
+		if ($user == null) {
+			return redirect()
+				->route('admin.users.index')
+				->with('flash_error', 'User either does not exists or is already deleted.');
+		}
 
-	// 		return redirect()
-	// 			->route('admin.users.index')
-	// 			->with('flash_error', 'Something went wrong, please try again later');
-	// 	}
+		$validator = Validator::make($req->all(), [
+			'first_name' => array('required', 'string', 'max:255'),
+			'middle_name' => array('string', 'max:255', 'nullable'),
+			'last_name' => array('required', 'string', 'max:255'),
+			'email' => 'required|email|string|max:255',
+			'type' => 'required|numeric|exists:types,id',
+			'avatar' => 'max:5120|mimes:jpeg,jpg,png,webp|nullable',
+		], [
+			'first_name.required' => 'The first or given name is required',
+			'first_name.string' => 'First names are only composed of string',
+			'first_name.max' => 'First names must not exceed 255 characters',
+			'middle_name.string' => 'Middle names are only composed of string',
+			'middle_name.max' => 'Middle names must not exceed 255 characters',
+			'last_name.required' => 'The last name is required',
+			'last_name.string' => 'Last names are only composed of string',
+			'last_name.max' => 'Last names must not exceed 255 characters',
+			'email.required' => 'The email for this user is required',
+			'email.email' => 'Invalid email address',
+			'email.string' => 'Inavlid email address',
+			'email.max' => 'Emails must not exceed 255 characters',
+			'type.required' => 'Please select the department where the user works under',
+			'type.numeric' => 'Please refrain from modifying the form',
+			'type.exists' => 'Unknown department',
+			'avatar.max' => 'Image should be below 5MB',
+			'avatar.mimes' => 'Selected file doesn\'t match the allowed image formats',
+		]);
 
-	// 	return redirect()
-	// 		->route('admin.users.index')
-	// 		->with('flash_success', 'Successfully added "' . trim($user->getName()) . '"');
-	// }
+		if ($validator->fails()) {
+			return redirect()
+				->back()
+				->withErrors($validator)
+				->withInput();
+		}
+
+		try {
+			DB::beginTransaction();
+
+			// FILE HANDLING
+			// If a new avatar is coming
+			if ($req->exists('avatar')) {
+				// If the user uses a custom avatar
+				if ($user->avatar != 'default.png')
+					File::delete(public_path() . '/uploads/users/' . $user->avatar);
+
+				// If the new avatar is a file, proceed with the usual storing of files
+				$avatar = null;
+				$destination = 'uploads/users';
+				$fileType = $req->file('avatar')->getClientOriginalExtension();
+				$avatar = $req->first_name . '-' . $req->last_name . "-DP." . $fileType;
+				$req->file('avatar')->move($destination, $avatar);
+
+				// Save the file name to the table
+				$user->avatar = $avatar;
+			}
+
+			$user->first_name = $req->first_name;
+			$user->middle_name = $req->middle_name;
+			$user->last_name = $req->last_name;
+			$user->suffix = $req->suffix;
+			$user->email = $req->email;
+			$user->type_id = $req->type;
+			$user->save();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.users.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->route('admin.users.index')
+			->with('flash_success', 'Successfully updated "' . trim($user->getName()) . '"');
+	}
+
+	protected function changePassword(Request $req, $id) {
+		$user = User::find($id);
+
+		if ($user == null) {
+			return response()
+				->json([
+					'type' => 'missing',
+					'message' => 'User either does not exists or is already deleted.'
+				]);
+		}
+
+		$validator = Validator::make($req->all(), [
+			'password' => array('required', 'regex:/([a-z])([0-9])/i', 'min:8', 'confirmed'),
+			'password_confirmation' => 'required'
+		], [
+			'password.required' => 'The new password is required',
+			'password.regex' => 'Password must contain at least 1 letter and 1 number',
+			'password.min' => 'Password should be at least 8 characters',
+			'password.confirmed' => 'You must confirm your password first',
+			'password_confirmation.required' => 'You must confirm your password first'
+		]);
+
+		if ($validator->fails()) {
+			return response()
+				->json([
+					'type' => 'validation_error',
+					'message' => $validator->messages()->first()
+				]);
+		}
+
+		try {
+			DB::beginTransaction();
+
+			$user->password = Hash::make($req->password);
+			$user->save();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return response()
+				->json([
+					'type' => 'error',
+					'message' => 'Something went wrong, please try again later.',
+				]);
+		}
+		return response()
+			->json([
+				'type' => 'success',
+				'message' => 'Succesfully updated ' . $user->getName()
+			]);
+	}
+
+	protected function managePermissions($id) {
+		$user = User::find($id);
+		$permissions = Permission::get();
+
+		if ($user == null) {
+			return redirect()
+				->route('admin.users.index')
+				->with('flash_error', 'The account either does not exists or is already deleted.');
+		}
+
+		return view('admin.users.manage-permissions', [
+			'user' => $user,
+			'permissions' => $permissions
+		]);
+	}
+
+	protected function revertPermissions($id) {
+		$user = User::find($id);
+		$permissions = Permission::get();
+
+		if ($user == null) {
+			return redirect()
+				->route('admin.users.index')
+				->with('flash_error', 'The account either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();
+
+			DB::table('user_permissions')
+				->where('user_id', '=', $user->id)
+				->delete();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.users.manage-permissions')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->route('admin.users.manage-permissions', [$user->id])
+			->with('flash_success', 'Successfully reverted back to type permissions');
+	}
+
+	protected function updatePermissions(Request $req, $id) {
+		$user = User::find($id);
+
+		if ($user == null) {
+			return redirect()
+				->route('admin.users.index')
+				->with('flash_error', 'The account either does not exists or is already deleted.');
+		}
+
+		$validator = Validator::make($req->all(), [
+			'permissions' => 'array',
+			'permissions.*' => 'exists:permissions,slug|nullable'
+		], [
+			'permissions.array' => 'Please refrain from modifying the form',
+			'permissions.*.exists' => 'The permission does not exists '
+		]);
+
+		try {
+			DB::beginTransaction();
+
+			$userPerms = UserPermission::where('user_id', '=', $user->id)->get();
+			$typePerms = $user->type->permissions;
+			$userPermsID = array();
+
+			foreach ($userPerms as $up)
+				array_push($userPermsID, $up->permission_id);
+			$userPerms = Permission::whereIn('id', $userPermsID)->get();
+			
+			// If there are are still permissions...
+			if ($req->permissions != null) {
+				// Store the list of permissions from the request and all department permissions.
+				$selectedPerms = array();
+				$userPermis = array();
+				$typesPerms = array();
+
+				foreach ($req->permissions as $sp)
+					array_push($selectedPerms, $sp);
+
+				foreach ($userPerms as $up)
+					array_push($userPermis, $up->slug);
+
+				foreach ($typePerms as $dp)
+					array_push($typesPerms, $dp->slug);
+
+				// Sort them...
+				sort($selectedPerms);
+				sort($userPermis);
+				sort($typesPerms);
+
+				// If the permission from the request is exactly the same as the department permissions...
+				if ($selectedPerms === $typesPerms) {
+					// Remove all user permission so that the default (department permissions) will be used.
+					DB::table('user_permissions')
+						->where('user_id', '=', $user->id)
+						->delete();
+				}
+				// Otherwise...
+				else {
+					// Remove all permissions that are in the use permission but not in the request...
+					foreach ($userPerms as $up) {
+						if (!in_array($up->slug, $selectedPerms)) {
+							DB::table('user_permissions')
+								->where('user_id', '=', $user->id)
+								->where('permission_id', '=', $up->id)
+								->delete();
+						}
+					}
+
+					// ...Then add all those that aren't in the user permission yet
+					foreach ($selectedPerms as $sp) {
+						if (!in_array($sp, $userPermis) && !UserPermission::isDuplicatePermission(Permission::where('slug', '=', $sp)->first(), $user->id)) {
+							UserPermission::insert([
+								'user_id' => $user->id,
+								'permission_id' => Permission::where('slug', '=', $sp)->first()->id
+							]);
+						}
+					}
+				}
+			}
+			// If all user permissions is remove...
+			else {
+				// Remove all instances of user permission for this user
+				DB::table('user_permissions')
+					->where('user_id', '=', $user->id)
+					->delete();
+			}
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.users.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->route('admin.users.index')
+			->with('flash_success', 'Successfully updated ' . trim($user->getName()) . '\'s permissions');
+	}
 }

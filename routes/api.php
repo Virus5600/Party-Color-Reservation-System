@@ -14,9 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-	return $request->user();
-});
-
 // (Admin) Search box request
 Route::post('/admin-search/{id}', 'ApiController@adminSearch')->name('adminSearch');
+
+// Removing Image
+Route::post('/remove-image', 'ApiController@removeImage')->name('removeImage');

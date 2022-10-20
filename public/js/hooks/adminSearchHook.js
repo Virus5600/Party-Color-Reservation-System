@@ -56,7 +56,7 @@ $('#admin-search').on('submit keypress', (e) => {
 		$.post(
 			path, dataPacket
 		).done((response) => {
-			// console.log(response);
+			console.log(response);
 
 			var newTable = ``;
 			$.each(response.content, (k, v) => {
@@ -69,9 +69,6 @@ $('#admin-search').on('submit keypress', (e) => {
 				// IMAGE TAB
 				if (response.has_image) {
 					let src = response.asset + '/' + v[response.image];
-					
-					if (parent.find('[name=type]').val() == 'users' && v.is_avatar_link)
-						src = v[response.image];
 					
 					newTable += `<td class="text-center"><img src="${src}" alt="${v[response.img_alt]} Logo" class="img img-fluid user-icon mx-auto" data-fallback-img="${response.asset + '/default.png'}"></td>`;
 				}
