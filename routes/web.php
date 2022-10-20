@@ -37,6 +37,20 @@ Route::group(['prefix' => 'admin'], function() {
 				Route::get('/create', 'UserController@create')->name('admin.users.create');
 				Route::post('/create/store', 'UserController@store')->name('admin.users.store');
 			});
+
+			// Edit
+			Route::group(['middleware' => ['permissions:users_tab_edit']], function() {
+				Route::get('/{id}/edit', 'UserController@edit')->name('admin.users.edit');
+				Route::post('/{id}/update', 'UserController@update')->name('admin.users.update');
+				Route::post('/{id}/change-password', 'UserController@changePassword')->name('admin.users.change-password');
+			});
+
+			// Permission Management
+			Route::group(['middleware' => ['permissions:users_tab_permissions']], function() {
+				Route::get('/{id}/manage-permissions', 'UserController@managePermissions')->name('admin.users.manage-permissions');
+				Route::get('/{id}/revert-permissions', 'UserController@revertPermissions')->name('admin.users.revert-permissions');
+				Route::post('{id}/update-permissions', 'UserController@updatePermissions')->name('admin.users.update-permissions');
+			});
 		});
 		
 		// PERMISSIONS
@@ -51,6 +65,7 @@ Route::group(['prefix' => 'admin'], function() {
 	});
 });
 
+// React (User) Routing. This is handled by react router instead of the web.php
 Route::get('/{path?}', 'PageController@index')
-	->where('path', '^((?!api).)*$')
+	->where('path', '^((?!api|admin))*$')
 	->name('home');
