@@ -8,9 +8,9 @@ $(document).ready(() => {
 		}
 		else {
 			if (action == 'submit')
-				$(e.currentTarget).html(`<div class="spinner-border spinner-border-sm text-light" role="status"><span class="sr-only"></span></div> Submitting...`);
+				$(e.currentTarget).html(`<div class="spinner-border spinner-border-sm text-light" role="status"><span class="sr-only"></span></div> 提出。。。`);
 			else if (action == 'update')
-				$(e.currentTarget).html(`<div class="spinner-border spinner-border-sm text-light" role="status"><span class="sr-only"></span></div> Updating...`);
+				$(e.currentTarget).html(`<div class="spinner-border spinner-border-sm text-light" role="status"><span class="sr-only"></span></div> 更新。。。`);
 		}
 
 		$(e.currentTarget).addClass(`disabled cursor-default`);

@@ -4,6 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\User;
+
+use DB;
+use Exception;
+use File;
+use Log;
+use Validator;
+
 class ApiController extends Controller
 {
 	protected function generalSearch(Request $req) {
@@ -35,7 +43,7 @@ class ApiController extends Controller
 		$etc = null;
 
 		// DEPARTMENTS
-		if ($req->type == 'departments') {
+		if ($req->type == 'types') {
 			$content = Department::query();
 
 			if ($req->sd == 1)
@@ -117,19 +125,20 @@ class ApiController extends Controller
 		}
 		// USERS
 		else if ($req->type == 'users') {
-			$content = User::where('first_name', 'LIKE', $toSearch)
+			$content = User::leftJoin('types', 'users.type_id', '=', 'types.id')
+				->where('first_name', 'LIKE', $toSearch)
 				->orWhere('middle_name', 'LIKE', $toSearch)
 				->orWhere('last_name', 'LIKE', $toSearch)
-				->orWhere('email', 'like', $toSearch)
-				->leftJoin('departments', 'users.department_id', '=', 'departments.id')
-				->select('users.id', DB::raw("CONCAT(first_name, ' ', last_name) as name"), 'abbreviation', 'email', 'is_avatar_link', 'avatar')
+				->orWhere('email', 'LIKE', $toSearch)
+				->orWhere('types.name', 'LIKE', $toSearch)
+				->select('users.id', DB::raw("CONCAT(first_name, ' ', last_name) as user_name"), 'types.name', 'email', 'avatar')
 				->get();
-			$content_order = ['abbreviation', 'email'];
+			$content_order = ['name', 'email'];
 			$data_length = 5;
 
 			$hasHeader = true;
 			$hasSoftDel = true;
-			$header = 'name';
+			$header = 'user_name';
 
 			$hasImage = true;
 			$image = 'avatar';
@@ -224,48 +233,17 @@ class ApiController extends Controller
 
 		$emptyResponse = true;
 
-		if ($req->type == 'department') {
-			try {
-				DB::beginTransaction();
-
-				$department = Department::find($req->id);
-
-				$oldSeal = $department->seal;
-				$department->seal = 'default.png';
-				$department->save();
-				
-				if ($oldSeal != 'default.png')
-					File::delete(public_path() . '/uploads/departments/' . $oldSeal);
-
-				$fallback = asset('uploads/departments/default.png');
-				$emptyResponse = false;
-
-				DB::commit();
-			} catch (Exception $e) {
-				DB::rollback();
-				Log::error($e);
-
-				return response()
-					->json([
-						'type' => 'error',
-						'error' => $e
-					]);
-			}
-		}
-		else if ($req->type == 'user') {
+		if ($req->type == 'user') {
 			try {
 				DB::beginTransaction();
 
 				$user = User::find($req->id);
 
 				$oldAvatar = $user->avatar;
-				$oldBool = $user->is_avatar_link;
 				$user->avatar = 'default.png';
-				$user->is_avatar_link = 0;
 				$user->save();
 
-				if ($oldAvatar != 'default.png' && !$oldBool)
-					File::delete(public_path() . '/uploads/users/' . $oldAvatar);
+				File::delete(public_path() . '/uploads/users/' . $oldAvatar);
 
 				$fallback = asset('uploads/users/default.png');
 				$emptyResponse = false;

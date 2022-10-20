@@ -29,7 +29,7 @@ class Permissions
 		}
 		else {
 			return redirect()
-				->route('dashboard')
+				->route('admin.dashboard')
 				->with('flash_info', 'Access Denied')
 				->with('has_icon', 'true')
 				->with('message', 'Redirected back to previous page.')
