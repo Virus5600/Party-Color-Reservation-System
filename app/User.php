@@ -39,7 +39,7 @@ class User extends Authenticatable
 	];
 
 	// Relationships
-	protected function posts() { return $this->hasMany('App\Post'); }
+	protected function announcements() { return $this->hasMany('App\Announcement'); }
 	protected function type() { return $this->belongsTo('App\Type'); }
 
 	// Custom Function

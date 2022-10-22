@@ -12,9 +12,6 @@ try {
 	// Sweetalert 2
 	window.Swal = require('sweetalert2/dist/sweetalert2.all.min');
 
-	// // Slick Carousel
-	// window.slick = require('slick-carousel/slick/slick.min');
-
 	// Fontawesome 6
 	require('@fortawesome/fontawesome-free/js/solid.min.js');
 	require('@fortawesome/fontawesome-free/js/regular.min.js');
@@ -22,7 +19,8 @@ try {
 	require('@fortawesome/fontawesome-free/js/fontawesome.min.js');
 
 	// Summernote
-	require('summernote/dist/summernote-bs4.min');
+	require('summernote/dist/summernote-bs4.min.js');
+	require('summernote/dist/lang/summernote-ja-JP.min.js');
 } catch (e) {
 	console.error(e);
 }

@@ -28,6 +28,17 @@ Route::group(['prefix' => 'admin'], function() {
 		Route::get('/', 'PageController@redirectToDashboard')->name('admin.redirectToDashboard');
 		Route::get('/dashboard', 'PageController@dashboard')->name('admin.dashboard');
 
+		// ANNOUNCEMENTS
+		Route::group(['prefix' => 'announcements', 'middleware' => ['permissions:announcements_tab_access']], function() {
+			Route::get('/', 'AnnouncementController@index')->name('admin.announcements.index');
+
+			// Create
+			Route::group(['middleware' => ['permissions:announcements_tab_create']], function() {
+				Route::get('/create', 'AnnouncementController@create')->name('admin.announcements.create');
+				Route::post('/create/store', 'AnnouncementController@store')->name('admin.announcements.store');
+			});
+		});
+
 		// USERS
 		Route::group(['prefix' => 'users', 'middleware' => ['permissions:users_tab_access']], function() {
 			Route::get('/', 'UserController@index')->name('admin.users.index');

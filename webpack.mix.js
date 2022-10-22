@@ -14,9 +14,9 @@ const mix = require('laravel-mix');
 mix.webpackConfig({
         devtool: 'inline-source-map'
     })
+    .sass('resources/sass/app.scss', 'public/css')
     .js('resources/js/app.js', 'public/js')
     .js('resources/js/scripts.js', 'public/js')
     .react()
-    .sass('resources/sass/app.scss', 'public/css')
     .sourceMaps()
     .disableNotifications();
