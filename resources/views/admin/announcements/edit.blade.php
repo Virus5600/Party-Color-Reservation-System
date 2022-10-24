@@ -25,17 +25,17 @@
 		<div class="col-12 col-md-8 mx-auto">
 			<div class="card dark-shadow mb-5" id="inner-content">
 				<div class="card-body">
-					<form action="{{ route('admin.announcements.store') }}" method="POST" enctype="multipart/form-data">
+					<form action="{{ route('admin.announcements.update', [$announcement->id]) }}" method="POST" enctype="multipart/form-data">
 						{{ csrf_field() }}
-						<input type="hidden" name="show_softdeletes" value="{{ $show_softdeletes }}">
-						<input type="hidden" name="show_drafts" value="{{ $show_drafts }}">
+						<input type="hidden" name="sd" value="{{ $show_softdeletes }}">
+						<input type="hidden" name="d" value="{{ $show_drafts }}">
 						
 						{{-- ANNOUNCEMENT POSTER --}}
 						<div class="row">
 							<div class="col-12 col-lg-6">
 								<div class="form-group text-center text-lg-left w-100" style="max-height: 20rem;">
 									<label class="h5" for="image">発行のイメージ</label><br>
-									<img src="{{ asset('uploads/announcements/default.png') }}" class="img-fluid cursor-pointer border" style="border-width: 0.25rem!important; max-height: 16.25rem;" id="image" alt="Announcement Image">
+									<img src="{{ $announcement->getPoster() }}" class="img-fluid cursor-pointer border" style="border-width: 0.25rem!important; max-height: 16.25rem;" id="image" alt="Announcement Image" data-fallback-image="{{ asset('uploads/announcements/default.png') }}">
 									<input type="file" id="image" name="image" class="d-none" accept=".jpg,.jpeg,.png"><br>
 									<small class="text-muted pt-0 mt-0"><b>初認された形式：</b> JPEG, JPG, PNG, WEBP</small><br>
 									<small class="text-muted pt-0 mt-0"><b>最大サイズ：</b> 5MB</small>
@@ -46,18 +46,18 @@
 							<div class="col-12 col-lg-6">
 								<div class="form-group">
 									<label class="h5" for="title">タイトル</label>
-									<input class="form-control" type="text" name="title" value="{{ old('title') }}"/>
+									<input class="form-control" type="text" name="title" value="{{ $announcement->title }}"/>
 								</div>
 
 								<div class="form-group text-counter-parent">
 									<label class="h5" for="summary">概要</label>
-									<textarea class="form-control not-resizable text-counter-input" name="summary" rows="4" data-max="255">{{ old('summary') }}</textarea>
+									<textarea class="form-control not-resizable text-counter-input" name="summary" rows="4" data-max="255">{{ $announcement->summary }}</textarea>
 									<span class="text-counter small">255</span>
 								</div>
 
 								<div class="form-group my-auto">
 									<div class="custom-control custom-switch custom-switch-md">
-										<input type='checkbox' class="custom-control-input" id="is-draft" name="is_draft" {{ old('is_draft') ? 'checked' : '' }}/>
+										<input type='checkbox' class="custom-control-input" id="is-draft" name="is_draft" {{ $announcement->is_draft ? 'checked' : '' }}/>
 										<label class="custom-control-label pt-1 pl-3" for="is-draft">ドラフトとしてマーク</label>
 									</div>
 								</div>
@@ -69,7 +69,7 @@
 						<div class="row">
 							<div class="col">
 								<label class="h5" for="content">内容</label>
-								<textarea class="summernote" name="content" rows="5">{!! old('content') !!}</textarea>
+								<textarea class="summernote" name="content" rows="5">{!! $announcement->content !!}</textarea>
 							</div>
 						</div>
 
@@ -119,7 +119,7 @@
 			reader.readAsDataURL(obj.files[0])
 		}
 		else {
-			$("#image").attr("src", "{{ asset('uploads/announcements/default.png') }}");
+			$("#image").attr("src", "{{ $announcement->getPoster() }}");
 		}
 	}
 

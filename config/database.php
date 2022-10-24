@@ -87,7 +87,7 @@ return [
 			'prefix_indexes' => true,
 			'strict' => true,
 			'engine' => 'InnoDB ROW_FORMAT=DYNAMIC',
-			'max_allowed_packet' => '5M',
+			'max_allowed_packet' => '64M',
 			'modes'  => [
 				'ONLY_FULL_GROUP_BY',
 				'STRICT_TRANS_TABLES',
