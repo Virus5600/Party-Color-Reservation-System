@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Oct 22, 2022 at 06:53 AM
+-- Generation Time: Oct 24, 2022 at 03:35 PM
 -- Server version: 5.7.36
 -- PHP Version: 7.4.26
 
@@ -32,8 +32,12 @@ CREATE TABLE IF NOT EXISTS `announcements` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `poster` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'default.png',
   `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `summary` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `content` mediumtext COLLATE utf8mb4_unicode_ci,
+  `is_draft` tinyint(4) NOT NULL DEFAULT '1',
   `user_id` bigint(20) UNSIGNED NOT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -52,21 +56,21 @@ CREATE TABLE IF NOT EXISTS `migrations` (
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=62 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `migrations`
 --
 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
-(54, '2014_10_11_999997_create_permissions_table', 1),
-(55, '2014_10_11_999998_create_types_table', 1),
-(56, '2014_10_11_999999_create_type_permissions_table', 1),
-(57, '2014_10_12_000000_create_users_table', 1),
-(58, '2014_10_12_100000_create_password_resets_table', 1),
-(59, '2022_10_10_135607_create_user_permissions_table', 1),
-(60, '2022_10_14_012146_create_settings_table', 1),
-(61, '2022_10_21_135542_create_announcements_table', 1);
+(70, '2014_10_11_999997_create_permissions_table', 1),
+(71, '2014_10_11_999998_create_types_table', 1),
+(72, '2014_10_11_999999_create_type_permissions_table', 1),
+(73, '2014_10_12_000000_create_users_table', 1),
+(74, '2014_10_12_100000_create_password_resets_table', 1),
+(75, '2022_10_10_135607_create_user_permissions_table', 1),
+(76, '2022_10_14_012146_create_settings_table', 1),
+(77, '2022_10_21_135542_create_announcements_table', 1);
 
 -- --------------------------------------------------------
 
@@ -104,31 +108,31 @@ CREATE TABLE IF NOT EXISTS `permissions` (
 --
 
 INSERT INTO `permissions` (`id`, `parent_permission`, `name`, `slug`, `created_at`, `updated_at`) VALUES
-(1, NULL, 'Reservations Tab Access', 'reservations_tab_access', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(2, 1, 'Reservations Tab Respond', 'reservations_tab_respond', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(3, 1, 'Reservations Tab Delete', 'reservations_tab_delete', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(4, 1, 'Reservations Tab Perma Delete', 'reservations_tab_perma_delete', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(5, NULL, 'Inventory Tab Access', 'inventory_tab_access', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(6, 5, 'Inventory Tab Create', 'inventory_tab_create', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(7, 5, 'Inventory Tab Edit', 'inventory_tab_edit', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(8, 5, 'Inventory Tab Delete', 'inventory_tab_delete', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(9, 5, 'Inventory Tab Perma Delete', 'inventory_tab_perma_delete', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(10, NULL, 'Announcements Tab Access', 'announcements_tab_access', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(11, 10, 'Announcements Tab Create', 'announcements_tab_create', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(12, 10, 'Announcements Tab Edit', 'announcements_tab_edit', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(13, 10, 'Announcements Tab Send Mail', 'announcements_tab_send_mail', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(14, 10, 'Announcements Tab Delete', 'announcements_tab_delete', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(15, 10, 'Announcements Tab Perma Delete', 'announcements_tab_perma_delete', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(16, NULL, 'Users Tab Access', 'users_tab_access', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(17, 16, 'Users Tab Create', 'users_tab_create', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(18, 16, 'Users Tab Edit', 'users_tab_edit', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(19, 16, 'Users Tab Permissions', 'users_tab_permissions', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(20, 16, 'Users Tab Delete', 'users_tab_delete', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(21, 16, 'Users Tab Perma Delete', 'users_tab_perma_delete', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(22, NULL, 'Permissions Tab Access', 'permissions_tab_access', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(23, 22, 'Permissions Tab Manage', 'permissions_tab_manage', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(24, NULL, 'Settings Tab Access', 'settings_tab_access', '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(25, 24, 'Settings Tab Edit', 'settings_tab_edit', '2022-10-21 22:53:51', '2022-10-21 22:53:51');
+(1, NULL, 'Reservations Tab Access', 'reservations_tab_access', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(2, 1, 'Reservations Tab Respond', 'reservations_tab_respond', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(3, 1, 'Reservations Tab Delete', 'reservations_tab_delete', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(4, 1, 'Reservations Tab Perma Delete', 'reservations_tab_perma_delete', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(5, NULL, 'Inventory Tab Access', 'inventory_tab_access', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(6, 5, 'Inventory Tab Create', 'inventory_tab_create', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(7, 5, 'Inventory Tab Edit', 'inventory_tab_edit', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(8, 5, 'Inventory Tab Delete', 'inventory_tab_delete', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(9, 5, 'Inventory Tab Perma Delete', 'inventory_tab_perma_delete', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(10, NULL, 'Announcements Tab Access', 'announcements_tab_access', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(11, 10, 'Announcements Tab Create', 'announcements_tab_create', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(12, 10, 'Announcements Tab Edit', 'announcements_tab_edit', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(13, 10, 'Announcements Tab Send Mail', 'announcements_tab_send_mail', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(14, 10, 'Announcements Tab Delete', 'announcements_tab_delete', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(15, 10, 'Announcements Tab Perma Delete', 'announcements_tab_perma_delete', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(16, NULL, 'Users Tab Access', 'users_tab_access', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(17, 16, 'Users Tab Create', 'users_tab_create', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(18, 16, 'Users Tab Edit', 'users_tab_edit', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(19, 16, 'Users Tab Permissions', 'users_tab_permissions', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(20, 16, 'Users Tab Delete', 'users_tab_delete', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(21, 16, 'Users Tab Perma Delete', 'users_tab_perma_delete', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(22, NULL, 'Permissions Tab Access', 'permissions_tab_access', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(23, 22, 'Permissions Tab Manage', 'permissions_tab_manage', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(24, NULL, 'Settings Tab Access', 'settings_tab_access', '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(25, 24, 'Settings Tab Edit', 'settings_tab_edit', '2022-10-24 07:35:14', '2022-10-24 07:35:14');
 
 -- --------------------------------------------------------
 
@@ -153,12 +157,12 @@ CREATE TABLE IF NOT EXISTS `settings` (
 --
 
 INSERT INTO `settings` (`id`, `name`, `value`, `is_file`, `created_at`, `updated_at`) VALUES
-(1, 'web-logo', 'party_color.png', 1, '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(2, 'web-name', 'Party Color', 0, '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(3, 'web-desc', 'Party Color website that offers reservation for barbecue plan, promos etc', 0, '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(4, 'address', '2-2-12 Nakahara Building 3F Tsuboya Naha city Okinawa, Japan', 0, '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(5, 'contacts', '080-3980-4560', 0, '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(6, 'email', 'partycolor3f@gmail.com', 0, '2022-10-21 22:53:51', '2022-10-21 22:53:51');
+(1, 'web-logo', 'party_color.png', 1, '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(2, 'web-name', 'Party Color', 0, '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(3, 'web-desc', 'Party Color website that offers reservation for barbecue plan, promos etc', 0, '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(4, 'address', '2-2-12 Nakahara Building 3F Tsuboya Naha city Okinawa, Japan', 0, '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(5, 'contacts', '080-3980-4560', 0, '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(6, 'email', 'partycolor3f@gmail.com', 0, '2022-10-24 07:35:14', '2022-10-24 07:35:14');
 
 -- --------------------------------------------------------
 
@@ -181,9 +185,9 @@ CREATE TABLE IF NOT EXISTS `types` (
 --
 
 INSERT INTO `types` (`id`, `name`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, 'Master Admin', NULL, '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(2, 'Manager', NULL, '2022-10-21 22:53:51', '2022-10-21 22:53:51'),
-(3, 'Staff', NULL, '2022-10-21 22:53:51', '2022-10-21 22:53:51');
+(1, 'Master Admin', NULL, '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(2, 'Manager', NULL, '2022-10-24 07:35:14', '2022-10-24 07:35:14'),
+(3, 'Staff', NULL, '2022-10-24 07:35:14', '2022-10-24 07:35:14');
 
 -- --------------------------------------------------------
 
@@ -265,7 +269,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`id`, `first_name`, `middle_name`, `last_name`, `suffix`, `email`, `avatar`, `type_id`, `login_attempts`, `locked`, `locked_by`, `password`, `last_auth`, `remember_token`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, 'アドミン', NULL, 'アカウント', NULL, 'privatelaravelmailtester@gmail.com', 'default.png', 1, 0, 0, NULL, '$2y$10$J5q8eq2aoFe4J.SCfA1St.aRF/8Rtp2kV6Mktt7BLbRwYPX2zGho.', NULL, NULL, NULL, '2022-10-21 22:53:51', '2022-10-21 22:53:51');
+(1, 'アドミン', NULL, 'アカウント', NULL, 'privatelaravelmailtester@gmail.com', 'default.png', 1, 0, 0, NULL, '$2y$10$TATfbGIJk11Vn.qMxgfn1OC/s939Lv1HPlXSVCH6i2YQFvLcfia9q', NULL, NULL, NULL, '2022-10-24 07:35:14', '2022-10-24 07:35:14');
 
 -- --------------------------------------------------------
 
