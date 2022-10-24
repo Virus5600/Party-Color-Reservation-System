@@ -28,6 +28,24 @@ Route::group(['prefix' => 'admin'], function() {
 		Route::get('/', 'PageController@redirectToDashboard')->name('admin.redirectToDashboard');
 		Route::get('/dashboard', 'PageController@dashboard')->name('admin.dashboard');
 
+		// ANNOUNCEMENTS
+		Route::group(['prefix' => 'announcements', 'middleware' => ['permissions:announcements_tab_access']], function() {
+			Route::get('/', 'AnnouncementController@index')->name('admin.announcements.index');
+			Route::get('/{id}', 'AnnouncementController@show')->name('admin.announcements.show');
+
+			// Create
+			Route::group(['prefix' => 'create', 'middleware' => ['permissions:announcements_tab_create']], function() {
+				Route::get('/', 'AnnouncementController@create')->name('admin.announcements.create');
+				Route::post('/store', 'AnnouncementController@store')->name('admin.announcements.store');
+			});
+
+			// Edit
+			Route::group(['middleware' => ['permissions:announcements_tab_edit']], function() {
+				Route::get('/{id}/edit', 'AnnouncementController@edit')->name('admin.announcements.edit');
+				Route::post('/{id}/update', 'AnnouncementController@update')->name('admin.announcements.update');
+			});
+		});
+
 		// USERS
 		Route::group(['prefix' => 'users', 'middleware' => ['permissions:users_tab_access']], function() {
 			Route::get('/', 'UserController@index')->name('admin.users.index');
