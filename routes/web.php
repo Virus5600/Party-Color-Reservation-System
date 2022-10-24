@@ -31,11 +31,18 @@ Route::group(['prefix' => 'admin'], function() {
 		// ANNOUNCEMENTS
 		Route::group(['prefix' => 'announcements', 'middleware' => ['permissions:announcements_tab_access']], function() {
 			Route::get('/', 'AnnouncementController@index')->name('admin.announcements.index');
+			Route::get('/{id}', 'AnnouncementController@show')->name('admin.announcements.show');
 
 			// Create
-			Route::group(['middleware' => ['permissions:announcements_tab_create']], function() {
-				Route::get('/create', 'AnnouncementController@create')->name('admin.announcements.create');
-				Route::post('/create/store', 'AnnouncementController@store')->name('admin.announcements.store');
+			Route::group(['prefix' => 'create', 'middleware' => ['permissions:announcements_tab_create']], function() {
+				Route::get('/', 'AnnouncementController@create')->name('admin.announcements.create');
+				Route::post('/store', 'AnnouncementController@store')->name('admin.announcements.store');
+			});
+
+			// Edit
+			Route::group(['middleware' => ['permissions:announcements_tab_edit']], function() {
+				Route::get('/{id}/edit', 'AnnouncementController@edit')->name('admin.announcements.edit');
+				Route::post('/{id}/update', 'AnnouncementController@update')->name('admin.announcements.update');
 			});
 		});
 

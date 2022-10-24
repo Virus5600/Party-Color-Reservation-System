@@ -12,7 +12,7 @@
 		@endif
 
 		<div class="input-group">
-			<input type='search' name="search" placeholder="「/」を押して検索します" class="form-control" id="search" aria-label="Search" accesskey="/" />
+			<input type='search' name="search" placeholder="「/」を押して検索します" class="form-control" id="search" aria-label="Search" accesskey="/" value="{{ request('search', '') }}" />
 			<div class="input-group-append">
 				<button type="submit" class="btn btn-secondary"><i class="fas fa-search" aria-hidden="true"></i></button>
 			</div>

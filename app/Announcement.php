@@ -2,14 +2,21 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Announcement extends Model
 {
+
+	use SoftDeletes;
+
 	protected $fillable = [
 		'poster',
 		'title',
+		'slug',
+		'summary',
 		'content',
+		'is_draft',
 		'user_id',
 	];
 
