@@ -87,6 +87,18 @@ class PermissionsTableSeeder extends Seeder
 
 		 Permission::create([
 		 	'parent_permission' => $annPerm->id,
+		 	'name' => 'Announcements Tab Publish',
+		 	'slug' => 'announcements_tab_publish'
+		 ]);
+
+		 Permission::create([
+		 	'parent_permission' => $annPerm->id,
+		 	'name' => 'Announcements Tab Unpublish',
+		 	'slug' => 'announcements_tab_unpublish'
+		 ]);
+
+		 Permission::create([
+		 	'parent_permission' => $annPerm->id,
 		 	'name' => 'Announcements Tab Send Mail',
 		 	'slug' => 'announcements_tab_send_mail'
 		 ]);
