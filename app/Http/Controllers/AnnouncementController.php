@@ -230,19 +230,154 @@ class AnnouncementController extends Controller
 			->with('flash_success', 'Successfully uploaded announcement');
 	}
 
-	// TODO: THIS SHITS... YEAH, FUCKIN DO IT...
-	protected function publish($id) {
+	protected function publish(Request $req, $id) {
+		$announcement = Announcement::find($id);
+
+		if ($announcement == null) {
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'The announcement either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();
+			
+			$announcement->is_draft = 0;
+			$announcement->save();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->back()
+			->with('flash_success', 'Successfully published announcement');
 	}
 
-	protected function unpublish($id) {
+	protected function unpublish(Request $req, $id) {
+		$announcement = Announcement::find($id);
+
+		if ($announcement == null) {
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'The announcement either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();
+			
+			$announcement->is_draft = 1;
+			$announcement->save();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->back()
+			->with('flash_success', 'Successfully unpublished announcement');
 	}
 
-	protected function delete($id) {
+	protected function delete(Request $req, $id) {
+		$announcement = Announcement::find($id);
+
+		if ($announcement == null) {
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'The announcement either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();			
+			$announcement->delete();
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->back()
+			->with('flash_success', 'Successfully moved announcement to trash');
 	}
 
-	protected function restore($id) {
+	protected function restore(Request $req, $id) {
+		$announcement = Announcement::withTrashed()->find($id);
+
+		if ($announcement == null) {
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'Announcement either does not exists or is already deleted permanently.');
+		}
+		else if (!$announcement->trashed()) {
+			return redirect()
+				->back()
+				->with('flash_error', 'The announcement is already restored.');
+		}
+
+		try {
+			DB::beginTransaction();
+			$announcement->restore();
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->back()
+			->with('flash_success', 'Successfully restored the announcement');
 	}
 
-	protected function permaDelete($id) {
+	protected function permaDelete(Request $req, $id) {
+		$announcement = Announcement::withTrashed()->find($id);
+
+		if ($announcement == null) {
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'Announcement either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();
+
+			$poster = $announcement->poster == 'default.png' ? null : $announcement->poster;
+			$announcement->forceDelete();
+			if ($poster != null)
+				File::delete(public_path() . '/uploads/announcements/' . $poster);
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+			->with('flash_success', 'Successfully removed the announcement permanently');
 	}
 }

@@ -30,9 +30,6 @@ Route::group(['prefix' => 'admin'], function() {
 
 		// ANNOUNCEMENTS
 		Route::group(['prefix' => 'announcements', 'middleware' => ['permissions:announcements_tab_access']], function() {
-			Route::get('/', 'AnnouncementController@index')->name('admin.announcements.index');
-			Route::get('/{id}', 'AnnouncementController@show')->name('admin.announcements.show');
-
 			// Create
 			Route::group(['prefix' => 'create', 'middleware' => ['permissions:announcements_tab_create']], function() {
 				Route::get('/', 'AnnouncementController@create')->name('admin.announcements.create');
@@ -44,6 +41,25 @@ Route::group(['prefix' => 'admin'], function() {
 				Route::get('/{id}/edit', 'AnnouncementController@edit')->name('admin.announcements.edit');
 				Route::post('/{id}/update', 'AnnouncementController@update')->name('admin.announcements.update');
 			});
+
+			// Delete
+			Route::group(['middleware' => ['permissions:users_tab_delete']], function() {
+				Route::get('/{id}/delete', 'AnnouncementController@delete')->name('admin.announcements.delete');
+				Route::get('/{id}/restore', 'AnnouncementController@restore')->name('admin.announcements.restore');
+			});
+			
+			// Permanent Delete
+			Route::get('/{id}/perma-delete', 'AnnouncementController@permaDelete')->name('admin.announcements.permaDelete')->middleware('permissions:users_tab_perma_delete');
+
+			// Publishing and Unpublishing
+			Route::get('/{id}/publish', 'AnnouncementController@publish')->name('admin.announcements.publish')->middleware('permissions:announcements_tab_publish');
+			Route::get('/{id}/unpublish', 'AnnouncementController@unpublish')->name('admin.announcements.unpublish')->middleware('permissions:announcements_tab_unpublish');
+
+			// Index
+			Route::get('/', 'AnnouncementController@index')->name('admin.announcements.index');
+
+			// Show
+			Route::get('/{id}', 'AnnouncementController@show')->name('admin.announcements.show');
 		});
 
 		// USERS

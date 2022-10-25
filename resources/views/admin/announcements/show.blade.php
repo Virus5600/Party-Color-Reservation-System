@@ -16,10 +16,28 @@
 					</h1>
 				</div>
 
+				@if (Auth::user()->hasSomePermission('announcements_tab_delete', 'announcements_tab_publish', 'announcements_tab_unpublish'))
 				{{-- Controls --}}
-				<div class="col-6">
-					<>
+				<div class="col-6 d-flex flex-row-reverse">
+					@if (Auth::user()->hasPermission('announcements_tab_delete'))
+						@if ($announcement->trashed())
+						<a href="{{ route('admin.announcements.restore', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}" class="btn btn-success my-auto mx-1">復元する</a>
+						@else
+						<a href="{{ route('admin.announcements.delete', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}" class="btn btn-danger my-auto mx-1">削除する</a>
+						@endif
+					@endif
+
+					@if ($announcement->is_draft)
+						@if(Auth::user()->hasPermission('announcements_tab_publish'))
+						<a href="{{ route('admin.announcements.publish', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}" class="btn btn-success my-auto mx-1">発表する</a>
+						@endif
+					@else
+						@if(Auth::user()->hasPermission('announcements_tab_unpublish'))
+						<a href="{{ route('admin.announcements.unpublish', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}" class="btn btn-info my-auto mx-1">ドラフトする</a>
+						@endif
+					@endif
 				</div>
+				@endif
 			</div>
 		</div>
 	</div>
@@ -27,7 +45,7 @@
 	<hr class="hr-thick">
 
 	<div class="row">
-		<div class="col-12 col-md-8 mx-auto">
+		<div class="col-12 col-md-10 mx-auto">
 			<div class="card dark-shadow mb-5" id="inner-content">
 				<h3 class="card-header font-weight-bold text-center">{{ $announcement->title }}</h3>
 				<div class="card-body">
