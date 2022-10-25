@@ -5,14 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Announcement;
+use App\AnnouncementContentImage;
 
 use Auth;
 use DB;
+use DOMDocument;
 use Exception;
 use File;
 use Location;
 use Log;
 use Mail;
+use Storage;
 use Validator;
 
 class AnnouncementController extends Controller
@@ -79,24 +82,52 @@ class AnnouncementController extends Controller
 
 			$slug = preg_replace('/\s+/', '_', $req->title);
 
-			$image = 'default.png';
-			// FILE HANDLING
-			if ($req->has('image')) {
-				$destination = 'uploads/announcements';
-				$fileType = $req->file('image')->getClientOriginalExtension();
-				$image = $slug . "-" . uniqid() . "ポスター." . $fileType;
-				$req->file('image')->move($destination, $image);
-			}
-
-			Announcement::create([
-				'poster' => $image,
+			// Content will be "To add..." to filter images
+			$announcement = Announcement::create([
 				'title' => $req->title,
 				'slug' => $slug,
 				'summary' => $req->summary,
-				'content' => $req->content,
 				'is_draft' => $req->is_draft ? 1 : 0,
 				'user_id' => Auth::user()->id
 			]);
+
+			// FILE HANDLING
+			if ($req->has('image')) {
+				$destination = 'uploads/announcements/'.$announcement->id;
+				$fileType = $req->file('image')->getClientOriginalExtension();
+				$image = $slug . "-" . uniqid() . "ポスター." . $fileType;
+				$req->file('image')->move($destination, $image);
+
+				$announcement->poster = $image;
+			}
+
+			// SUMMERNOTE BASEE64 HANDLING
+			$dom = new DOMDocument();
+			$dom->loadHtml($req->content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+			$images = $dom->getElementsByTagName('img');
+			foreach($images as $i) {
+				if (!preg_match('(^data:image)', $i->getAttribute('src')))
+					continue;
+
+				$extension = explode('/', explode(':', substr($i->getAttribute('src'), 0, strpos($i->getAttribute('src'), ';')))[1])[1];
+				$replace = substr($i->getAttribute('src'), 0, strpos($i->getAttribute('src'), ',')+1);
+				$image = str_replace($replace, '', $i->getAttribute('src'));
+				$image_name = $slug . '-内容' . uniqid() . '.' . $extension;
+
+				Storage::disk('root')->put('/announcements/'.$announcement->id.'/'.$image_name, base64_decode($image));
+
+				AnnouncementContentImage::create([
+					'announcement_id' => $announcement->id,
+					'image_name' => $image_name
+				]);
+
+				$i->removeAttribute('src');
+				$i->setAttribute('src', asset('/uploads/announcements/'.$announcement->id.'/'.$image_name));
+				$i->setAttribute('data-fallback-image', asset('/uploads/announcements/default.png'));
+			}
+
+			$announcement->content = $dom->saveHTML();
+			$announcement->save();
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -104,12 +135,12 @@ class AnnouncementController extends Controller
 			Log::error($e);
 
 			return redirect()
-				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->route('admin.announcements.index', ['d' => $req->show_drafts, 'sd' => $req->show_softdeletes])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
 		return redirect()
-			->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+			->route('admin.announcements.index', ['d' => $req->show_drafts, 'sd' => $req->show_softdeletes])
 			->with('flash_success', 'Successfully uploaded announcement');
 	}
 

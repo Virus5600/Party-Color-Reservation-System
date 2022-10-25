@@ -28,9 +28,10 @@ class Announcement extends Model
 
 	// Relationship Function
 	protected function user() { return $this->belongsTo('App\User'); }
+	protected function announcementContentImages() { return $this->hasMany('App\AnnouncementContentImage'); }
 
 	// Custom Function
 	public function getPoster() {
-		return asset('uploads/announcements/'.$this->poster);
+		return asset('uploads/announcements/'.$this->id.'/'.$this->poster);
 	}
 }
