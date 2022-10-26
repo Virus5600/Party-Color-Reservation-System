@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Route;
 
 // Route::fallback('PageController@fallback')->name('fallback');
 Route::get('/login', 'UserController@redirectLogin')->name('redirectLogin');
-Route::get('/phpinfo', function() {dd(phpinfo());});
 
 Route::group(['prefix' => 'admin'], function() {
 	// AUTHENTICATION RELATED

@@ -15,9 +15,11 @@ class CreateAnnouncementContentImagesTable extends Migration
 	{
 		Schema::create('announcement_content_images', function (Blueprint $table) {
 			$table->id();
-			$table->integer('announcement_id')->unsigned();
+			$table->bigInteger('announcement_id')->unsigned();
 			$table->string('image_name');
 			$table->timestamps();
+
+			$table->foreign('announcement_id')->references('id')->on('announcements')->onDelete('cascade');
 		});
 	}
 

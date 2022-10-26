@@ -73,7 +73,34 @@
 
 							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown{{$a->id}}">
 								<a href="{{ route('admin.announcements.show', [$a->id]) }}?d={{ $show_drafts ? 1 : 0 }}&sd={{ $show_softdeletes ? 1 : 0 }}" class="dropdown-item"><i class="fas fa-eye mr-2"></i>表示</a>
+
+								{{-- EDIT --}}
+								@if (Auth::user()->hasPermission('announcements_tab_edit'))
 								<a href="{{ route('admin.announcements.edit', [$a->id]) }}?d={{ $show_drafts ? 1 : 0 }}&sd={{ $show_softdeletes ? 1 : 0 }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>編集</a>
+								@endif
+
+								{{-- PUBLISH/UNPUBLISH --}}
+								@if (Auth::user()->hasSomePermission('announcements_tab_publish', 'announcements_tab_unpublish'))
+									@if ($a->is_draft && Auth::user()->hasPermission('announcements_tab_publish'))
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.publish', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を発表するますか？');" class="dropdown-item"><i class="fas fa-upload mr-2"></i>発表する</a>
+									@elseif (!$a->is_draft && Auth::user()->hasPermission('announcements_tab_unpublish'))
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.unpublish', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表をドラフトするますか？');" class="dropdown-item"><i class="fas fa-pencil-ruler mr-2"></i>ドラフトする</a>
+									@endif
+								@endif
+								
+								{{-- DELETE --}}
+								@if (Auth::user()->hasPermission('announcements_tab_delete'))
+									@if ($a->trashed())
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.restore', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を復元するますか？');" class="dropdown-item"><i class="fas fa-recycle mr-2"></i>復元する</a>
+									@else
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.delete', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を削除するますか？');" class="dropdown-item"><i class="fas fa-trash mr-2"></i>削除する</a>
+									@endif
+								@endif
+
+								{{-- PERMANENT DELETE --}}
+								@if (Auth::user()->hasPermission('announcements_tab_perma_delete'))
+								<a onclick="confirmLeave('{{ route('admin.announcements.permaDelete', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を完全に削除するますか？')" class="dropdown-item"><i class="fas fa-fire-alt mr-2"></i>完全に削除する</a>
+								@endif
 							</div>
 						</div>
 					</td>
@@ -87,4 +114,8 @@
 		</table>
 	</div>
 </div>
+@endsection
+
+@section('scripts')
+<script type="text/javascript" src="{{ asset('js/util/confirm-leave.js') }}"></script>
 @endsection

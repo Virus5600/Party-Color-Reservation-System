@@ -124,6 +124,7 @@ class AnnouncementController extends Controller
 
 				$i->removeAttribute('src');
 				$i->setAttribute('src', asset('/uploads/announcements/'.$announcement->id.'/'.$image_name));
+				$i->setAttribute('data-filename', $image_name);
 				$i->setAttribute('data-fallback-image', asset('/uploads/announcements/default.png'));
 			}
 
@@ -230,21 +231,71 @@ class AnnouncementController extends Controller
 
 			$slug = preg_replace('/\s+/', '_', $req->title);
 
-			$image = 'default.png';
-			// FILE HANDLING
-			if ($req->has('image')) {
-				$destination = 'uploads/announcements';
-				$fileType = $req->file('image')->getClientOriginalExtension();
-				$image = $slug . "-" . uniqid() . "ポスター." . $fileType;
-				$req->file('image')->move($destination, $image);
-				$announcement->poster = $image;
-			}
-
+			// Content will be "To add..." to filter images
 			$announcement->title = $req->title;
 			$announcement->slug = $slug;
 			$announcement->summary = $req->summary;
-			$announcement->content = $req->content;
-			$announcement->is_draft = $req->is_draft ? 1 : 0;
+			$announcement->is_draft = $req->is_draft ? 0 : 1;
+
+			// FILE HANDLING
+			if ($req->has('image')) {
+				$destination = 'uploads/announcements/'.$announcement->id;
+				$fileType = $req->file('image')->getClientOriginalExtension();
+				$image = $slug . "-" . uniqid() . "ポスター." . $fileType;
+				$req->file('image')->move($destination, $image);
+
+				$announcement->poster = $image;
+			}
+
+			// Preparation for removal of removed images on announcement...
+			$keptImages = array();
+
+			// SUMMERNOTE BASEE64 HANDLING
+			$dom = new DOMDocument();
+			$dom->encoding = 'utf-8';
+			$dom->loadHtml(mb_convert_encoding($req->content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+			$images = $dom->getElementsByTagName('img');
+			foreach($images as $i) {
+				$announcementImage = AnnouncementContentImage::where('image_name', '=', $i->getAttribute('data-filename'))->first();
+
+				if ($announcementImage == null) {
+					if (!preg_match('(^data:image)', $i->getAttribute('src')))
+						continue;
+
+					$extension = explode('/', explode(':', substr($i->getAttribute('src'), 0, strpos($i->getAttribute('src'), ';')))[1])[1];
+					$replace = substr($i->getAttribute('src'), 0, strpos($i->getAttribute('src'), ',')+1);
+					$image = str_replace($replace, '', $i->getAttribute('src'));
+					$image_name = $slug . '-内容' . uniqid() . '.' . $extension;
+
+					Storage::disk('root')->put('/announcements/'.$announcement->id.'/'.$image_name, base64_decode($image));
+
+					AnnouncementContentImage::create([
+						'announcement_id' => $announcement->id,
+						'image_name' => $image_name
+					]);
+
+					$i->removeAttribute('src');
+					$i->setAttribute('src', asset('/uploads/announcements/'.$announcement->id.'/'.$image_name));
+					$i->setAttribute('data-filename', $image_name);
+					$i->setAttribute('data-fallback-image', asset('/uploads/announcements/default.png'));
+					array_push($keptImages, $image_name);
+				}
+				else {
+					$image_name = $i->getAttribute('data-filename');
+					array_push($keptImages, $image_name);
+				}
+			}
+
+			foreach ($announcement->announcementContentImages as $ci) {
+				if (!in_array($ci->image_name, $keptImages)) {
+					$image_name = $ci->image_name;
+					$ci->delete();
+
+					File::delete(public_path() . '/uploads/announcements/' . $announcement->id . '/' . $image_name);
+				}
+			}
+
+			$announcement->content = $dom->saveHTML();
 			$announcement->save();
 
 			DB::commit();
@@ -394,9 +445,11 @@ class AnnouncementController extends Controller
 			DB::beginTransaction();
 
 			$poster = $announcement->poster == 'default.png' ? null : $announcement->poster;
+			$id = $announcement->id;
+
 			$announcement->forceDelete();
 			if ($poster != null)
-				File::delete(public_path() . '/uploads/announcements/' . $poster);
+				File::delete(public_path() . '/uploads/announcements/' . $id . '/' . $poster);
 
 			DB::commit();
 		} catch (Exception $e) {
