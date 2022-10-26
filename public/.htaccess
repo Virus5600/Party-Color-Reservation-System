@@ -30,3 +30,7 @@
 		php_value max_execution_time 300
 	</IfModule>
 </IfModule>
+
+<Files ".user.ini"> 
+    Require all denied
+</Files>
