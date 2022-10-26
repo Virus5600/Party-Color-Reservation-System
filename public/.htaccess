@@ -1,27 +1,36 @@
 <IfModule mod_rewrite.c>
-    <IfModule mod_negotiation.c>
-        Options -MultiViews -Indexes
-    </IfModule>
+	<IfModule mod_negotiation.c>
+		Options -MultiViews -Indexes
+	</IfModule>
 
-    RewriteEngine On
+	RewriteEngine On
 
-    # Handle Authorization Header
-    RewriteCond %{HTTP:Authorization} .
-    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+	# Handle Authorization Header
+	RewriteCond %{HTTP:Authorization} .
+	RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Redirect Trailing Slashes If Not A Folder...
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_URI} (.+)/$
-    RewriteRule ^ %1 [L,R=301]
+	# Redirect Trailing Slashes If Not A Folder...
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_URI} (.+)/$
+	RewriteRule ^ %1 [L,R=301]
 
-    # Send Requests To Front Controller...
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^ index.php [L]
+	# Send Requests To Front Controller...
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^ index.php [L]
 
-    # Sets PHP max post size
-    php_value upload_max_filesize 64M
-    php_value post_max_size 64M
-    php_value max_input_time 120
-    php_value max_execution_time 120
+	# Sets PHP max post size
+	<IfModule mod_php7.c>
+		php_flag display_errors 0
+		php_flag display_startup_errors 0
+		
+		php_value upload_max_filesize 32M
+		php_value post_max_size 128M
+		php_value max_input_time 300
+		php_value max_execution_time 300
+	</IfModule>
 </IfModule>
+
+<Files ".user.ini"> 
+    Require all denied
+</Files>

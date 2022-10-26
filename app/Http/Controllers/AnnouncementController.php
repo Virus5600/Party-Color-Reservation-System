@@ -5,14 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Announcement;
+use App\AnnouncementContentImage;
 
 use Auth;
 use DB;
+use DOMDocument;
 use Exception;
 use File;
 use Location;
 use Log;
 use Mail;
+use Storage;
 use Validator;
 
 class AnnouncementController extends Controller
@@ -79,24 +82,53 @@ class AnnouncementController extends Controller
 
 			$slug = preg_replace('/\s+/', '_', $req->title);
 
-			$image = 'default.png';
-			// FILE HANDLING
-			if ($req->has('image')) {
-				$destination = 'uploads/announcements';
-				$fileType = $req->file('image')->getClientOriginalExtension();
-				$image = $slug . "-" . uniqid() . "ポスター." . $fileType;
-				$req->file('image')->move($destination, $image);
-			}
-
-			Announcement::create([
-				'poster' => $image,
+			// Content will be "To add..." to filter images
+			$announcement = Announcement::create([
 				'title' => $req->title,
 				'slug' => $slug,
 				'summary' => $req->summary,
-				'content' => $req->content,
 				'is_draft' => $req->is_draft ? 1 : 0,
 				'user_id' => Auth::user()->id
 			]);
+
+			// FILE HANDLING
+			if ($req->has('image')) {
+				$destination = 'uploads/announcements/'.$announcement->id;
+				$fileType = $req->file('image')->getClientOriginalExtension();
+				$image = $slug . "-" . uniqid() . "ポスター." . $fileType;
+				$req->file('image')->move($destination, $image);
+
+				$announcement->poster = $image;
+			}
+
+			// SUMMERNOTE BASEE64 HANDLING
+			$dom = new DOMDocument();
+			$dom->encoding = 'utf-8';
+			$dom->loadHtml(mb_convert_encoding($req->content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+			$images = $dom->getElementsByTagName('img');
+			foreach($images as $i) {
+				if (!preg_match('(^data:image)', $i->getAttribute('src')))
+					continue;
+
+				$extension = explode('/', explode(':', substr($i->getAttribute('src'), 0, strpos($i->getAttribute('src'), ';')))[1])[1];
+				$replace = substr($i->getAttribute('src'), 0, strpos($i->getAttribute('src'), ',')+1);
+				$image = str_replace($replace, '', $i->getAttribute('src'));
+				$image_name = $slug . '-内容' . uniqid() . '.' . $extension;
+
+				Storage::disk('root')->put('/announcements/'.$announcement->id.'/'.$image_name, base64_decode($image));
+
+				AnnouncementContentImage::create([
+					'announcement_id' => $announcement->id,
+					'image_name' => $image_name
+				]);
+
+				$i->removeAttribute('src');
+				$i->setAttribute('src', asset('/uploads/announcements/'.$announcement->id.'/'.$image_name));
+				$i->setAttribute('data-fallback-image', asset('/uploads/announcements/default.png'));
+			}
+
+			$announcement->content = $dom->saveHTML();
+			$announcement->save();
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -104,12 +136,12 @@ class AnnouncementController extends Controller
 			Log::error($e);
 
 			return redirect()
-				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->route('admin.announcements.index', ['d' => $req->show_drafts, 'sd' => $req->show_softdeletes])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
 		return redirect()
-			->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+			->route('admin.announcements.index', ['d' => $req->show_drafts, 'sd' => $req->show_softdeletes])
 			->with('flash_success', 'Successfully uploaded announcement');
 	}
 
@@ -230,19 +262,154 @@ class AnnouncementController extends Controller
 			->with('flash_success', 'Successfully uploaded announcement');
 	}
 
-	// TODO: THIS SHITS... YEAH, FUCKIN DO IT...
-	protected function publish($id) {
+	protected function publish(Request $req, $id) {
+		$announcement = Announcement::find($id);
+
+		if ($announcement == null) {
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'The announcement either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();
+			
+			$announcement->is_draft = 0;
+			$announcement->save();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->back()
+			->with('flash_success', 'Successfully published announcement');
 	}
 
-	protected function unpublish($id) {
+	protected function unpublish(Request $req, $id) {
+		$announcement = Announcement::find($id);
+
+		if ($announcement == null) {
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'The announcement either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();
+			
+			$announcement->is_draft = 1;
+			$announcement->save();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->back()
+			->with('flash_success', 'Successfully unpublished announcement');
 	}
 
-	protected function delete($id) {
+	protected function delete(Request $req, $id) {
+		$announcement = Announcement::find($id);
+
+		if ($announcement == null) {
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'The announcement either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();			
+			$announcement->delete();
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->back()
+			->with('flash_success', 'Successfully moved announcement to trash');
 	}
 
-	protected function restore($id) {
+	protected function restore(Request $req, $id) {
+		$announcement = Announcement::withTrashed()->find($id);
+
+		if ($announcement == null) {
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'Announcement either does not exists or is already deleted permanently.');
+		}
+		else if (!$announcement->trashed()) {
+			return redirect()
+				->back()
+				->with('flash_error', 'The announcement is already restored.');
+		}
+
+		try {
+			DB::beginTransaction();
+			$announcement->restore();
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->back()
+			->with('flash_success', 'Successfully restored the announcement');
 	}
 
-	protected function permaDelete($id) {
+	protected function permaDelete(Request $req, $id) {
+		$announcement = Announcement::withTrashed()->find($id);
+
+		if ($announcement == null) {
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'Announcement either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();
+
+			$poster = $announcement->poster == 'default.png' ? null : $announcement->poster;
+			$announcement->forceDelete();
+			if ($poster != null)
+				File::delete(public_path() . '/uploads/announcements/' . $poster);
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
+			->with('flash_success', 'Successfully removed the announcement permanently');
 	}
 }
