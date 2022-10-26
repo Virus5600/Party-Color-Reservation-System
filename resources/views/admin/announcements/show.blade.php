@@ -21,19 +21,19 @@
 				<div class="col-6 d-flex flex-row-reverse">
 					@if (Auth::user()->hasPermission('announcements_tab_delete'))
 						@if ($announcement->trashed())
-						<a href="{{ route('admin.announcements.restore', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}" class="btn btn-success my-auto mx-1">復元する</a>
+						<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.restore', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を復元するますか？');" class="btn btn-success my-auto mx-1">復元する</a>
 						@else
-						<a href="{{ route('admin.announcements.delete', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}" class="btn btn-danger my-auto mx-1">削除する</a>
+						<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.delete', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を削除するますか？');" class="btn btn-danger my-auto mx-1">削除する</a>
 						@endif
 					@endif
 
 					@if ($announcement->is_draft)
 						@if(Auth::user()->hasPermission('announcements_tab_publish'))
-						<a href="{{ route('admin.announcements.publish', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}" class="btn btn-success my-auto mx-1">発表する</a>
+						<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.publish', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を発表するますか？');" class="btn btn-success my-auto mx-1">発表する</a>
 						@endif
 					@else
 						@if(Auth::user()->hasPermission('announcements_tab_unpublish'))
-						<a href="{{ route('admin.announcements.unpublish', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}" class="btn btn-info my-auto mx-1">ドラフトする</a>
+						<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.unpublish', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表をドラフトするますか？');" class="btn btn-info my-auto mx-1">ドラフトする</a>
 						@endif
 					@endif
 				</div>
@@ -63,4 +63,8 @@
 		</div>
 	</div>
 </div>
+@endsection
+
+@section('scripts')
+<script type="text/javascript" src="{{ asset('js/util/confirm-leave.js') }}"></script>
 @endsection
