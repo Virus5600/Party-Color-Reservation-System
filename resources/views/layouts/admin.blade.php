@@ -2,6 +2,7 @@
 <html lang="ja-JP">
 	<head>
 		{{-- META DATA --}}
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta http-equiv="Content-Language" content="ja-JP" />
@@ -89,7 +90,7 @@
 						@include('components.admin.sidebar')
 						
 						{{-- CONTENT --}}
-						<div class="container-fluid content flex-fill" style="margin: 0;">
+						<div class="container-fluid content flex-fill m-0">
 							@yield('content')
 						</div>
 					</div>
