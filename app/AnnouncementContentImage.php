@@ -12,7 +12,7 @@ class AnnouncementContentImage extends Model
 	];
 
 	// Relation
-	protected function announcement() { return $this->belongsTo('App\Announcement'); }
+	protected function announcement() { return $this->belongsTo('App\Announcement', 'announcement_id', 'id'); }
 
 	// Custom Function
 	public function getImage() {
