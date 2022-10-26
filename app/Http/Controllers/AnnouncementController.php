@@ -103,7 +103,8 @@ class AnnouncementController extends Controller
 
 			// SUMMERNOTE BASEE64 HANDLING
 			$dom = new DOMDocument();
-			$dom->loadHtml($req->content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+			$dom->encoding = 'utf-8';
+			$dom->loadHtml(mb_convert_encoding($req->content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 			$images = $dom->getElementsByTagName('img');
 			foreach($images as $i) {
 				if (!preg_match('(^data:image)', $i->getAttribute('src')))
