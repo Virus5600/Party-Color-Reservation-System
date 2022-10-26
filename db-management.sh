@@ -58,7 +58,7 @@ goto mysqlTest
 backupContinue:
 echo ""
 echo "Doing Backup..."
-mysql -h migae5o25m2psr4q.cbetxkdyhwsb.us-east-1.rds.amazonaws.com -u pamw67f0epuedsl6 -pmeu96nwt8vec2d4p kyzi6brs12iblq22 > backup.sql
+mysqldump -h migae5o25m2psr4q.cbetxkdyhwsb.us-east-1.rds.amazonaws.com -u pamw67f0epuedsl6 -pmeu96nwt8vec2d4p kyzi6brs12iblq22 > backup.sql --set-gtid-purged=OFF
 echo "Done."
 goto endFile
 
