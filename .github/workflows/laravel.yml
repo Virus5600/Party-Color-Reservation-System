@@ -1,8 +1,12 @@
 name: Laravel
 
 on:
-  [push, pull_request]:
-    branches: [ "*" ]
+  push:
+    branches: 
+      - "*"
+  pull_request:
+    branches:
+      - "*"
 
 jobs:
   laravel-tests:
