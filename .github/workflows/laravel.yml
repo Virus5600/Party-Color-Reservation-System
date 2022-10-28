@@ -1,10 +1,8 @@
 name: Laravel
 
 on:
-  push:
-    branches: [ "main", "development", "admin-frontend", "user-frontend" ]
-  pull_request:
-    branches: [ "main", "development", "admin-frontend", "user-frontend" ]
+  [push, pull_request]:
+    branches: [ "*" ]
 
 jobs:
   laravel-tests:
