@@ -3,8 +3,8 @@
 	<div class="container-fluid">
 		{{-- Branding --}}
 		<a class="navbar-brand m-0 py-0" href="{{route('admin.dashboard')}}" style="height: auto;">
-			<img src="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}" style="max-height: 3.25rem;" class="m-0 p-0" alt="Smile Taytay Dashboard" data-fallback-img="{{ asset('uploads/settings/default.png') }}" />
-			パーティーカラー
+			<img src="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}" style="max-height: 3.25rem;" class="m-0 p-0" alt="{{ App\Settings::getInstance('web-logo')->value }}" data-fallback-img="{{ asset('uploads/settings/default.png') }}" />
+			Party Color
 		</a>
 
 		<div class="d-flex flex-row">
@@ -18,9 +18,9 @@
 							</a>
 
 							<div class="dropdown-menu dropdown-menu-right">
-								<a class="dropdown-item" href="{{ route('home') }}">ページを見る</a>
+								<a class="dropdown-item" href="{{ route('home') }}">View Home Page</a>
 								<div class="dropdown-divider"></div>
-								<a class="dropdown-item" href="{{ route('logout') }}">サインアウト</a>
+								<a class="dropdown-item" href="{{ route('logout') }}">Logout</a>
 							</div>
 						</div>
 					</label>

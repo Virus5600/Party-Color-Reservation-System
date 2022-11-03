@@ -11,7 +11,7 @@
 				<div class="col-12">
 					<h1>
 						<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.users.index')}}');" class="text-dark text-decoration-none font-weight-normal">
-							<i class="fas fa-chevron-left mr-2"></i>ユーザーズ
+							<i class="fas fa-chevron-left mr-2"></i>Users
 						</a>
 					</h1>
 				</div>
@@ -25,7 +25,7 @@
 		<div class="col-12 col-md-11 col-lg-10 mx-auto">
 			<div class="card dark-shadow mb-5" id="inner-content">
 				<h4 class="card-header">
-					{{ $user->getName() }}は{{ $user->isUsingTypePermissions() ? '部門権限を使用しています【既定】' : 'ユーザ権限を使用しています【独自】' }}
+					{{ $user->getName() }} is {{ $user->isUsingTypePermissions() ? 'using account role permissions (Default)' : 'using user permissions (Custom)' }}
 				</h4>
 
 				<div class="card-body">
