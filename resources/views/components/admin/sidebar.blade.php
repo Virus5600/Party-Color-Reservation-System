@@ -23,9 +23,9 @@
 		@if (\Request::is('admin/inventory'))
 		<span class="bg-secondary text-white"><i class="fas fa-boxes mr-2"></i>Inventory</span>
 		@elseif (\Request::is('admin/inventory*'))
-		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.dashboard') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-boxes mr-2"></i>Inventory</a>
+		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.inventory.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-boxes mr-2"></i>Inventory</a>
 		@else
-		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.dashboard') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-boxes mr-2"></i>Inventory</a>
+		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.inventory.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-boxes mr-2"></i>Inventory</a>
 		@endif
 
 		{{-- ANNOUNCEMENT --}}
