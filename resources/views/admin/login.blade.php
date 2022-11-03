@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ja-JP">
+<html lang="en-US">
 	<head>
 		{{-- META DATA --}}
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<meta http-equiv="Content-Language" content="ja-JP" />
+		<meta http-equiv="Content-Language" content="en-US" />
 
 		{{-- SITE META --}}
 		<meta name="type" content="website">
@@ -45,7 +45,7 @@
 		<link rel="mask-icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">
 
 		{{-- TITLE --}}
-		<title>アドミンログイン - Party Color</title>
+		<title>Admin Login - Party Color</title>
 	</head>
 
 	<body>
@@ -60,7 +60,7 @@
 			<div class="row h-100">
 				<div class="col-12 col-md-4 offset-md-4 py-5 my-auto">
 					<div class="card shadow my-auto">
-						<h4 class="card-header card-title text-center">Javascriptが無効になっています</h4>
+						<h4 class="card-header card-title text-center">Javascript is Disabled</h4>
 
 						<div class="card-body">
 							<p class="card-text">This website required <b>JavaScript</b> to run. Please allow/enable JavaScript and refresh the page.</p>
@@ -77,18 +77,18 @@
 					
 					{{-- LOGIN FORM START --}}
 					<div class="card w-100 w-sm-75 w-md-50 w-lg-25 m-auto">
-						<h4 class="card-header text-center">ログイン</h4>
+						<h4 class="card-header text-center">LOGIN</h4>
 
 						<form action="{{ route('authenticate') }}" method="POST" class="card-body">
 							{{ csrf_field() }}
 							
 							<div class="form-group">
-								<label class="form-label" for="email">Eメール</label>
+								<label class="form-label" for="email">Email</label>
 								<input class="form-control border-secondary" type="email" name="email" value="{{ old('email') }}" aria-label="E-mail" placeholder="E-mail" />
 							</div>
 
 							<div class="form-group">
-								<label class="form-label" for="password">パスワード</label>
+								<label class="form-label" for="password">Password</label>
 								<div class="input-group">
 									<input class="form-control border-secondary border-right-0" type="password" name="password" id="password" aria-label="Password" aria-describedby="toggle-show-password" placeholder="Password" />
 									<div class="input-group-append">
@@ -101,7 +101,7 @@
 							</div>
 
 							<div class="form-group text-center">
-								<button type="submit" class="btn btn-primary">差し出す</button>
+								<button type="submit" class="btn btn-primary">Submit</button>
 							</div>
 						</form>
 					</div>

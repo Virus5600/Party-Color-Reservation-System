@@ -20,5 +20,43 @@ class TypePermissionsTableSeeder extends Seeder
 				'type_id' => 1,
 				'permission_id' => $i
 			]);
+
+		// Manager
+		$reservationAcc = Permission::where('slug', '=', 'reservations_tab_access')->first();
+		$reservationPerm = Permission::where('parent_permission', '=', $reservationAcc->id)->orWhere('slug', '=', $reservationAcc->slug)->get();
+		for ($reservationPerm => $r)
+			TypePermission::insert([
+				'type_id' => 2,
+				'permission_id' => $r->id
+			]);
+
+		$inventoryAcc = Permission::where('slug', '=', 'inventory_tab_access')->first();
+		$inventoryPerm = Permission::where('parent_permission', '=', $inventoryAcc->id)->orWhere('slug', '=', $inventoryAcc->slug)->get();
+		for ($inventoryPerm => $i)
+			TypePermission::insert([
+				'type_id' => 2,
+				'permission_id' => $i->id
+			]);
+
+		$announcementsAcc = Permission::where('slug', '=', 'announcements_tab_access')->first();
+		$announcementsPerm = Permission::where('parent_permission', '=', $announcementsAcc->id)->orWhere('slug', '=', $announcementsAcc->slug)->get();
+		for ($announcementsPerm => $a)
+			TypePermission::insert([
+				'type_id' => 2,
+				'permission_id' => $a->id
+			]);
+
+		// Staff
+		$staffAccess = [
+			Permission::where('slug', '=', 'inventory_tab_access')->first(),
+			Permission::where('slug', '=', 'inventory_tab_create')->first(),
+			Permission::where('slug', '=', 'inventory_tab_edit')->first()
+		];
+
+		for ($staffAccess => $s)
+			TypePermission::insert([
+				'type_id' => 3,
+				'permission_id' => $s->id
+			]);
 	}
 }
