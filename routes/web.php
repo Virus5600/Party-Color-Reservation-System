@@ -28,6 +28,38 @@ Route::group(['prefix' => 'admin'], function() {
 		Route::get('/', 'PageController@redirectToDashboard')->name('admin.redirectToDashboard');
 		Route::get('/dashboard', 'PageController@dashboard')->name('admin.dashboard');
 
+		// INVENTORY
+		Route::group(['prefix' => 'inventory', 'middleware' => ['permissions:inventory_tab_access']], function() {
+			// Create
+			Route::group(['prefix' => 'create', 'middleware' => ['permissions:inventory_tab_create']], function() {
+				Route::get('/', 'InventoryController@create')->name('admin.inventory.create');
+				Route::post('/store', 'InventoryController@store')->name('admin.inventory.store');
+			});
+
+			// Edit
+			Route::group(['middleware' => ['permissions:inventory_tab_edit']], function() {
+				Route::get('/{id}/edit', 'InventoryController@edit')->name('admin.inventory.edit');
+				// Route::post('/{id}/update', 'InventoryController@update')->name('admin.inventory.update');
+			});
+
+			// Delete
+			Route::group(['middleware' => ['permissions:inventory_tab_delete']], function() {
+				Route::get('/{id}/delete', 'InventoryController@delete')->name('admin.inventory.delete');
+				Route::get('/{id}/restore', 'InventoryController@restore')->name('admin.inventory.restore');
+			});
+			
+			// Permanent Delete
+			// Route::get('/{id}/perma-delete', 'InventoryController@permaDelete')->name('admin.inventory.permaDelete')->middleware('permissions:inventory_tab_perma_delete');
+
+			// Publishing and Unpublishing
+			// Route::get('/{id}/publish', 'InventoryController@publish')->name('admin.inventory.publish')->middleware('permissions:inventory_tab_publish');
+			// Route::get('/{id}/unpublish', 'InventoryController@unpublish')->name('admin.inventory.unpublish')->middleware('permissions:inventory_tab_unpublish');
+
+			// Index
+			Route::get('/', 'InventoryController@index')->name('admin.inventory.index');
+		});
+
+
 		// ANNOUNCEMENTS
 		Route::group(['prefix' => 'announcements', 'middleware' => ['permissions:announcements_tab_access']], function() {
 			// Create
