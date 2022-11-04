@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', '権限')
+@section('title', 'Permissions')
 
 @section('content')
 <div class="container-fluid d-flex flex-column h-100">
@@ -9,7 +9,7 @@
 			<div class="row">
 				{{-- Header --}}
 				<div class="col-12 col-md-6 text-center text-md-left">
-					<h1>権限</h1>
+					<h1>Permissions</h1>
 				</div>
 
 				{{-- Controls --}}
@@ -33,8 +33,8 @@
 		<table class="table table-striped my-0">
 			<thead>
 				<tr>
-					<th class="text-center">権限の名前</th>
-					<th class="text-center">権限を持つユーザー数</th>
+					<th class="text-center">Permission Name</th>
+					<th class="text-center">Number of Permission Users</th>
 					<th class="text-center"></th>
 				</tr>
 			</thead>
@@ -46,15 +46,7 @@
 					<td class="text-center align-middle mx-auto">{{ $p->allUsers()->count() }}</td>
 
 					<td class="align-middle">
-						<div class="dropdown ">
-							<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="dropdown@{{$p->id}}" aria-haspopup="true" aria-expanded="false">
-								アクション
-							</button>
-
-							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown@{{$p->id}}">
-								<a href="#@{{ route('admin.permissions.edit', [$p->id]) }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>編集</a>
-							</div>
-						</div>
+						<a href="{{ route('admin.permissions.show', [$p->slug]) }}" class="btn btn-primary"><i class="fas fa-eye mr-2"></i>View</a>
 					</td>
 				</tr>
 				@empty

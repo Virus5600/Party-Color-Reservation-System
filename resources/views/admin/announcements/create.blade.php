@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', '発行')
+@section('title', 'Announcements')
 
 @section('content')
 <div class="container-fluid">
@@ -11,7 +11,7 @@
 				<div class="col-12">
 					<h1>
 						<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.announcements.index', ['d' => $show_drafts, 'sd' => $show_softdeletes])}}');" class="text-dark text-decoration-none font-weight-normal">
-							<i class="fas fa-chevron-left mr-2"></i>発表
+							<i class="fas fa-chevron-left mr-2"></i>Announcements
 						</a>
 					</h1>
 				</div>
@@ -34,23 +34,23 @@
 						<div class="row">
 							<div class="col-12 col-lg-6">
 								<div class="form-group text-center text-lg-left w-100" style="max-height: 20rem;">
-									<label class="h5" for="image">発行のイメージ</label><br>
+									<label class="h5" for="image">Announcement Poster</label><br>
 									<img src="{{ asset('uploads/announcements/default.png') }}" class="img-fluid cursor-pointer border" style="border-width: 0.25rem!important; max-height: 16.25rem;" id="image" alt="Announcement Image">
 									<input type="file" id="image" name="image" class="d-none" accept=".jpg,.jpeg,.png"><br>
-									<small class="text-muted pt-0 mt-0"><b>初認された形式：</b> JPEG, JPG, PNG, WEBP</small><br>
-									<small class="text-muted pt-0 mt-0"><b>最大サイズ：</b> 5MB</small>
+									<small class="text-muted pt-0 mt-0"><b>ALLOWED FORMATS:</b> JPEG, JPG, PNG, WEBP</small><br>
+									<small class="text-muted pt-0 mt-0"><b>MAX SIZE:</b> 5MB</small>
 								</div>
 							</div>
 
 							{{-- TITLE --}}
 							<div class="col-12 col-lg-6">
 								<div class="form-group">
-									<label class="h5" for="title">タイトル</label>
+									<label class="h5" for="title">Title</label>
 									<input class="form-control" type="text" name="title" value="{{ old('title') }}"/>
 								</div>
 
 								<div class="form-group text-counter-parent">
-									<label class="h5" for="summary">概要</label>
+									<label class="h5" for="summary">Summary</label>
 									<textarea class="form-control not-resizable text-counter-input" name="summary" rows="4" data-max="255">{{ old('summary') }}</textarea>
 									<span class="text-counter small">255</span>
 								</div>
@@ -58,7 +58,7 @@
 								<div class="form-group my-auto">
 									<div class="custom-control custom-switch custom-switch-md">
 										<input type='checkbox' class="custom-control-input" id="is-draft" name="is_draft" {{ old('is_draft') ? 'checked' : '' }}/>
-										<label class="custom-control-label pt-1 pl-3" for="is-draft">ドラフトとしてマーク</label>
+										<label class="custom-control-label pt-1 pl-3" for="is-draft">Mark as Draft?</label>
 									</div>
 								</div>
 							</div>
@@ -68,15 +68,15 @@
 
 						<div class="row">
 							<div class="col">
-								<label class="h5" for="content">内容</label>
+								<label class="h5" for="content">Content</label>
 								<textarea class="summernote" name="content" rows="5">{!! old('content') !!}</textarea>
 							</div>
 						</div>
 
 						<div class="row py-3">
 							<div class="col">
-								<button class="btn btn-success ml-auto" type="submit" data-action="submit">提出する</button>
-								<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.announcements.index', ['d' => $show_drafts, 'sd' => $show_softdeletes])}}');" class="btn btn-danger ml-3 mr-auto">キャンセル</a>
+								<button class="btn btn-success ml-auto" type="submit" data-action="submit">Submit</button>
+								<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.announcements.index', ['d' => $show_drafts, 'sd' => $show_softdeletes])}}');" class="btn btn-danger ml-3 mr-auto">Cancel</a>
 							</div>
 						</div>
 					</form>
@@ -130,11 +130,10 @@
 
 		// Summernote
 		$('.summernote').summernote({
-			lang: 'ja-JP',
 			minHeight: 128,
 			maxHeight: 384,
 			height: 256,
-			placeholder: 'ここに内容が入れます。。。',
+			placeholder: 'Content goes here...',
 			toolbar: [
 				['style', ['style']],
 				['font', ['bold', 'underline', 'clear']],
