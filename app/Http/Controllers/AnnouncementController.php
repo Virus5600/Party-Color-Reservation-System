@@ -235,7 +235,7 @@ class AnnouncementController extends Controller
 			$announcement->title = $req->title;
 			$announcement->slug = $slug;
 			$announcement->summary = $req->summary;
-			$announcement->is_draft = $req->is_draft ? 0 : 1;
+			$announcement->is_draft = $req->is_draft ? 1 : 0;
 
 			// FILE HANDLING
 			if ($req->has('image')) {
@@ -251,9 +251,11 @@ class AnnouncementController extends Controller
 			$keptImages = array();
 
 			// SUMMERNOTE BASEE64 HANDLING
-			$dom = new DOMDocument();
+			$dom = new DOMDocument('1.0', 'UTF-8');
 			$dom->encoding = 'utf-8';
-			$dom->loadHtml(mb_convert_encoding($req->content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+			$dom->loadHtml(mb_convert_encoding("<div>{$req->content}</div>", 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
+			Log::debug("Content: {$req->content}");
+			
 			$images = $dom->getElementsByTagName('img');
 			foreach($images as $i) {
 				$announcementImage = AnnouncementContentImage::where('image_name', '=', $i->getAttribute('data-filename'))->first();
@@ -295,8 +297,13 @@ class AnnouncementController extends Controller
 				}
 			}
 
-			$announcement->content = $dom->saveHTML();
+			$content = "";
+			foreach ($dom->childNodes as $c)
+				$content .= $dom->saveHTML($c);
+
+			$announcement->content = substr($content, strlen("<div>"), strlen("{$content}") - strlen("<div></div>"));
 			$announcement->save();
+			Log::debug("Updated Content: {$announcement->content}");
 
 			DB::commit();
 		} catch (Exception $e) {

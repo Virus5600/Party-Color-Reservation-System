@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', '発表')
+@section('title', 'Announcements')
 
 @section('content')
 <div class="container-fluid d-flex flex-column h-100">
@@ -9,7 +9,7 @@
 			<div class="row">
 				{{-- Header --}}
 				<div class="col-12 col-md-4 text-center text-md-left">
-					<h1>発表</h1>
+					<h1>Announcements</h1>
 				</div>
 
 				{{-- Controls --}}
@@ -18,7 +18,7 @@
 						{{-- ADD --}}
 						@if (Auth::user()->hasPermission('announcements_tab_create'))
 						<div class="col-12 col-md text-center text-md-right ml-md-auto">
-							<a href="{{ route('admin.announcements.create', ['d' => $show_drafts, 'sd' => $show_softdeletes]) }}" class="btn btn-success m-auto"><i class="fa fa-plus-circle mr-2"></i>発表追加</a>
+							<a href="{{ route('admin.announcements.create', ['d' => $show_drafts, 'sd' => $show_softdeletes]) }}" class="btn btn-success m-auto"><i class="fa fa-plus-circle mr-2"></i>Add Announcements</a>
 						</div>
 						@endif
 
@@ -33,13 +33,13 @@
 
 	<h6>
 		@if ($show_drafts && $show_softdeletes)
-		<a href="{{ route('admin.announcements.index') }}?d=0&sd=0" class="text-primary">公開</a> | <a href="{{ route('admin.announcements.index') }}?d=1&sd=0" class="text-primary">ドラフト</a> | <span class="text-dark">全て</span> | <a href="{{ route('admin.announcements.index') }}?d=0&sd=1" class="text-primary">ごみ箱</a>
+		<a href="{{ route('admin.announcements.index') }}?d=0&sd=0" class="text-primary">Published</a> | <a href="{{ route('admin.announcements.index') }}?d=1&sd=0" class="text-primary">Draft</a> | <span class="text-dark">All</span> | <a href="{{ route('admin.announcements.index') }}?d=0&sd=1" class="text-primary">Trashed</a>
 		@elseif ($show_drafts)
-		<a href="{{ route('admin.announcements.index') }}?d=0&sd=0" class="text-primary">公開</a> | <span class="text-dark">ドラフト</span> | <a href="{{ route('admin.announcements.index') }}?d=1&sd=1" class="text-primary">全て</a> | <a href="{{ route('admin.announcements.index') }}?d=0&sd=1" class="text-primary">ごみ箱</a>
+		<a href="{{ route('admin.announcements.index') }}?d=0&sd=0" class="text-primary">Published</a> | <span class="text-dark">Draft</span> | <a href="{{ route('admin.announcements.index') }}?d=1&sd=1" class="text-primary">All</a> | <a href="{{ route('admin.announcements.index') }}?d=0&sd=1" class="text-primary">Trashed</a>
 		@elseif ($show_softdeletes)
-		<a href="{{ route('admin.announcements.index') }}?d=0&sd=0" class="text-primary">公開</a> | <a href="{{ route('admin.announcements.index') }}?d=1&sd=0" class="text-primary">ドラフト</a> | <a href="{{ route('admin.announcements.index') }}?d=1&sd=1" class="text-primary">全て</a> | <span class="text-dark">ごみ箱</span>
+		<a href="{{ route('admin.announcements.index') }}?d=0&sd=0" class="text-primary">Published</a> | <a href="{{ route('admin.announcements.index') }}?d=1&sd=0" class="text-primary">Draft</a> | <a href="{{ route('admin.announcements.index') }}?d=1&sd=1" class="text-primary">All</a> | <span class="text-dark">Trashed</span>
 		@else
-		<span class="text-dark">公開</span> | <a href="{{ route('admin.announcements.index') }}?d=1&sd=0" class="text-primary">ドラフト</a> | <a href="{{ route('admin.announcements.index') }}?d=1&sd=1" class="text-primary">全て</a> | <a href="{{ route('admin.announcements.index') }}?d=0&sd=1" class="text-primary">ごみ箱</a>
+		<span class="text-dark">Published</span> | <a href="{{ route('admin.announcements.index') }}?d=1&sd=0" class="text-primary">Draft</a> | <a href="{{ route('admin.announcements.index') }}?d=1&sd=1" class="text-primary">All</a> | <a href="{{ route('admin.announcements.index') }}?d=0&sd=1" class="text-primary">Trashed</a>
 		@endif
 	</h6>
 
@@ -47,10 +47,10 @@
 		<table class="table table-striped my-0">
 			<thead>
 				<tr>
-					<th class="text-center">発表のイメージ</th>
-					<th class="text-center">発表のタイトル</th>
-					<th class="text-center">発行日</th>
-					<th class="text-center">発行する</th>
+					<th class="text-center">Announcement Poster</th>
+					<th class="text-center">Title</th>
+					<th class="text-center">Published Date</th>
+					<th class="text-center">Publisher</th>
 					<th class="text-center"></th>
 				</tr>
 			</thead>
@@ -62,44 +62,44 @@
 						<img src="{{ $a->getPoster() }}" alt="{{ $a->title }}" class="img img-fluid user-icon mx-auto rounded">
 					</td>
 					<td class="text-center align-middle mx-auto font-weight-bold"><i class="fas fa-circle {{ $a->is_draft ? 'text-info' : 'text-success' }} mr-2"></i>{{ $a->title }}</td>
-					<td class="text-center align-middle mx-auto">{{ $a->created_at->locale('ja_JP')->translatedFormat('M d, Y') }}</td>
+					<td class="text-center align-middle mx-auto">{{ $a->created_at->locale('en_US')->translatedFormat('M d, Y') }}</td>
 					<td class="text-center align-middle mx-auto">{{ $a->user->getName() }}</td>
 
 					<td class="align-middle">
 						<div class="dropdown ">
 							<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="dropdown{{$a->id}}" aria-haspopup="true" aria-expanded="false">
-								アクション
+								Actions
 							</button>
 
 							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown{{$a->id}}">
-								<a href="{{ route('admin.announcements.show', [$a->id]) }}?d={{ $show_drafts ? 1 : 0 }}&sd={{ $show_softdeletes ? 1 : 0 }}" class="dropdown-item"><i class="fas fa-eye mr-2"></i>表示</a>
+								<a href="{{ route('admin.announcements.show', [$a->id]) }}?d={{ $show_drafts ? 1 : 0 }}&sd={{ $show_softdeletes ? 1 : 0 }}" class="dropdown-item"><i class="fas fa-eye mr-2"></i>View</a>
 
 								{{-- EDIT --}}
 								@if (Auth::user()->hasPermission('announcements_tab_edit'))
-								<a href="{{ route('admin.announcements.edit', [$a->id]) }}?d={{ $show_drafts ? 1 : 0 }}&sd={{ $show_softdeletes ? 1 : 0 }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>編集</a>
+								<a href="{{ route('admin.announcements.edit', [$a->id]) }}?d={{ $show_drafts ? 1 : 0 }}&sd={{ $show_softdeletes ? 1 : 0 }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>
 								@endif
 
 								{{-- PUBLISH/UNPUBLISH --}}
 								@if (Auth::user()->hasSomePermission('announcements_tab_publish', 'announcements_tab_unpublish'))
 									@if ($a->is_draft && Auth::user()->hasPermission('announcements_tab_publish'))
-									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.publish', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を発表するますか？');" class="dropdown-item"><i class="fas fa-upload mr-2"></i>発表する</a>
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.publish', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Publish this announcement?');" class="dropdown-item"><i class="fas fa-upload mr-2"></i>Publish</a>
 									@elseif (!$a->is_draft && Auth::user()->hasPermission('announcements_tab_unpublish'))
-									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.unpublish', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表をドラフトするますか？');" class="dropdown-item"><i class="fas fa-pencil-ruler mr-2"></i>ドラフトする</a>
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.unpublish', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Unpublish this announcement');" class="dropdown-item"><i class="fas fa-pencil-ruler mr-2"></i>Draft</a>
 									@endif
 								@endif
 								
 								{{-- DELETE --}}
 								@if (Auth::user()->hasPermission('announcements_tab_delete'))
 									@if ($a->trashed())
-									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.restore', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を復元するますか？');" class="dropdown-item"><i class="fas fa-recycle mr-2"></i>復元する</a>
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.restore', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を復元するますか？');" class="dropdown-item"><i class="fas fa-recycle mr-2"></i>Restore</a>
 									@else
-									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.delete', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を削除するますか？');" class="dropdown-item"><i class="fas fa-trash mr-2"></i>削除する</a>
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.delete', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を削除するますか？');" class="dropdown-item"><i class="fas fa-trash mr-2"></i>Trash</a>
 									@endif
 								@endif
 
 								{{-- PERMANENT DELETE --}}
 								@if (Auth::user()->hasPermission('announcements_tab_perma_delete'))
-								<a onclick="confirmLeave('{{ route('admin.announcements.permaDelete', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を完全に削除するますか？')" class="dropdown-item"><i class="fas fa-fire-alt mr-2"></i>完全に削除する</a>
+								<a onclick="confirmLeave('{{ route('admin.announcements.permaDelete', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を完全に削除するますか？')" class="dropdown-item"><i class="fas fa-fire-alt mr-2"></i>Delete</a>
 								@endif
 							</div>
 						</div>
