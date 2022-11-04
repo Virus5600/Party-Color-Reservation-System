@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'ユーザーズ')
+@section('title', 'Users')
 
 @section('content')
 <div class="container-fluid">
@@ -11,7 +11,7 @@
 				<div class="col-12">
 					<h1>
 						<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.users.index')}}');" class="text-dark text-decoration-none font-weight-normal">
-							<i class="fas fa-chevron-left mr-2"></i>ユーザーズ
+							<i class="fas fa-chevron-left mr-2"></i>Users
 						</a>
 					</h1>
 				</div>
@@ -34,7 +34,7 @@
 								<div class="image-input-scope" id="avatar-scope" data-settings="#image-input-settings" data-fallback-img="{{ asset('uploads/users/default.png') }}">
 									{{-- FILE IMAGE --}}
 									<div class="form-group text-center image-input collapse show avatar_holder" id="avatar-image-input-wrapper">
-										<label class="form-label font-weight-bold" for="avatar">ユーザーズイメージ</label><br>
+										<label class="form-label font-weight-bold" for="avatar">User Image</label><br>
 										<div class="hover-cam mx-auto avatar circular-border overflow-hidden">
 											<img src="{{ $user->getAvatar($user->is_avatar_link) }}" class="hover-zoom img-fluid avatar" id="avatar-file-container" alt="User Avatar" data-default-src="{{ $user->getAvatar(true) }}">
 											<span class="icon text-center image-input-float" id="avatar" tabindex="0">
@@ -44,23 +44,23 @@
 										<input type="file" class="d-none" accept=".jpg,.jpeg,.png,.webp" data-target-image-container="#avatar-file-container" data-target-name-container="#avatar-name" {{ $user->is_avatar_link ? '' : 'name=avatar' }} >
 										<h6 id="avatar-name" class="text-truncate w-50 mx-auto" data-default-name="{{ $user->getAvatar($user->is_avatar_link, false) }}">{{ $user->getAvatar($user->is_avatar_link, false) }}</h6>
 										<small class="text-muted pb-0 mb-0">
-											<b>初認された形式：</b>
+											<b>ALLOWED FORMATS:</b>
 											<br>JPEG, JPG, PNG, WEBP
 										</small><br>
-										<small class="text-muted pt-0 mt-0"><b>最大サイズ：</b> 5MB</small>
+										<small class="text-muted pt-0 mt-0"><b>MAX SIZE:</b> 5MB</small>
 									</div>
 								</div>
 
 								{{-- LOGO ERROR --}}
 								<div class="text-center">
-									<span style="color: #FC1838">{{$errors->first('avatar')}}</span>
+									<span class="text-danger small">{{$errors->first('avatar')}}</span>
 								</div>
 
 								{{-- OPTIONS --}}
 								<div class="text-center" id="image-input-settings">
 									{{-- REMOVE IMAGE --}}
 									<button type="button" class="btn btn-secondary image-input-reset" data-target="#avatar-scope" data-target-url="{{ route('removeImage') }}" data-category="user" data-id="{{ $user->id }}">
-										イメージを削除する
+										Remove Image
 									</button>
 								</div>
 							</div>
@@ -69,42 +69,42 @@
 								<div class="row">
 									{{-- FIRST NAME --}}
 									<div class="form-group col-6">
-										<label class="form-label" for="first_name">名</label>
-										<input type="text" id="first_name" name="first_name" class="form-control" placeholder="名" value="{{ $user->first_name }}" />
+										<label class="form-label" for="first_name">First Name</label>
+										<input type="text" id="first_name" name="first_name" class="form-control" placeholder="First Name" value="{{ $user->first_name }}" />
 										<span class="text-danger small">{{$errors->first('first_name')}}</span>
 									</div>
 
 									{{-- MIDDLE NAME --}}
 									<div class="form-group col-6">
-										<label class="form-label" for="middle_name">ミドル・ネーム</label>
-										<input type="text" id="middle_name" name="middle_name" class="form-control" placeholder="ミドル・ネーム" value="{{ $user->middle_name }}" />
+										<label class="form-label" for="middle_name">Middle Name</label>
+										<input type="text" id="middle_name" name="middle_name" class="form-control" placeholder="Middle Name" value="{{ $user->middle_name }}" />
 										<span class="text-danger small">{{$errors->first('middle_name')}}</span>
 									</div>
 
 									{{-- LAST NAME --}}
 									<div class="form-group col-6">
-										<label class="form-label" for="last_name">姓</label>
-										<input type="text" id="last_name" name="last_name" class="form-control" placeholder="姓" value="{{ $user->last_name }}" />
+										<label class="form-label" for="last_name">Last Name</label>
+										<input type="text" id="last_name" name="last_name" class="form-control" placeholder="Last Name" value="{{ $user->last_name }}" />
 										<span class="text-danger small">{{$errors->first('last_name')}}</span>
 									</div>
 
 									{{-- SUFFIX --}}
 									<div class="form-group col-6">
-										<label class="form-label" for="suffix">サフィックス</label>
-										<input type="text" id="suffix" name="suffix" class="form-control" placeholder="サフィックス" value="{{ $user->suffix }}" />
+										<label class="form-label" for="suffix">Suffix</label>
+										<input type="text" id="suffix" name="suffix" class="form-control" placeholder="Suffix" value="{{ $user->suffix }}" />
 										<span class="text-danger small">{{$errors->first('suffix')}}</span>
 									</div>
 
 									{{-- EMAIL --}}
 									<div class="form-group col-12">
-										<label class="form-label" for="email">Ｅメール</label>
-										<input type="email" id="email" name="email" class="form-control" placeholder="Ｅメール" value="{{ $user->email }}" />
+										<label class="form-label" for="email">Email</label>
+										<input type="email" id="email" name="email" class="form-control" placeholder="Email" value="{{ $user->email }}" />
 										<span class="text-danger small">{{$errors->first('email')}}</span>
 									</div>
 
 									{{-- USER TYPE --}}
 									<div class="form-group col-12">
-										<label class="form-label" for="type">ユーザーズタイプ</label>
+										<label class="form-label" for="type">User Type</label>
 										<br>
 										<select class="form-control selectpicker" name="type" id="type" data-live-search="true" title="User's role or user type">
 											@foreach($types as $t)
@@ -121,8 +121,8 @@
 
 						<div class="row">
 							<div class="col-6 mx-auto ml-lg-auto d-flex flex-row">
-								<button class="btn btn-success ml-auto" type="submit" data-action="update">提出する</button>
-								<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.users.index')}}');" class="btn btn-danger ml-3 mr-auto">キャンセル</a>
+								<button class="btn btn-success ml-auto" type="submit" data-action="update">Submit</button>
+								<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.users.index')}}');" class="btn btn-danger ml-3 mr-auto">Cancel</a>
 							</div>
 						</div>
 					</form>

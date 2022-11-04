@@ -78,6 +78,20 @@ class PermissionController extends Controller
 			->with('flash_success', 'Successfully added "' . trim($req->name) . '"');
 	}
 
+	protected function show($slug) {
+		$permission = Permission::where('slug', '=', $slug)->first();
+
+		if ($permission == null) {
+			return redirect()
+				->route('admin.permissions.index')
+				->with('flash_error', 'The permission does not exists.');
+		}
+
+		return view('admin.permissions.show', [
+			'permission' => $permission
+		]);
+	}
+
 	protected function edit($id) {
 		// Set to 404 to prevent editing of permissions
 		return abort(404);

@@ -43,13 +43,13 @@ Route::group(['prefix' => 'admin'], function() {
 			});
 
 			// Delete
-			Route::group(['middleware' => ['permissions:users_tab_delete']], function() {
+			Route::group(['middleware' => ['permissions:announcements_tab_delete']], function() {
 				Route::get('/{id}/delete', 'AnnouncementController@delete')->name('admin.announcements.delete');
 				Route::get('/{id}/restore', 'AnnouncementController@restore')->name('admin.announcements.restore');
 			});
 			
 			// Permanent Delete
-			Route::get('/{id}/perma-delete', 'AnnouncementController@permaDelete')->name('admin.announcements.permaDelete')->middleware('permissions:users_tab_perma_delete');
+			Route::get('/{id}/perma-delete', 'AnnouncementController@permaDelete')->name('admin.announcements.permaDelete')->middleware('permissions:announcements_tab_perma_delete');
 
 			// Publishing and Unpublishing
 			Route::get('/{id}/publish', 'AnnouncementController@publish')->name('admin.announcements.publish')->middleware('permissions:announcements_tab_publish');
@@ -64,8 +64,6 @@ Route::group(['prefix' => 'admin'], function() {
 
 		// USERS
 		Route::group(['prefix' => 'users', 'middleware' => ['permissions:users_tab_access']], function() {
-			Route::get('/', 'UserController@index')->name('admin.users.index');
-
 			// Create
 			Route::group(['middleware' => ['permissions:users_tab_create']], function() {
 				Route::get('/create', 'UserController@create')->name('admin.users.create');
@@ -85,10 +83,17 @@ Route::group(['prefix' => 'admin'], function() {
 				Route::get('/{id}/revert-permissions', 'UserController@revertPermissions')->name('admin.users.revert-permissions');
 				Route::post('{id}/update-permissions', 'UserController@updatePermissions')->name('admin.users.update-permissions');
 			});
+
+			// Index
+			Route::get('/', 'UserController@index')->name('admin.users.index');
 		});
 		
 		// PERMISSIONS
 		Route::group(['prefix' => 'permissions', 'middleware' => ['permissions:permissions_tab_access']], function() {
+			// Show
+			Route::get('/{slug}', 'PermissionController@show')->name('admin.permissions.show');
+
+			// Index
 			Route::get('/', 'PermissionController@index')->name('admin.permissions.index');
 		});
 

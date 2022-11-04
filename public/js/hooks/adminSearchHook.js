@@ -11,9 +11,9 @@ $('#admin-search input[name=search]').on('focusin focusout', (e) => {
 	let obj = $(e.currentTarget);
 
 	if (e.type == 'focusin')
-		obj.attr('placeholder', '検索・・・');
+		obj.attr('placeholder', 'Search...');
 	else if (e.type == 'focusout')
-		obj.attr('placeholder', '「/」を押して検索します');
+		obj.attr('placeholder', 'Press / to search');
 });
 
 $('#admin-search').on('submit keypress', (e) => {

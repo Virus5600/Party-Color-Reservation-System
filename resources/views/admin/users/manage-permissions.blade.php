@@ -31,6 +31,7 @@
 				<div class="card-body">
 					<form method="POST" action="{{ route('admin.users.update-permissions', [$user->id]) }}" enctype="multipart/form-data" class="form">
 						{{ csrf_field() }}
+						<input type="hidden" name="from" value="{{ $from }}"/>
 
 						@php($listed_perms = array())
 						@foreach($permissions as $p)
@@ -62,9 +63,9 @@
 
 						<div class="row">
 							<div class="col-6 mx-auto ml-lg-auto d-flex flex-row">
-								<button class="btn btn-success ml-auto" type="submit" data-action="update">提出する</button>
-								<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.users.revert-permissions', [$user->id])}}', '権限を元に戻しますか？', '部門権限を使用するか？');" class="btn btn-primary mx-3 di {{ $user->isUsingTypePermissions() ? 'disabled' : '' }}"><i class="fas fa-undo mr-2"></i>既定使用する</a>
-								<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.users.index')}}');" class="btn btn-danger mr-auto">キャンセル</a>
+								<button class="btn btn-success ml-auto" type="submit" data-action="update">Submit</button>
+								<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.users.revert-permissions', [$user->id, 'from' => $from])}}', 'Restore Permissions?', 'Use user type permissions?');" class="btn btn-primary mx-3 di {{ $user->isUsingTypePermissions() ? 'disabled' : '' }}"><i class="fas fa-undo mr-2"></i>Reset Permission</a>
+								<a href="javascript:void(0);" onclick="confirmLeave('{{url($from)}}');" class="btn btn-danger mr-auto">Cancel</a>
 							</div>
 						</div>
 					</form>

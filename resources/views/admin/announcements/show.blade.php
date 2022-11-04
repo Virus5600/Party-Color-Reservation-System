@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', '発行')
+@section('title', 'Announcements')
 
 @section('content')
 <div class="container-fluid">
@@ -11,7 +11,7 @@
 				<div class="col-6">
 					<h1>
 						<a href="{{ route('admin.announcements.index', ['d' => $show_drafts, 'sd' => $show_softdeletes]) }}" class="text-dark text-decoration-none font-weight-normal">
-							<i class="fas fa-chevron-left mr-2"></i>発表
+							<i class="fas fa-chevron-left mr-2"></i>Announcements
 						</a>
 					</h1>
 				</div>
@@ -21,19 +21,19 @@
 				<div class="col-6 d-flex flex-row-reverse">
 					@if (Auth::user()->hasPermission('announcements_tab_delete'))
 						@if ($announcement->trashed())
-						<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.restore', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を復元するますか？');" class="btn btn-success my-auto mx-1">復元する</a>
+						<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.restore', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Restore this announcement?');" class="btn btn-success my-auto mx-1">Restore</a>
 						@else
-						<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.delete', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を削除するますか？');" class="btn btn-danger my-auto mx-1">削除する</a>
+						<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.delete', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Delete this announcement?');" class="btn btn-danger my-auto mx-1">Delete</a>
 						@endif
 					@endif
 
 					@if ($announcement->is_draft)
 						@if(Auth::user()->hasPermission('announcements_tab_publish'))
-						<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.publish', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を発表するますか？');" class="btn btn-success my-auto mx-1">発表する</a>
+						<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.publish', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Publish this announcement?');" class="btn btn-success my-auto mx-1">Publish</a>
 						@endif
 					@else
 						@if(Auth::user()->hasPermission('announcements_tab_unpublish'))
-						<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.unpublish', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表をドラフトするますか？');" class="btn btn-info my-auto mx-1">ドラフトする</a>
+						<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.unpublish', [$announcement->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Mark this announcement as draft?');" class="btn btn-info my-auto mx-1">Draft</a>
 						@endif
 					@endif
 				</div>

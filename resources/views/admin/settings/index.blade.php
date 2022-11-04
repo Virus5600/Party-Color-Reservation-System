@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', '設定')
+@section('title', 'Settings')
 
 @section('content')
 <div class="container-fluid d-flex flex-column h-100">
@@ -54,7 +54,7 @@
 
 					{{-- LOGO ERROR --}}
 					<div class="text-center">
-						<span style="color: #FC1838">{{$errors->first('web-logo')}}</span>
+						<span class="text-danger small">{{$errors->first('web-logo')}}</span>
 					</div>
 				</div>
 
@@ -63,13 +63,13 @@
 					<div class="form-group">
 						<label class="form-label">Website Name</label>
 						<input type="text" name="web-name" class="form-control" value="{{ App\Settings::getValue('web-name') == null ? 'Municipality of Taytay, Rizal' : App\Settings::getValue('web-name') }}" />
-						<span style="color: #FC1838">{{$errors->first('web-name')}}</span>
+						<span class="text-danger small">{{$errors->first('web-name')}}</span>
 					</div>
 
 					<div class="form-group">
 						<label class="form-label">Website Description</label>
 						<textarea name="web-name" class="form-control not-resizable" rows="3">{{ App\Settings::getValue('web-desc') == null ? 'The official website of Taytay Municipal' : App\Settings::getValue('web-desc') }}</textarea>
-						<span style="color: #FC1838">{{$errors->first('web-desc')}}</span>
+						<span class="text-danger small">{{$errors->first('web-desc')}}</span>
 					</div>
 				</div>
 			</div>
