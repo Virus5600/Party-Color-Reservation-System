@@ -48,7 +48,6 @@
 					<td class="text-center align-middle mx-auto font-weight-bold">{{ $i->item_name }}</td>
 					<td class="text-center align-middle mx-auto">{{ $i->quantity }}</td>
 					<td class="text-center align-middle mx-auto"><i class="fas fa-circle {{ $i->trashed() ? 'text-info' : 'text-success' }} mr-2"></i>{{ $i->trashed() ? 'Inactive' : 'Active'}}</td>
-
 					<td class="align-middle">
 						<div class="dropdown ">
 							<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="dropdown{{$i->id}}" aria-haspopup="true" aria-expanded="false">
@@ -73,7 +72,7 @@
 
 								{{-- PERMANENT DELETE --}}
 								@if (Auth::user()->hasPermission('inventory_tab_perma_delete'))
-								<a onclick="confirmLeave('@{{ route('admin.inventory.permaDelete', [$i->id]) }}', undefined, 'Are you sure you want to delete this?')" class="dropdown-item"><i class="fas fa-fire-alt mr-2"></i>Delete</a>
+								<a onclick="confirmLeave('{{ route('admin.inventory.permaDelete', [$i->id]) }}', undefined, 'Are you sure you want to delete this?')" class="dropdown-item"><i class="fas fa-fire-alt mr-2"></i>Delete</a>
 								@endif
 							</div>
 						</div>
