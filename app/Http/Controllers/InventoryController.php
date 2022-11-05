@@ -130,4 +130,35 @@ class InventoryController extends Controller
 			->route('admin.inventory.index')
 			->with('flash_success', 'Successfully added item');
 	}
+
+	protected function permaDelete(Request $req, $id) {
+		$item = Inventory::withTrashed()->find($id);
+
+		if ($item == null) {
+			return redirect()
+				->route('admin.inventory.index')
+				->with('flash_error', 'Item either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();
+
+			$id = $item->id;
+
+			$item->forceDelete();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.inventory.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->route('admin.inventory.index')
+			->with('flash_success', 'Successfully removed the announcement permanently');
+	}
 }
