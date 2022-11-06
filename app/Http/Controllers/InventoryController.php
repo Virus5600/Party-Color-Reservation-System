@@ -12,17 +12,93 @@ use Validator;
 
 class InventoryController extends Controller
 {
-    protected function index(Request $req) {
-
-        $items = Inventory::withTrashed()->get();
+	protected function index(Request $req) {
+		$items = Inventory::withTrashed()->get();
 
 		return view('admin.inventory.index', [
-            'items' => $items
+			'items' => $items
 		]);
 	}
 
-    protected function create(Request $req) {
-		return view('admin.inventory.create');
+	protected function create(Request $req) {
+		$measurement_unit = [];
+
+		foreach (Inventory::withTrashed()->get() as $i)
+			array_push($measurement_unit, $i->measurement_unit);
+
+		return view('admin.inventory.create', [
+			'measurement_unit' => $measurement_unit
+		]);
+	}
+
+	protected function store(Request $req) {
+		$existing = Inventory::withTrashed()->where('item_name', '=', $req->item_name)->first();
+
+		if ($existing)
+			return $this->update($req, $existing->id);
+
+		$validator = Validator::make($req->all(), [
+			'item_name' => 'required|string|max:255',
+			'quantity' => 'required|integer|max:4294967295',
+			'measurement_unit' => 'required|string|max:50',
+		], [
+			'item_name.required' => 'Item name is required',
+			'item_name.string' => 'Item name should be a string',
+			'item_name.max' => 'Item name should not be longer than 255 characters',
+			'quantity.required' => 'Quantity is required',
+			'quantity.integer' => 'Quantity should be a number',
+			'quantity.max' => 'Quantity should not exceed 4,294,967,295',
+			'measurement_unit.required' => 'A unit of measurement is required',
+			'measurement_unit.string' => 'Unit of measurement should be a string',
+			'measurement_unit.max' => 'Unit of measurement should not be longer than 50 characters',
+		]);
+
+		if ($validator->fails()) {
+			return redirect()
+				->back()
+				->withErrors($validator)
+				->withInput();
+		}
+
+		try {
+			DB::beginTransaction();
+
+			$item = Inventory::create([
+				'item_name' => $req->item_name,
+				'quantity' => $req->quantity,
+				'measurement_unit' => $req->measurement_unit
+			]);
+
+			if (!$req->is_active)
+				$item->delete();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.inventory.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->route('admin.inventory.index')
+			->with('flash_success', 'Successfully added ' . $req->item_name);
+	}
+
+	protected function edit(Request $req, $id) {
+		$item = Inventory::withTrashed()->find($id);
+
+		if ($item == null) {
+			return redirect()
+				->route('admin.inventory.index')
+				->with('flash_error', 'The item either does not exists or is already deleted.');
+		}
+
+		return view('admin.inventory.edit', [
+			'item' => $item
+		]);
 	}
 
 	protected function update(Request $req, $id) {
@@ -36,13 +112,18 @@ class InventoryController extends Controller
 
 		$validator = Validator::make($req->all(), [
 			'item_name' => 'required|string|max:255',
-			'quantity' => 'required|integer|max:4294967295'
+			'quantity' => 'required|integer|max:4294967295',
+			'measurement_unit' => 'required|string|max:50',
 		], [
 			'item_name.required' => 'Item name is required',
-			'quantity.required' => 'Quantity is required',
-
+			'item_name.string' => 'Item name should be a string',
 			'item_name.max' => 'Item name should not be longer than 255 characters',
+			'quantity.required' => 'Quantity is required',
+			'quantity.integer' => 'Quantity should be a number',
 			'quantity.max' => 'Quantity should not exceed 4,294,967,295',
+			'measurement_unit.required' => 'A unit of measurement is required',
+			'measurement_unit.string' => 'Unit of measurement should be a string',
+			'measurement_unit.max' => 'Unit of measurement should not be longer than 50 characters',
 		]);
 
 		if ($validator->fails()) {
@@ -58,6 +139,7 @@ class InventoryController extends Controller
 
 			$item->item_name = $req->item_name;
 			$item->quantity = $req->quantity;
+			$item->measurement_unit = $req->measurement_unit;
 			
 			if ($req->is_active == null) {
 				$item->delete();
@@ -82,7 +164,7 @@ class InventoryController extends Controller
 			->with('flash_success', 'Successfully updated item.');
 	}
 
-    protected function delete(Request $req, $id) {
+	protected function delete(Request $req, $id) {
 		$item = Inventory::find($id);
 
 		if ($item == null) {
@@ -107,20 +189,6 @@ class InventoryController extends Controller
 		return redirect()
 			->back()
 			->with('flash_success', 'Successfully deactivated item.');
-	}
-
-	protected function edit(Request $req, $id) {
-		$item = Inventory::withTrashed()->find($id);
-
-		if ($item == null) {
-			return redirect()
-				->route('admin.inventory.index')
-				->with('flash_error', 'The item either does not exists or is already deleted.');
-		}
-
-		return view('admin.inventory.edit', [
-			'item' => $item
-		]);
 	}
 
 	protected function restore(Request $req, $id) {
@@ -153,53 +221,6 @@ class InventoryController extends Controller
 		return redirect()
 			->back()
 			->with('flash_success', 'Successfully activated item.');
-	}
-
-    protected function store(Request $req) {
-
-		$validator = Validator::make($req->all(), [
-			'item_name' => 'required|string|max:255',
-			'quantity' => 'required|integer|max:4294967295'
-		], [
-			'item_name.required' => 'Item name is required',
-			'quantity.required' => 'Quantity is required',
-
-			'item_name.max' => 'Item name should not be longer than 255 characters',
-			'quantity.max' => 'Quantity should not exceed 4,294,967,295',
-		]);
-
-		if ($validator->fails()) {
-			Log::debug($validator->messages());
-			return redirect()
-				->back()
-				->withErrors($validator)
-				->withInput();
-		}
-
-		try {
-			DB::beginTransaction();
-
-			$item = Inventory::create([
-				'item_name' => $req->item_name,
-				'quantity' => $req->quantity
-			]);
-
-			if (!$req->is_active)
-				$item->delete();
-
-			DB::commit();
-		} catch (Exception $e) {
-			DB::rollback();
-			Log::error($e);
-
-			return redirect()
-				->route('admin.inventory.index')
-				->with('flash_error', 'Something went wrong, please try again later');
-		}
-
-		return redirect()
-			->route('admin.inventory.index')
-			->with('flash_success', 'Successfully added item');
 	}
 
 	protected function permaDelete(Request $req, $id) {

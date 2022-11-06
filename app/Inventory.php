@@ -11,7 +11,8 @@ class Inventory extends Model
 
 	protected $fillable = [
 		'item_name',
-		'quantity'
+		'quantity',
+		'measurement_unit'
 	];
 
     protected $casts = [
@@ -19,4 +20,9 @@ class Inventory extends Model
 		'updated_at' => 'datetime',
 		'deleted_at' => 'datetime',
 	];
+
+	// Custom Functions
+	public function getInStock() {
+		return "{$this->quantity} {$this->measurement_unit}";
+	}
 }

@@ -17,6 +17,7 @@ class CreateInventoriesTable extends Migration
             $table->id();
             $table->string('item_name')->unique();
             $table->integer('quantity')->unsigned();
+            $table->string('measurement_unit', 50);
             $table->softDeletes();
             $table->timestamps();
         });
