@@ -127,7 +127,7 @@ class UserController extends Controller
 
 	protected function create() {
 		$types = Type::get();
-		$password = Str::random(25);
+		$password = str_shuffle(Str::random(25) . str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT));
 
 		return view('admin.users.create', [
 			'types' => $types,
