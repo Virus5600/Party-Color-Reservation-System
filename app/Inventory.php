@@ -23,6 +23,6 @@ class Inventory extends Model
 
 	// Custom Functions
 	public function getInStock() {
-		return "{$this->quantity} {$this->measurement_unit}";
+		return number_format($this->quantity, 0, ',', ', ') . " {$this->measurement_unit}";
 	}
 }

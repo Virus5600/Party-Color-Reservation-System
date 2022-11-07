@@ -88,7 +88,11 @@ class InventoryController extends Controller
 	}
 
 	protected function edit(Request $req, $id) {
+		$measurement_unit = [];
 		$item = Inventory::withTrashed()->find($id);
+
+		foreach (Inventory::withTrashed()->get() as $i)
+			array_push($measurement_unit, $i->measurement_unit);
 
 		if ($item == null) {
 			return redirect()
@@ -97,7 +101,8 @@ class InventoryController extends Controller
 		}
 
 		return view('admin.inventory.edit', [
-			'item' => $item
+			'item' => $item,
+			'measurement_unit' => $measurement_unit
 		]);
 	}
 
