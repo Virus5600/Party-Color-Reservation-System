@@ -15,7 +15,7 @@ class SettingsTableSeeder extends Seeder
 	{
 		Settings::create([
 			'name' => 'web-logo',
-			'value' => 'party_color.png',
+			'value' => 'default.png',
 			'is_file' => 1
 		]);
 

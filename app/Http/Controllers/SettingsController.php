@@ -8,6 +8,7 @@ use App\Settings;
 
 use DB;
 use Exception;
+use File;
 use Log;
 use Validator;
 
@@ -59,7 +60,19 @@ class SettingsController extends Controller
 					$v = implode(', ', $v);
 				}
 				else if ($k == 'web-logo') {
-					continue;
+					if ($req->has($k)) {
+						$setting = Settings::where('name', '=', $k)->first();
+
+						if ($setting->value != 'default.png')
+							File::delete(public_path() . "/uploads/settings/{$setting->value}");
+						
+						$destination = "uploads/settings";
+						$fileType = $req->file($k)->getClientOriginalExtension();
+						$v = "favicon.{$fileType}";
+						$req->file($k)->move($destination, $v);
+					}
+					else
+						continue;
 				}
 
 				$setting = Settings::where('name', '=', $k)->first();

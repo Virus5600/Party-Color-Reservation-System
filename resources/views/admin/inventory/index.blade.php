@@ -59,7 +59,7 @@
 								{{-- EDIT --}}
 								@if (Auth::user()->hasPermission('inventory_tab_edit'))
 								<a href="{{ route('admin.inventory.edit', [$i->id]) }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>
-								{{-- <a href="javascript:void(0);" class="dropdown-item" data-scf="quantity" ><i class="fas fa-plus-circle mr-2"></i>Increase Stock</a> --}}
+								{{-- <a href="javascript:void(0);" class="dropdown-item" data-scf="Quantity" data-scf-name="quantity" data-scf-target-uri="{{ route('admin.inventory.increase', [$i->id]) }}"><i class="fas fa-plus-circle mr-2"></i>Increase Stock</a> --}}
 								@endif
 								
 								{{-- DELETE --}}
@@ -95,5 +95,6 @@
 @endsection
 
 @section('scripts')
+<script type="text/javascript" src="{{ asset('js/util/confirm-leave.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/util/swal-change-field.js') }}"></script>
 @endsection

@@ -17,7 +17,7 @@
 
 	<div class="card dark-shadow flex-fill py-2 px-3 mb-3" id="inner-content">
 		@if (Auth::user()->hasPermission('settings_tab_edit'))
-		<form method="POST" action="{{ route('admin.settings.update') }}" class="form">
+		<form method="POST" action="{{ route('admin.settings.update') }}" class="form" enctype="multipart/form-data">
 		@else
 		<form class="form" readonly>
 		@endif
@@ -50,7 +50,8 @@
 										<b>FORMATS ALLOWED:</b>
 										<br>JPEG, JPG, PNG, WEBP
 									</small><br>
-									<small class="text-muted pt-0 mt-0"><b>MAX SIZE:</b> 5MB</small>
+									<small class="text-muted pt-0 mt-0"><b>MAX SIZE:</b> 5MB</small><br>
+									{{-- <a href="javascript:void(0);" class="btn btn-sm btn-secondary" id="revert-favicon"><i class="fas fa-share mr-2"></i>Revert to Original</a> --}}
 								</div>
 							</div>
 						</div>
@@ -165,6 +166,10 @@
 		$('#revert').on('click', (e) => {
 			location.reload();
 		});
+
+		// $('#revert-favicon').on('click', (e) => {
+		// 	Swal.fire();
+		// });
 		@else
 		$.each($('form').find('input, textarea'), (k, v) => {
 			$(v).prop('readonly', true);

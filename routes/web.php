@@ -40,6 +40,8 @@ Route::group(['prefix' => 'admin'], function() {
 			Route::group(['middleware' => ['permissions:inventory_tab_edit']], function() {
 				Route::get('/{id}/edit', 'InventoryController@edit')->name('admin.inventory.edit');
 				Route::post('/{id}/update', 'InventoryController@update')->name('admin.inventory.update');
+
+				Route::post('/{id}/increase', 'InventoryController@increase')->name('admin.inventory.increase');
 			});
 
 			// Delete

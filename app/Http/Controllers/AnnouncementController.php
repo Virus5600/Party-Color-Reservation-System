@@ -219,7 +219,6 @@ class AnnouncementController extends Controller
 		]);
 
 		if ($validator->fails()) {
-			Log::debug($validator->messages());
 			return redirect()
 				->back()
 				->withErrors($validator)
@@ -456,7 +455,7 @@ class AnnouncementController extends Controller
 
 			$announcement->forceDelete();
 			if ($poster != null)
-				File::delete(public_path() . '/uploads/announcements/' . $id . '/' . $poster);
+				File::deleteDirectory(public_path() . '/uploads/announcements/' . $id);
 
 			DB::commit();
 		} catch (Exception $e) {

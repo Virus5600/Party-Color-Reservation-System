@@ -91,15 +91,15 @@
 								{{-- DELETE --}}
 								@if (Auth::user()->hasPermission('announcements_tab_delete'))
 									@if ($a->trashed())
-									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.restore', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を復元するますか？');" class="dropdown-item"><i class="fas fa-recycle mr-2"></i>Restore</a>
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.restore', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Are you sure you want to restore this?');" class="dropdown-item"><i class="fas fa-recycle mr-2"></i>Restore</a>
 									@else
-									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.delete', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を削除するますか？');" class="dropdown-item"><i class="fas fa-trash mr-2"></i>Trash</a>
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.delete', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Are you sure you want to delete this?');" class="dropdown-item"><i class="fas fa-trash mr-2"></i>Trash</a>
 									@endif
 								@endif
 
 								{{-- PERMANENT DELETE --}}
 								@if (Auth::user()->hasPermission('announcements_tab_perma_delete'))
-								<a onclick="confirmLeave('{{ route('admin.announcements.permaDelete', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'この発表を完全に削除するますか？')" class="dropdown-item"><i class="fas fa-fire-alt mr-2"></i>Delete</a>
+								<a onclick="confirmLeave('{{ route('admin.announcements.permaDelete', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Are you sure you want to permanently delete this?')" class="dropdown-item"><i class="fas fa-fire-alt mr-2"></i>Delete</a>
 								@endif
 							</div>
 						</div>

@@ -1,7 +1,6 @@
 $(document).ready(() => {
 	$(document).on('click', '.change-password', (e) => {
 		let obj = $(e.currentTarget);
-		console.log(obj.attr('data-scp'));
 		let data = JSON.parse(obj.attr('data-scp'));
 
 		if(typeof data.preventDefault == 'undefined')

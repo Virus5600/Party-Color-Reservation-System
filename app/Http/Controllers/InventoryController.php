@@ -169,6 +169,53 @@ class InventoryController extends Controller
 			->with('flash_success', 'Successfully updated item.');
 	}
 
+	protected function increase(Request $req, $id) {
+		$item = Inventory::withTrashed()->find($id);
+
+		if ($item == null) {
+			return redirect()
+				->route('admin.inventory.index')
+				->with('flash_error', 'The item either does not exists or is already deleted.');
+		}
+
+		$validator = Validator::make($req->all(), [
+			'quantity' => 'required|integer|max:4294967295',
+		], [
+			'quantity.required' => 'Quantity is required',
+			'quantity.integer' => 'Quantity should be a number',
+			'quantity.max' => 'Quantity should not exceed 4,294,967,295',
+		]);
+
+		if ($validator->fails()) {
+			Log::debug($validator->messages());
+			return response()
+				->json([
+					''
+				]);
+		}
+
+		try {
+			DB::beginTransaction();
+
+			$item->quantity = $item->quantity + $req->quantity;
+			$item->save();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.inventory.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return response()
+			->json([
+				''
+			]);
+	}
+
 	protected function delete(Request $req, $id) {
 		$item = Inventory::find($id);
 
