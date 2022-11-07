@@ -169,6 +169,8 @@
 		$.each($('form').find('input, textarea'), (k, v) => {
 			$(v).prop('readonly', true);
 		});
+
+		$('div.tag .tag-i').remove();
 		@endif
 	});
 </script>
