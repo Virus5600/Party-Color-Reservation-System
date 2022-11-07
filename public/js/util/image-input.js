@@ -1,5 +1,5 @@
 function openInput(obj) {
-	$("input[name=" + obj.attr("id") + "]").trigger("click");
+	$("input[name=" + obj.attr("id") + "]:not([readonly])").trigger("click");
 }
 
 function swapImgFile(obj) {
