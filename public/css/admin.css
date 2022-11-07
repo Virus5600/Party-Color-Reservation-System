@@ -79,68 +79,6 @@
 }
 /* サイドバールエンドー */
 
-/* HOVER CAM */
-.hover-cam {
-	width: min-content;
-	height: min-content;
-	position: relative;
-}
-
-.hover-cam > span.icon, .hover-zoom, .hover-zoom-2, .div-hover-zoom > div, .a-hover-zoom > a, .a-fa-hover-zoom > a > svg, .div-hover-zoom-2 > div, .a-hover-zoom-2 > a, .a-fa-hover-zoom-2 > a > svg, .secondary-hover-dark {
-	transition: 0.25s;
-}
-
-.hover-zoom:hover, .div-hover-zoom > div:hover, .a-hover-zoom > a:hover, .a-fa-hover-zoom > a > svg:hover {
-	transform: scale(1.0625);
-	-o-transform: scale(1.0625);
-	-ms-transform: scale(1.0625);
-	-moz-transform: scale(1.0625);
-	-webkit-transform: scale(1.0625);
-}
-.hover-zoom-2:hover ,.div-hover-zoom-2 > div:hover, .a-hover-zoom-2 > a:hover, .a-fa-hover-zoom-2 > a > svg:hover {
-	transform: scale(1.125);
-	-o-transform: scale(1.125);
-	-ms-transform: scale(1.125);
-	-moz-transform: scale(1.125);
-	-webkit-transform: scale(1.125);
-}
-
-.hover-cam > span.icon {
-	background-color: rgba(0, 0, 0, 0.5);
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	opacity: 0;
-}
-
-.hover-cam > span.icon > .hover-icon, .hover-cam > span.icon > .hover-icon-2x {
-	top: 50%;
-	left: 50%;
-	position: absolute;
-	transform: translate(-50%, -50%);
-	-o-transform: translate(-50%, -50%);
-	-ms-transform: translate(-50%, -50%);
-	-moz-transform: translate(-50%, -50%);
-	-webkit-transform: translate(-50%, -50%);
-	opacity: 0.75;
-}
-
-.hover-cam > span.icon > .hover-icon {
-	font-size: 250%;
-}
-
-.hover-cam > span.icon > .hover-icon-2x {
-	font-size: 500%;
-}
-
-.hover-cam > span.icon:hover,
-.hover-cam > span.icon:focus {
-	opacity: 1;
-}
-/* HOVER CAM END */
-
 .custom-hr {
 	border-width: 2.5pt;
 }

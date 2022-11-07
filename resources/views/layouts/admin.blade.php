@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ja-JP">
+<html lang="en-US">
 	<head>
 		{{-- META DATA --}}
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<meta http-equiv="Content-Language" content="ja-JP" />
+		<meta http-equiv="Content-Language" content="en-US" />
 
 		{{-- SITE META --}}
 		<meta name="type" content="website">
@@ -37,7 +37,7 @@
 
 		@yield('css')
 
-		{{-- JQUERY / SWEETALERT 2 / SLICK CAROUSEL / FONTAWESOME 6 / SUMMERNOTE --}}
+		{{-- JQUERY / SWEETALERT 2 / SLICK CAROUSEL / FONTAWESOME 6 / SUMMERNOTE / TAGGING JS --}}
 		<script type="text/javascript" src="{{ asset('js/scripts.js') }}"></script>
 
 		{{-- Removes the code that shows up when script is disabled/not allowed/blocked --}}
@@ -96,69 +96,70 @@
 					</div>
 				</div>
 			</main>
-
-			<!-- SCRIPTS -->
-			<script type="text/javascript">const fiFallbackImage = '{{ asset("uploads/users/default.png") }}';</script>
-			<script type="text/javascript" src="{{ asset('js/admin.js') }}"></script>
-			<script type="text/javascript" src="{{ asset('js/util/fallback-image.js') }}"></script>
-			<script type="text/javascript">
-				@if (Session::has('flash_error'))
-				Swal.fire({
-					{!!Session::has('has_icon') ? "icon: `error`," : ""!!}
-					title: `{{Session::get('flash_error')}}`,
-					{!!Session::has('message') ? 'html: `' . Session::get('message') . '`,' : ''!!}
-					position: {!!Session::has('position') ? '`' . Session::get('position') . '`' : '`top`'!!},
-					showConfirmButton: false,
-					toast: {!!Session::has('is_toast') ? Session::get('is_toast') : true!!},
-					{!!Session::has('has_timer') ? (Session::get('has_timer') ? (Session::has('duration') ? ('timer: ' . Session::get('duration')) . ',' : `timer: 10000,`) : '') : `timer: 10000,`!!}
-					background: `#dc3545`,
-					customClass: {
-						title: `text-white`,
-						content: `text-white`,
-						popup: `px-3`
-					},
-				});
-				@elseif (Session::has('flash_info'))
-				Swal.fire({
-					{!!Session::has('has_icon') ? "icon: `info`," : ""!!}
-					title: `{{Session::get('flash_info')}}`,
-					{!!Session::has('message') ? 'html: `' . Session::get('message') . '`,' : ''!!}
-					position: {!!Session::has('position') ? '`' . Session::get('position') . '`' : '`top`'!!},
-					showConfirmButton: false,
-					toast: {!!Session::has('is_toast') ? Session::get('is_toast') : true!!},
-					{!!Session::has('has_timer') ? (Session::get('has_timer') ? (Session::has('duration') ? ('timer: ' . Session::get('duration')) . ',' : `timer: 10000,`) : '') : `timer: 10000,`!!}
-					background: `#17a2b8`,
-					customClass: {
-						title: `text-white`,
-						content: `text-white`,
-						popup: `px-3`
-					},
-				});
-				@elseif (Session::has('flash_success'))
-				Swal.fire({
-					{!!Session::has('has_icon') ? "icon: `success`," : ""!!}
-					title: `{{Session::get('flash_success')}}`,
-					{!!Session::has('message') ? 'html: `' . Session::get('message') . '`,' : ''!!}
-					position: {!!Session::has('position') ? '`' . Session::get('position') . '`' : '`top`'!!},
-					showConfirmButton: false,
-					toast: {!!Session::has('is_toast') ? Session::get('is_toast') : true!!},
-					{!!Session::has('has_timer') ? (Session::get('has_timer') ? (Session::has('duration') ? ('timer: ' . Session::get('duration')) . ',' : `timer: 10000,`) : '') : `timer: 10000,`!!}
-					background: `#28a745`,
-					customClass: {
-						title: `text-white`,
-						content: `text-white`,
-						popup: `px-3`
-					},
-				});
-				@endif
-
-				$(document).ready(function(){
-					$(".col-a").click(function(){
-						$('.collapse.show').collapse('hide');
-					});
-				});
-			</script>
-			@yield('scripts')
 		</div>
+
+		<!-- SCRIPTS -->
+		<script type="text/javascript">const fiFallbackImage = '{{ asset("uploads/users/default.png") }}';</script>
+		<script type="text/javascript" src="{{ asset('js/admin.js') }}"></script>
+		<script type="text/javascript" src="{{ asset('js/util/fallback-image.js') }}"></script>
+		<script type="text/javascript">
+			@if (Session::has('flash_error'))
+			Swal.fire({
+				{!!Session::has('has_icon') ? "icon: `error`," : ""!!}
+				title: `{{Session::get('flash_error')}}`,
+				{!!Session::has('message') ? 'html: `' . Session::get('message') . '`,' : ''!!}
+				position: {!!Session::has('position') ? '`' . Session::get('position') . '`' : '`top`'!!},
+				showConfirmButton: false,
+				toast: {!!Session::has('is_toast') ? Session::get('is_toast') : true!!},
+				{!!Session::has('has_timer') ? (Session::get('has_timer') ? (Session::has('duration') ? ('timer: ' . Session::get('duration')) . ',' : `timer: 10000,`) : '') : `timer: 10000,`!!}
+				background: `#dc3545`,
+				customClass: {
+					title: `text-white`,
+					content: `text-white`,
+					popup: `px-3`
+				},
+			});
+			@elseif (Session::has('flash_info'))
+			Swal.fire({
+				{!!Session::has('has_icon') ? "icon: `info`," : ""!!}
+				title: `{{Session::get('flash_info')}}`,
+				{!!Session::has('message') ? 'html: `' . Session::get('message') . '`,' : ''!!}
+				position: {!!Session::has('position') ? '`' . Session::get('position') . '`' : '`top`'!!},
+				showConfirmButton: false,
+				toast: {!!Session::has('is_toast') ? Session::get('is_toast') : true!!},
+				{!!Session::has('has_timer') ? (Session::get('has_timer') ? (Session::has('duration') ? ('timer: ' . Session::get('duration')) . ',' : `timer: 10000,`) : '') : `timer: 10000,`!!}
+				background: `#17a2b8`,
+				customClass: {
+					title: `text-white`,
+					content: `text-white`,
+					popup: `px-3`
+				},
+			});
+			@elseif (Session::has('flash_success'))
+			Swal.fire({
+				{!!Session::has('has_icon') ? "icon: `success`," : ""!!}
+				title: `{{Session::get('flash_success')}}`,
+				{!!Session::has('message') ? 'html: `' . Session::get('message') . '`,' : ''!!}
+				position: {!!Session::has('position') ? '`' . Session::get('position') . '`' : '`top`'!!},
+				showConfirmButton: false,
+				toast: {!!Session::has('is_toast') ? Session::get('is_toast') : true!!},
+				{!!Session::has('has_timer') ? (Session::get('has_timer') ? (Session::has('duration') ? ('timer: ' . Session::get('duration')) . ',' : `timer: 10000,`) : '') : `timer: 10000,`!!}
+				background: `#28a745`,
+				customClass: {
+					title: `text-white`,
+					content: `text-white`,
+					popup: `px-3`
+				},
+			});
+			@endif
+
+			$(document).ready(function(){
+				$(".col-a").click(function(){
+					$('.collapse.show').collapse('hide');
+				});
+			});
+		</script>
+		@yield('scripts')
+		
 	</body>
 </html>

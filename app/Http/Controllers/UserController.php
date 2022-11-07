@@ -42,7 +42,8 @@ class UserController extends Controller
 		if ($user == null)
 			return redirect()
 				->back()
-				->with('flash_error', 'Wrong email/password!');
+				->with('flash_error', 'Wrong email/password!')
+				->withInput(array('email' => $req->email));
 
 		$authenticated = false;
 		if (!$user->locked) {
@@ -117,14 +118,10 @@ class UserController extends Controller
 
 	// PAGES
 	protected function index(Request $req) {
-		$users = User::get();
-
-		if ($req->has('sd') && $req->sd == 1)
-			$users = User::withTrashed()->get();
+		$users = User::withTrashed()->get();
 
 		return view('admin.users.index', [
-			'users' => $users,
-			'show_softdeletes' => ($req->has('sd') && $req->sd == 1 ? true : false)
+			'users' => $users
 		]);
 	}
 
@@ -145,7 +142,7 @@ class UserController extends Controller
 			'last_name' => array('required', 'string', 'max:255'),
 			'email' => 'required|email|string|max:255',
 			'type' => 'required|numeric|exists:types,id',
-			'password' => 'required|string|min:8|max:255',
+			'password' => array('required', 'string', 'min:8', 'max:255', 'regex:/^[a-zA-Z]+[0-9]+$/'),
 			'avatar' => 'max:5120|mimes:jpeg,jpg,png,webp|nullable',
 		], [
 			'first_name.required' => 'The first or given name is required',
@@ -223,7 +220,7 @@ class UserController extends Controller
 	}
 
 	protected function edit($id) {
-		$user = User::find($id);
+		$user = User::withTrashed()->find($id);
 		$types = Type::get();
 
 		if ($user == null) {
@@ -239,7 +236,7 @@ class UserController extends Controller
 	}
 
 	protected function update(Request $req, $id) {
-		$user = User::find($id);
+		$user = User::withTrashed()->find($id);
 
 		if ($user == null) {
 			return redirect()
@@ -326,7 +323,7 @@ class UserController extends Controller
 	}
 
 	protected function changePassword(Request $req, $id) {
-		$user = User::find($id);
+		$user = User::withTrashed()->find($id);
 
 		if ($user == null) {
 			return response()
@@ -337,7 +334,7 @@ class UserController extends Controller
 		}
 
 		$validator = Validator::make($req->all(), [
-			'password' => array('required', 'regex:/([a-z])([0-9])/i', 'min:8', 'confirmed'),
+			'password' => array('required', 'regex:/([a-z]*)([0-9])*/i', 'min:8', 'confirmed'),
 			'password_confirmation' => 'required'
 		], [
 			'password.required' => 'The new password is required',
@@ -379,29 +376,32 @@ class UserController extends Controller
 			]);
 	}
 
-	protected function managePermissions($id) {
-		$user = User::find($id);
+	protected function managePermissions(Request $req, $id) {
+		$user = User::withTrashed()->find($id);
 		$permissions = Permission::get();
+		$from = $req->from ? $req->from : route('admin.users.index');
 
 		if ($user == null) {
 			return redirect()
-				->route('admin.users.index')
+				->to($from)
 				->with('flash_error', 'The account either does not exists or is already deleted.');
 		}
 
 		return view('admin.users.manage-permissions', [
 			'user' => $user,
-			'permissions' => $permissions
+			'permissions' => $permissions,
+			'from' => $from
 		]);
 	}
 
-	protected function revertPermissions($id) {
-		$user = User::find($id);
+	protected function revertPermissions(Request $req, $id) {
+		$user = User::withTrashed()->find($id);
 		$permissions = Permission::get();
+		$from = $req->from ? $req->from : false;
 
 		if ($user == null) {
 			return redirect()
-				->route('admin.users.index')
+				->to($from)
 				->with('flash_error', 'The account either does not exists or is already deleted.');
 		}
 
@@ -418,21 +418,22 @@ class UserController extends Controller
 			Log::error($e);
 
 			return redirect()
-				->route('admin.users.manage-permissions')
+				->route('admin.users.manage-permissions', [$user->id, 'from' => $from ? $from : null])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
 		return redirect()
-			->route('admin.users.manage-permissions', [$user->id])
+			->route('admin.users.manage-permissions', [$user->id, 'from' => $from ? $from : null])
 			->with('flash_success', 'Successfully reverted back to type permissions');
 	}
 
 	protected function updatePermissions(Request $req, $id) {
-		$user = User::find($id);
+		$user = User::withTrashed()->find($id);
+		$from = $req->from ? $req->from : route('admin.users.index');
 
 		if ($user == null) {
 			return redirect()
-				->route('admin.users.index')
+				->to($from)
 				->with('flash_error', 'The account either does not exists or is already deleted.');
 		}
 
@@ -520,12 +521,14 @@ class UserController extends Controller
 			Log::error($e);
 
 			return redirect()
-				->route('admin.users.index')
+				->to($from)
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
 		return redirect()
-			->route('admin.users.index')
+			->to($from)
 			->with('flash_success', 'Successfully updated ' . trim($user->getName()) . '\'s permissions');
 	}
+
+
 }

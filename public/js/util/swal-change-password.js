@@ -34,9 +34,9 @@ $(document).ready(() => {
 		html = `
 		<div class="row">
 			<div class="col-12 my-2">
-				<label class="form-label d-none" for="password">パスワード</label>
+				<label class="form-label d-none" for="password">Password</label>
 				<div class="input-group">
-					<input class="form-control border-secondary border-right-0" type="password" name="password" id="password" aria-label="Password" aria-describedby="toggle-show-password" placeholder="パスワード" />
+					<input class="form-control border-secondary border-right-0" type="password" name="password" id="password" aria-label="Password" aria-describedby="toggle-show-password" placeholder="Password" />
 					<div class="input-group-append">
 						<button type="button" class="btn bg-white border-secondary border-left-0 toggle-show-password" aria-label="Show Password" data-target="#password">
 							<i class="fas fa-eye d-none" id="show"></i>
@@ -47,9 +47,9 @@ $(document).ready(() => {
 			</div>
 
 			<div class="col-12 my-2">
-				<label class="form-label d-none" for="confirm_password">パスワードの確認</label>
+				<label class="form-label d-none" for="confirm_password">Confirm Password</label>
 				<div class="input-group">
-					<input class="form-control border-secondary border-right-0" type="password" name="confirm_password" id="confirm_password" aria-label="Confirm Password" aria-describedby="toggle-show-password" placeholder="パスワードの確認" />
+					<input class="form-control border-secondary border-right-0" type="password" name="confirm_password" id="confirm_password" aria-label="Confirm Password" aria-describedby="toggle-show-password" placeholder="Confirm Password" />
 					<div class="input-group-append">
 						<button type="button" class="btn bg-white border-secondary border-left-0 toggle-show-password" aria-label="Show Password" data-target="#confirm_password">
 							<i class="fas fa-eye d-none" id="show"></i>
@@ -62,10 +62,10 @@ $(document).ready(() => {
 		`;
 
 		Swal.fire({
-			title: `<b>${data.name}</b>のパスワードの変更`,
+			title: `Changed password for <b>${data.name}</b>`,
 			html: html,
-			confirmButtonText: '提出する',
-			cancelButtonText: 'キャンセル',
+			confirmButtonText: 'Submit',
+			cancelButtonText: 'Cancel',
 			showCancelButton: true,
 			focusConfirm: false,
 			allowOutsideClick: false,

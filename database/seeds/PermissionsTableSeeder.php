@@ -151,7 +151,7 @@ class PermissionsTableSeeder extends Seeder
 			'slug' => 'users_tab_perma_delete'
 		]);
 
-		// PERMISSION - 11
+		// PERMISSION
 		$permsPerm = Permission::create([
 			'name' => 'Permissions Tab Access',
 			'slug' => 'permissions_tab_access'
@@ -163,7 +163,7 @@ class PermissionsTableSeeder extends Seeder
 			'slug' => 'permissions_tab_manage'
 		]);
 
-		// SETTINGS - 13
+		// SETTINGS
 		$settingsPerm = Permission::create([
 			'name' => 'Settings Tab Access',
 			'slug' => 'settings_tab_access'

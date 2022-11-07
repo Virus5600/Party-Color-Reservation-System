@@ -28,6 +28,38 @@ Route::group(['prefix' => 'admin'], function() {
 		Route::get('/', 'PageController@redirectToDashboard')->name('admin.redirectToDashboard');
 		Route::get('/dashboard', 'PageController@dashboard')->name('admin.dashboard');
 
+		// INVENTORY
+		Route::group(['prefix' => 'inventory', 'middleware' => ['permissions:inventory_tab_access']], function() {
+			// Create
+			Route::group(['prefix' => 'create', 'middleware' => ['permissions:inventory_tab_create']], function() {
+				Route::get('/', 'InventoryController@create')->name('admin.inventory.create');
+				Route::post('/store', 'InventoryController@store')->name('admin.inventory.store');
+			});
+
+			// Edit
+			Route::group(['middleware' => ['permissions:inventory_tab_edit']], function() {
+				Route::get('/{id}/edit', 'InventoryController@edit')->name('admin.inventory.edit');
+				Route::post('/{id}/update', 'InventoryController@update')->name('admin.inventory.update');
+			});
+
+			// Delete
+			Route::group(['middleware' => ['permissions:inventory_tab_delete']], function() {
+				Route::get('/{id}/delete', 'InventoryController@delete')->name('admin.inventory.delete');
+				Route::get('/{id}/restore', 'InventoryController@restore')->name('admin.inventory.restore');
+			});
+			
+			// Permanent Delete
+			Route::get('/{id}/perma-delete', 'InventoryController@permaDelete')->name('admin.inventory.permaDelete')->middleware('permissions:inventory_tab_perma_delete');
+
+			// Publishing and Unpublishing
+			// Route::get('/{id}/publish', 'InventoryController@publish')->name('admin.inventory.publish')->middleware('permissions:inventory_tab_publish');
+			// Route::get('/{id}/unpublish', 'InventoryController@unpublish')->name('admin.inventory.unpublish')->middleware('permissions:inventory_tab_unpublish');
+
+			// Index
+			Route::get('/', 'InventoryController@index')->name('admin.inventory.index');
+		});
+
+
 		// ANNOUNCEMENTS
 		Route::group(['prefix' => 'announcements', 'middleware' => ['permissions:announcements_tab_access']], function() {
 			// Create
@@ -43,13 +75,13 @@ Route::group(['prefix' => 'admin'], function() {
 			});
 
 			// Delete
-			Route::group(['middleware' => ['permissions:users_tab_delete']], function() {
+			Route::group(['middleware' => ['permissions:announcements_tab_delete']], function() {
 				Route::get('/{id}/delete', 'AnnouncementController@delete')->name('admin.announcements.delete');
 				Route::get('/{id}/restore', 'AnnouncementController@restore')->name('admin.announcements.restore');
 			});
 			
 			// Permanent Delete
-			Route::get('/{id}/perma-delete', 'AnnouncementController@permaDelete')->name('admin.announcements.permaDelete')->middleware('permissions:users_tab_perma_delete');
+			Route::get('/{id}/perma-delete', 'AnnouncementController@permaDelete')->name('admin.announcements.permaDelete')->middleware('permissions:announcements_tab_perma_delete');
 
 			// Publishing and Unpublishing
 			Route::get('/{id}/publish', 'AnnouncementController@publish')->name('admin.announcements.publish')->middleware('permissions:announcements_tab_publish');
@@ -64,8 +96,6 @@ Route::group(['prefix' => 'admin'], function() {
 
 		// USERS
 		Route::group(['prefix' => 'users', 'middleware' => ['permissions:users_tab_access']], function() {
-			Route::get('/', 'UserController@index')->name('admin.users.index');
-
 			// Create
 			Route::group(['middleware' => ['permissions:users_tab_create']], function() {
 				Route::get('/create', 'UserController@create')->name('admin.users.create');
@@ -85,15 +115,26 @@ Route::group(['prefix' => 'admin'], function() {
 				Route::get('/{id}/revert-permissions', 'UserController@revertPermissions')->name('admin.users.revert-permissions');
 				Route::post('{id}/update-permissions', 'UserController@updatePermissions')->name('admin.users.update-permissions');
 			});
+
+			// Index
+			Route::get('/', 'UserController@index')->name('admin.users.index');
 		});
 		
 		// PERMISSIONS
 		Route::group(['prefix' => 'permissions', 'middleware' => ['permissions:permissions_tab_access']], function() {
+			// Show
+			Route::get('/{slug}', 'PermissionController@show')->name('admin.permissions.show');
+
+			// Index
 			Route::get('/', 'PermissionController@index')->name('admin.permissions.index');
 		});
 
 		// SETTINGS
 		Route::group(['prefix' => 'settings', 'middleware' => ['permissions:settings_tab_access']], function() {
+			// Update
+			Route::post('/update', 'SettingsController@update')->name('admin.settings.update')->middleware('permissions:settings_tab_edit');
+
+			// Index
 			Route::get('/', 'SettingsController@index')->name('admin.settings.index');
 		});
 	});
