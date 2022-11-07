@@ -330,8 +330,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `first_name`, `middle_name`, `last_name`, `suffix`, `email`, `avatar`, `type_id`, `login_attempts`, `locked`, `locked_by`, `password`, `last_auth`, `remember_token`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, 'アドミン', NULL, 'アカウント', NULL, 'privatelaravelmailtester@gmail.com', 'default.png', 1, 0, 0, NULL, '$2y$10$LnJboRQu0UECfYfntsVNeu8IhpN.2.afPdoer7G7Nga66klHKIN5a', NULL, NULL, NULL, '2022-11-07 05:19:30', '2022-11-07 05:19:30');
+INSERT INTO `users` VALUES (1,'アドミン',NULL,'アカウント',NULL,'privatelaravelmailtester@gmail.com','default.png',1,0,0,NULL,'$2y$10$LnJboRQu0UECfYfntsVNeu8IhpN.2.afPdoer7G7Nga66klHKIN5a','2022-11-07 22:17:21',NULL,NULL,'2022-11-07 05:19:30','2022-11-07 14:17:21'),(2,'Mark Angelo',NULL,'Equias',NULL,'equiasmg@students.national-u.edu.ph','default.png',1,0,0,NULL,'$2y$10$/iBCkkkpmqLT2ptcj3mCvOkaxfetTfGHD1ExOplDNs1eumFOuj706','2022-11-07 22:08:37',NULL,NULL,'2022-11-07 13:53:30','2022-11-07 14:08:37'),(3,'Jaymar',NULL,'Cezar',NULL,'cezarjr@students.national-u.edu.ph','default.png',1,0,0,NULL,'$2y$10$5.p873oJg0Yzh4LKCg5ni.SAv9k8EHZ.HzPHos3mAf7Fj/GSTxbUC','2022-11-07 22:23:35',NULL,NULL,'2022-11-07 13:54:45','2022-11-07 14:23:35'),(4,'John Michael',NULL,'Elbambo',NULL,'elbambojt@students.national-u.edu.ph','default.png',1,0,0,NULL,'$2y$10$2O7NC9/OEw/d9kjYCREqBuLIeSoDTVWPokQhszl0GhckV0X6JmL4u',NULL,NULL,NULL,'2022-11-07 13:55:31','2022-11-07 13:55:31'),(5,'Kenji',NULL,'Sugino',NULL,'suginok@students.national-u.edu.ph','default.png',1,0,0,NULL,'$2y$10$Yq/hyxN3P5lv2eykAd7O1Oqugk8komtTlTWggS9hsCYLO0n10Sduy','2022-11-07 22:13:03',NULL,NULL,'2022-11-07 13:58:22','2022-11-07 14:26:54');
 
 -- --------------------------------------------------------
 

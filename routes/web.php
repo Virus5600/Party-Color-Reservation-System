@@ -118,6 +118,15 @@ Route::group(['prefix' => 'admin'], function() {
 				Route::post('{id}/update-permissions', 'UserController@updatePermissions')->name('admin.users.update-permissions');
 			});
 
+			// Delete
+			Route::group(['middleware' => ['permissions:users_tab_delete']], function() {
+				Route::get('/{id}/delete', 'UserController@delete')->name('admin.users.delete');
+				Route::get('/{id}/restore', 'UserController@restore')->name('admin.users.restore');
+			});
+
+			// Permanent Delete
+			Route::get('/{id}/perma-delete', 'UserController@permaDelete')->name('admin.users.permaDelete')->middleware('permissions:users_tab_perma_delete');
+
 			// Index
 			Route::get('/', 'UserController@index')->name('admin.users.index');
 		});

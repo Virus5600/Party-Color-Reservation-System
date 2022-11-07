@@ -11,7 +11,7 @@
 		<meta name="type" content="website">
 		<meta name="title" content="{{ App\Settings::getValue('web-name') }}">
 		<meta name="description" content="{{ App\Settings::getValue('web-desc') }}">
-		<meta name="image" content="{{ asset('images/meta-banner.jpg') }}">
+		<meta name="image" content="{{ asset('uploads/settings/meta-banner.jpg') }}">
 		<meta name="keywords" content="{{ env('APP_KEYW') }}">
 		<meta name="application-name" content="{{ App\Settings::getValue('web-name') }}">
 
@@ -19,14 +19,14 @@
 		<meta name="twitter:card" content="summary_large_image">
 		<meta name="twitter:title" content="{{ App\Settings::getValue('web-name') }}">
 		<meta name="twitter:description" content="{{ App\Settings::getValue('web-desc') }}">
-		<meta name="twitter:image" content="{{asset('/images/meta-banner.jpg')}}">
+		<meta name="twitter:image" content="{{ asset('uploads/settings/meta-banner.jpg') }}">
 
 		{{-- OG META --}}
 		<meta name="og:url" content="{{Request::url()}}">
 		<meta name="og:type" content="website">
 		<meta name="og:title" content="{{ App\Settings::getValue('web-name') }}">
 		<meta name="og:description" content="{{ App\Settings::getValue('web-desc') }}">
-		<meta name="og:image" content="{{asset('/images/meta-banner.jpg')}}">
+		<meta name="og:image" content="{{ asset('uploads/settings/meta-banner.jpg') }}">
 
 		{{-- FAVICON --}}
 		<link rel="icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">

@@ -95,7 +95,9 @@
 				{{-- PUBLIC EMAIL --}}
 				<div class="col-12 col-lg-6 form-group">
 					<label class="form-label">Email Address</label>
-					<input type="text" name="email" class="form-control" value="{{ App\Settings::getValue('email') == null ? 'information@taytayrizal.gov.ph' : App\Settings::getValue('email') }}" />
+					<div data-tags-input-name="emails" class="tag-input form-control tags-remove-prefix" data-forbidden-chars='["," , "_", "?"]'>
+						{{ App\Settings::getValue('emails') == null ? 'partycolor3f@gmail.com' : App\Settings::getValue('emails') }}
+					</div>
 				</div>
 
 				{{-- ADDRESS --}}
@@ -120,7 +122,9 @@
 <style type="text/css">
 	.tag-input.form-control {
 		padding: 0.375rem 0.75rem;
-		height: calc(1.5em + 0.75rem + 2px);
+		height: auto;
+		display: flex;
+		flex-wrap: wrap;
 	}
 
 	div.tag {
@@ -133,11 +137,11 @@
 
 	div.tag, div.tag > * {
 		background-color: var(--primary);
-		margin: 0 0.5rem;
+		margin: 0.25rem 0.5rem;
 	}
 
 	div.tag .tag-i {
-		top: 40%;
+		top: 25%;
 		right: 0.25rem;
 		color: #fff;
 		transition: 0.25s;
@@ -161,6 +165,8 @@
 		$('.tag-input').tagging({
 			'edit-on-delete': false
 		});
+
+		$('.tags-remove-prefix span').text('');
 
 		@if (Auth::user()->hasPermission('settings_tab_edit'))
 		$('#revert').on('click', (e) => {

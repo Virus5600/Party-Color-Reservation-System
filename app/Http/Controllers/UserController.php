@@ -20,6 +20,7 @@ use Hash;
 use Location;
 use Log;
 use Mail;
+use Session;
 use Validator;
 
 class UserController extends Controller
@@ -111,6 +112,7 @@ class UserController extends Controller
 	protected function logout() {
 		if (Auth::check()) {
 			auth()->logout();
+			Session::flush();
 			return redirect(route('home'))->with('flash_success', 'Logged out!');
 		}
 		return redirect()->route('admin.dashboard')->with('flash_error', 'Something went wrong, please try again.');
@@ -530,5 +532,89 @@ class UserController extends Controller
 			->with('flash_success', 'Successfully updated ' . trim($user->getName()) . '\'s permissions');
 	}
 
+	protected function delete(Request $req, $id) {
+		$user = User::find($id);
 
+		if ($user == null) {
+			return redirect()
+				->route('admin.user.index')
+				->with('flash_error', 'The user either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();			
+			$user->delete();
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.user.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->back()
+			->with('flash_success', 'Successfully deactivated account.');
+	}
+
+	protected function restore(Request $req, $id) {
+		$user = User::withTrashed()->find($id);
+
+		if ($user == null) {
+			return redirect()
+				->route('admin.user.index')
+				->with('flash_error', 'The account either does not exists or is already deleted permanently.');
+		}
+		else if (!$user->trashed()) {
+			return redirect()
+				->back()
+				->with('flash_error', 'The account is already activated.');
+		}
+
+		try {
+			DB::beginTransaction();
+			$user->restore();
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.user.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->back()
+			->with('flash_success', 'Successfully re-activated account.');
+	}
+
+	protected function permaDelete(Request $req, $id) {
+		$user = User::withTrashed()->find($id);
+
+		if ($user == null) {
+			return redirect()
+				->route('admin.users.index')
+				->with('flash_error', 'The account either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();
+			$user->forceDelete();
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.users.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->route('admin.users.index')
+			->with('flash_success', 'Successfully removed the user permanently');
+	}
 }
