@@ -142,7 +142,7 @@ class UserController extends Controller
 			'last_name' => array('required', 'string', 'max:255'),
 			'email' => 'required|email|string|max:255',
 			'type' => 'required|numeric|exists:types,id',
-			'password' => array('required', 'string', 'min:8', 'max:255', 'regex:/^[a-zA-Z]+[0-9]+$/'),
+			'password' => array('required', 'string', 'min:8', 'max:255', 'regex:/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]*$/'),
 			'avatar' => 'max:5120|mimes:jpeg,jpg,png,webp|nullable',
 		], [
 			'first_name.required' => 'The first or given name is required',
