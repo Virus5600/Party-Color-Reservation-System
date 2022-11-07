@@ -5,12 +5,12 @@
 // Variables
 @import 'variables';
 
-// jQuery UI
-@import "node_modules/jquery-ui/dist/themes/base/jquery-ui.min";
-
 // Bootstrap
 @import "node_modules/bootstrap/dist/css/bootstrap.min";
 @import "node_modules/bootstrap-select/dist/css/bootstrap-select.min";
+
+// jQuery Input Tags
+@import "node_modules/taggingJS/example/tag-basic-style";
 
 // Sweetalert 2
 @import "node_modules/sweetalert2/dist/sweetalert2.min";

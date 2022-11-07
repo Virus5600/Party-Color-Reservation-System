@@ -5,12 +5,15 @@ try {
 	// jQuery UI
 	require('jquery-ui/dist/jquery-ui.min.js');
 
+	// Tagging JS
+	require('taggingJS/tagging.min.js');
+
 	// popper.js
 	window.Popper = require('@popperjs/core');
 
 	// Bootstrap 4
-	require('bootstrap/dist/js/bootstrap.min')
-	require('bootstrap-select/dist/js/bootstrap-select.min')
+	require('bootstrap/dist/js/bootstrap.min');
+	require('bootstrap-select/dist/js/bootstrap-select.min');
 
 	// Sweetalert 2
 	window.Swal = require('sweetalert2/dist/sweetalert2.all.min');
