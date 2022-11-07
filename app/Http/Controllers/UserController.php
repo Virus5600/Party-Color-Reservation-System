@@ -42,7 +42,8 @@ class UserController extends Controller
 		if ($user == null)
 			return redirect()
 				->back()
-				->with('flash_error', 'Wrong email/password!');
+				->with('flash_error', 'Wrong email/password!')
+				->withInput(array('email' => $req->email));
 
 		$authenticated = false;
 		if (!$user->locked) {

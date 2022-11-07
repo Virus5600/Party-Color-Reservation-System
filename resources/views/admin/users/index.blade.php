@@ -3,7 +3,7 @@
 @section('title', 'Users')
 
 @section('content')
-<div class="container-fluid d-flex flex-column h-100">
+<div class="container-fluid d-flex flex-column min-h-100">
 	<div class="row">
 		<div class="col-12 col-md my-3">
 			<div class="row">

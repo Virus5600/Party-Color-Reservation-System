@@ -131,6 +131,10 @@ Route::group(['prefix' => 'admin'], function() {
 
 		// SETTINGS
 		Route::group(['prefix' => 'settings', 'middleware' => ['permissions:settings_tab_access']], function() {
+			// Update
+			Route::post('/update', 'SettingsController@update')->name('admin.settings.update')->middleware('permissions:settings_tab_edit');
+
+			// Index
 			Route::get('/', 'SettingsController@index')->name('admin.settings.index');
 		});
 	});
