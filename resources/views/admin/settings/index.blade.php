@@ -163,10 +163,10 @@
 <script type="text/javascript">
 	$(document).ready(() => {
 		$('.tag-input').tagging({
-			'edit-on-delete': false
+			'edit-on-delete': true
 		});
 
-		$('.tags-remove-prefix span').text('');
+		$('.tags-remove-prefix span').text('').addClass('mx-1');
 
 		@if (Auth::user()->hasPermission('settings_tab_edit'))
 		$('#revert').on('click', (e) => {

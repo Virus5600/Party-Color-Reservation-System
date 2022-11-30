@@ -98,33 +98,33 @@
 	$(document).ready(() => {
 		$("#is_active").prop("checked", {{ old('is_active') or "true" }});
 
-		$('.quantity-decrement').on('click', (e) => {
-			$(e.currentTarget).parent().parent().find('[name=quantity]').trigger('change', ['-']);
-		}).on('mousedown', (e) => {
+		$(document).on('click', '.quantity-decrement:not(.disabled)', (e, elm) => {
+			$(e.currentTarget).parent().parent().find('[name=quantity]').trigger('change', ['-', elm]);
+		}).on('mousedown', '.quantity-decrement:not(.disabled)', (e) => {
 			let obj = $(e.currentTarget);
 			let id = setInterval(() => {obj.trigger('click')}, 100);
 			obj.attr('data-id', id);
-		}).on('mouseup mouseleave', (e) => {
+		}).on('mouseup mouseleave', '.quantity-decrement:not(.disabled)', (e) => {
 			let obj = $(e.currentTarget);
 			let id = parseInt(obj.attr('data-id'));
 			clearInterval(id);
 			obj.removeAttr('data-id');
 		});
 
-		$('.quantity-increment:not(.disabled)').on('click', (e) => {
-			$(e.currentTarget).parent().parent().find('[name=quantity]').trigger('change', ['+']);
-		}).on('mousedown', (e) => {
+		$(document).on('click', '.quantity-increment:not(.disabled)', (e, elm) => {
+			$(e.currentTarget).parent().parent().find('[name=quantity]').trigger('change', ['+', elm]);
+		}).on('mousedown', '.quantity-increment:not(.disabled)', (e) => {
 			let obj = $(e.currentTarget);
 			let id = setInterval(() => {obj.trigger('click')}, 100);
 			obj.attr('data-id', id);
-		}).on('mouseup mouseleave', (e) => {
+		}).on('mouseup mouseleave', '.quantity-increment:not(.disabled)', (e) => {
 			let obj = $(e.currentTarget);
 			let id = parseInt(obj.attr('data-id'));
 			clearInterval(id);
 			obj.removeAttr('data-id');
 		});
 
-		$('[name=quantity]').on('change', (e, operation) => {
+		$('[name=quantity]').on('change', (e, operation, elm) => {
 			let obj = $(e.currentTarget);
 			let val = parseInt(obj.val());
 
@@ -135,16 +135,28 @@
 				obj.val(--val);
 			}
 
+			// Increment
 			if (val >= 4294967295) {
 				$(obj.parent().find('.quantity-increment')).addClass('disabled');
 				obj.val(4294967295);
+
+				if (typeof elm != 'undefined') {
+					let id = parseInt(elm.attr('data-id'));
+					clearInterval(id);
+				}
 			}
 			else
 				$(obj.parent().find('.quantity-increment')).removeClass('disabled');
 
+			// Decrement
 			if (val <= 0) {
 				$(obj.parent().find('.quantity-decrement')).addClass('disabled');
 				obj.val(0);
+
+				if (typeof elm != 'undefined') {
+					let id = parseInt(elm.attr('data-id'));
+					clearInterval(id);
+				}
 			}
 			else
 				$(obj.parent().find('.quantity-decrement')).removeClass('disabled');

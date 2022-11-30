@@ -13,8 +13,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/email', function() {
+	return view('layouts.emails.account.creation');
+});
+
 // Route::fallback('PageController@fallback')->name('fallback');
 Route::get('/login', 'UserController@redirectLogin')->name('redirectLogin');
+
+Route::get('/change-password/{token}', 'UserController@changePassword')->name('user.change-password');
 
 Route::group(['prefix' => 'admin'], function() {
 	// AUTHENTICATION RELATED
@@ -27,6 +33,17 @@ Route::group(['prefix' => 'admin'], function() {
 		// DASHBAORD
 		Route::get('/', 'PageController@redirectToDashboard')->name('admin.redirectToDashboard');
 		Route::get('/dashboard', 'PageController@dashboard')->name('admin.dashboard');
+
+		// RESERVATIONS
+		Route::group(['prefix' => 'reservations', 'middleware' => ['permissions:reservations_tab_access']], function() {
+			// Create
+			Route::group(['prefix' => 'create', 'middleware' => ['permissions:reservations_tab_create']], function() {
+				// Route::get()
+			});
+
+			// Index
+			Route::get('/', 'ReservationController@index')->name('admin.reservations.index');
+		});
 
 		// INVENTORY
 		Route::group(['prefix' => 'inventory', 'middleware' => ['permissions:inventory_tab_access']], function() {

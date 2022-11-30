@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
+use App\Jobs\AccountNotification;
+
+use App\PasswordReset;
 use App\Permission;
 use App\Type;
 use App\TypePermission;
@@ -85,7 +88,17 @@ class UserController extends Controller
 					}
 					else {
 						if ($user->locked == 0) {
-							// DO THE MAILING HERE. THIS IS TO SEND AN EMAIL ONLY ONCE
+							PasswordReset::insert(['email' => $user->email]);
+							$pr = PasswordReset::where('email', '=', $user->email)->first();
+							$pr->generateToken()->generateExpiration();
+
+
+							$args = [
+								"subject" => "Your account has been locked!",
+								"token" => $pr->token,
+								"recipients" => [$user->email]
+							];
+							AccountNotification::dispatch($user, "locked", $args);
 						}
 
 						$user->locked = 1;
@@ -187,7 +200,7 @@ class UserController extends Controller
 				// Store the image
 				$destination = 'uploads/users';
 				$fileType = $req->file('avatar')->getClientOriginalExtension();
-				$avatar = $req->first_name . '-' . $req->last_name . "-DP." . $fileType;
+				$avatar = $req->first_name . '-' . $req->last_name . "-DP-" . uniqid() . "." . $fileType;
 				$req->file('avatar')->move($destination, $avatar);
 
 				// Save the file name to the table
@@ -205,6 +218,16 @@ class UserController extends Controller
 				'password' => Hash::make($req->password),
 				'type_id' => $req->type
 			]);
+
+			// MAILING
+			$reqArgs = $req->except('avatar');
+			$args = [
+				'subject' => 'Account Created',
+				'req' => $reqArgs,
+				'email' => $req->email,
+				'recipients' => [$req->email, Auth::user()->email]
+			];
+			AccountNotification::dispatch($user, "creation", $args)->afterCommit();
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -294,7 +317,7 @@ class UserController extends Controller
 				$avatar = null;
 				$destination = 'uploads/users';
 				$fileType = $req->file('avatar')->getClientOriginalExtension();
-				$avatar = $req->first_name . '-' . $req->last_name . "-DP." . $fileType;
+				$avatar = $req->first_name . '-' . $req->last_name . "-DP-" . uniqid() . "." . $fileType;
 				$req->file('avatar')->move($destination, $avatar);
 
 				// Save the file name to the table
@@ -602,7 +625,11 @@ class UserController extends Controller
 
 		try {
 			DB::beginTransaction();
+
+			if ($user->avatar != 'default.png')
+					File::delete(public_path() . '/uploads/users/' . $user->avatar);
 			$user->forceDelete();
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
