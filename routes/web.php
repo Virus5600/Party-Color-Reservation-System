@@ -14,13 +14,31 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/email', function() {
-	return view('layouts.emails.account.creation');
+	return view('layouts.emails.account.changed-password');
 });
 
 // Route::fallback('PageController@fallback')->name('fallback');
 Route::get('/login', 'UserController@redirectLogin')->name('redirectLogin');
 
-Route::get('/change-password/{token}', 'UserController@changePassword')->name('user.change-password');
+// FORGOT PASSWORD
+Route::group(['prefix' => 'forgot-password'], function() {
+	// Index
+	Route::get('/', 'PasswordResetController@index')->name('forgot-password.index');
+
+	// Submit
+	Route::post('/submit', 'PasswordResetController@submit')->name('forgot-password.submit');
+	
+});
+
+// CHANGE PASSWORD
+Route::group(['prefix' => 'change-password'], function() {
+	// Edit
+	Route::get('{token}', 'PasswordResetController@edit')->name('change-password.edit');
+
+	// Update
+	Route::post('{token}/update', 'PasswordResetController@update')->name('change-password.update');
+});
+
 
 Route::group(['prefix' => 'admin'], function() {
 	// AUTHENTICATION RELATED

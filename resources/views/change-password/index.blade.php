@@ -45,7 +45,7 @@
 		<link rel="mask-icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">
 
 		{{-- TITLE --}}
-		<title>Admin Login - Party Color</title>
+		<title>Forgot Password - Party Color</title>
 	</head>
 
 	<body>
@@ -75,33 +75,17 @@
 			<main class="content d-flex flex-column flex-grow-1 my-3 my-lg-5" id="content">
 				<div class="container-fluid d-flex flex-column flex-grow-1">
 					
-					{{-- LOGIN FORM START --}}
+					{{-- FORGOT PASSWORD FORM START --}}
 					<div class="card w-100 w-sm-75 w-md-50 w-lg-25 m-auto">
-						<h4 class="card-header text-center">LOGIN</h4>
+						<h4 class="card-header text-center">Forgot Password</h4>
 
-						<form action="{{ route('authenticate') }}" method="POST" class="card-body">
+						<form action="{{ route('forgot-password.submit') }}" method="POST" class="card-body">
 							{{ csrf_field() }}
 							
 							<div class="form-group">
 								<label class="form-label" for="email">Email</label>
-								<input class="form-control border-secondary" type="email" name="email" value="{{ old('email') }}" aria-label="E-mail" placeholder="E-mail" />
-							</div>
-
-							<div class="form-group mb-0">
-								<label class="form-label" for="password">Password</label>
-								<div class="input-group">
-									<input class="form-control border-secondary border-right-0" type="password" name="password" id="password" aria-label="Password" aria-describedby="toggle-show-password" placeholder="Password" />
-									<div class="input-group-append">
-										<button type="button" class="btn bg-white border-secondary border-left-0" id="toggle-show-password" aria-label="Show Password" data-target="#password">
-											<i class="fas fa-eye d-none" id="show"></i>
-											<i class="fas fa-eye-slash" id="hide"></i>
-										</button>
-									</div>
-								</div>
-							</div>
-
-							<div class="form-group text-center">
-								<a href="{{ route('forgot-password.index') }}" class="text-primary small" id="forgotPassword">Forgot Password?</a>
+								<input class="form-control border-secondary" type="email" name="email" value="{{ old('email') ? old('email') : $email }}" aria-label="E-mail" placeholder="E-mail" />
+								<small class="text-danger">{{ $errors->first('email') }}</small>
 							</div>
 
 							<div class="form-group text-center">
@@ -109,13 +93,14 @@
 							</div>
 						</form>
 					</div>
-					{{-- LOGIN FORM END --}}
+					{{-- FORGOT PASSWORD FORM END --}}
 
 				</div>
 			</main>
 
 			<!-- SCRIPTS -->
 			<script type="text/javascript" src="{{ asset('js/login.js') }}"></script>
+			<script type="text/javascript" src="{{ asset('js/util/disable-on-submit.js') }}"></script>
 			<script type="text/javascript">
 				@if (Session::has('flash_error'))
 				Swal.fire({
@@ -127,38 +112,6 @@
 					toast: {!!Session::has('is_toast') ? Session::get('is_toast') : true!!},
 					{!!Session::has('has_timer') ? (Session::get('has_timer') ? (Session::has('duration') ? ('timer: ' . Session::get('duration')) . ',' : `timer: 10000,`) : '') : `timer: 10000,`!!}
 					background: `#dc3545`,
-					customClass: {
-						title: `text-white`,
-						content: `text-white`,
-						popup: `px-3`
-					},
-				});
-				@elseif (Session::has('flash_info'))
-				Swal.fire({
-					{!!Session::has('has_icon') ? "icon: `info`," : ""!!}
-					title: `{{Session::get('flash_info')}}`,
-					{!!Session::has('message') ? 'html: `' . Session::get('message') . '`,' : ''!!}
-					position: {!!Session::has('position') ? '`' . Session::get('position') . '`' : '`top`'!!},
-					showConfirmButton: false,
-					toast: {!!Session::has('is_toast') ? Session::get('is_toast') : true!!},
-					{!!Session::has('has_timer') ? (Session::get('has_timer') ? (Session::has('duration') ? ('timer: ' . Session::get('duration')) . ',' : `timer: 10000,`) : '') : `timer: 10000,`!!}
-					background: `#17a2b8`,
-					customClass: {
-						title: `text-white`,
-						content: `text-white`,
-						popup: `px-3`
-					},
-				});
-				@elseif (Session::has('flash_success'))
-				Swal.fire({
-					{!!Session::has('has_icon') ? "icon: `success`," : ""!!}
-					title: `{{Session::get('flash_success')}}`,
-					{!!Session::has('message') ? 'html: `' . Session::get('message') . '`,' : ''!!}
-					position: {!!Session::has('position') ? '`' . Session::get('position') . '`' : '`top`'!!},
-					showConfirmButton: false,
-					toast: {!!Session::has('is_toast') ? Session::get('is_toast') : true!!},
-					{!!Session::has('has_timer') ? (Session::get('has_timer') ? (Session::has('duration') ? ('timer: ' . Session::get('duration')) . ',' : `timer: 10000,`) : '') : `timer: 10000,`!!}
-					background: `#28a745`,
 					customClass: {
 						title: `text-white`,
 						content: `text-white`,

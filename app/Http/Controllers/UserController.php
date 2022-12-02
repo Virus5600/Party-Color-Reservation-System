@@ -88,11 +88,20 @@ class UserController extends Controller
 					}
 					else {
 						if ($user->locked == 0) {
-							PasswordReset::insert(['email' => $user->email]);
-							$pr = PasswordReset::where('email', '=', $user->email)->first();
-							$pr->generateToken()->generateExpiration();
-
-
+							// Generates a password reset link if there are no other instances of this email in this table.
+							if (PasswordReset::where('email', '=', $user->email)->get()->count() <= 0) {
+								PasswordReset::insert([
+									'email' => $user->email,
+									'created_at' => now()->timezone('Asia/Manila')
+								]);
+								$pr = PasswordReset::where('email', '=', $user->email)->first();
+								$pr->generateToken()->generateExpiration();
+							}
+							// Otherwise, fetch the row to use the already generated data
+							else {
+								$pr = PasswordReset::where('email', '=', $user->email)->first();
+							}
+							
 							$args = [
 								"subject" => "Your account has been locked!",
 								"token" => $pr->token,
@@ -381,6 +390,18 @@ class UserController extends Controller
 			DB::beginTransaction();
 
 			$user->password = Hash::make($req->password);
+
+			$args = [
+				'subject' => 'Password Changed',
+				'recipients' => [$user->email],
+				'email' => $user->email,
+				'password' => $req->password,
+				'type' => 'admin-change'
+			];
+
+			// Uses past-tense due to password is now changed
+			AccountNotification::dispatch($user, "changed-password", $args);
+
 			$user->save();
 
 			DB::commit();

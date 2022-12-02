@@ -17,6 +17,8 @@ class PasswordReset extends Model
 	use HasFactory;
 
 	protected $primaryKey = 'email';
+	protected $keyType = 'string';
+	public $incrementing = false;
 
 	const CREATED_AT = 'created_at';
 	const UPDATED_AT = null;
@@ -72,6 +74,6 @@ class PasswordReset extends Model
 		if ($this->expires_at == null)
 			return false;
 
-		return $this->expires_at->lt(Carbon::now()->timezone("Asia/Manila"));
+		return $this->expires_at->lte(Carbon::now()->timezone("Asia/Manila"));
 	}
 }
