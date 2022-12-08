@@ -69,6 +69,36 @@ class PermissionsTableSeeder extends Seeder
 			'slug' => 'inventory_tab_perma_delete'
 		]);
 
+		// MENU
+		$menuPerm = Permission::create([
+			'name' => 'Menu Tab Access',
+			'slug' => 'menu_tab_access'
+		]);
+
+		Permission::create([
+			'parent_permission' => $menuPerm->id,
+			'name' => 'Menu Tab Create',
+			'slug' => 'menu_tab_create'
+		]);
+
+		Permission::create([
+			'parent_permission' => $menuPerm->id,
+			'name' => 'Menu Tab Edit',
+			'slug' => 'menu_tab_edit'
+		]);
+
+		Permission::create([
+			'parent_permission' => $menuPerm->id,
+			'name' => 'Menu Tab Delete',
+			'slug' => 'menu_tab_delete'
+		]);
+
+		Permission::create([
+			'parent_permission' => $menuPerm->id,
+			'name' => 'Menu Tab Perma Delete',
+			'slug' => 'menu_tab_perma_delete'
+		]);
+
 		// ANNOUNCEMENTS
 		 $annPerm = Permission::create([
 		 	'name' => 'Announcements Tab Access',

@@ -17,7 +17,7 @@ class TypePermissionsTableSeeder extends Seeder
 	public function run()
 	{	
 		// Master Admin
-		for ($i = 1; $i <= Permission::get()->count(); $i++)
+		for ($i = 1; $i <= Permission::count(); $i++)
 			TypePermission::insert([
 				'type_id' => 1,
 				'permission_id' => $i
@@ -38,6 +38,14 @@ class TypePermissionsTableSeeder extends Seeder
 			TypePermission::insert([
 				'type_id' => 2,
 				'permission_id' => $i->id
+			]);
+
+		$menuAcc = Permission::where('slug', '=', 'menu_tab_access')->first();
+		$menuPerm = Permission::where('parent_permission', '=', $menuAcc->id)->orWhere('slug', '=', $menuAcc->slug)->get();
+		foreach ($menuPerm as $m)
+			TypePermission::insert([
+				'type_id' => 2,
+				'permission_id' => $m->id
 			]);
 
 		$announcementsAcc = Permission::where('slug', '=', 'announcements_tab_access')->first();

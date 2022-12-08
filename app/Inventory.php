@@ -2,12 +2,13 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Inventory extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
 	protected $fillable = [
 		'item_name',
@@ -20,6 +21,9 @@ class Inventory extends Model
 		'updated_at' => 'datetime',
 		'deleted_at' => 'datetime',
 	];
+
+	// Relationships
+	public function menus() { return $this->belongsToMany('App\Menu', 'menu_items', 'inventory_id', 'menu_id'); }
 
 	// Custom Functions
 	public function getInStock() {

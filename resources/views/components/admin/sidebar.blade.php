@@ -28,6 +28,15 @@
 		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.inventory.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-boxes mr-2"></i>Inventory</a>
 		@endif
 
+		{{-- MENU --}}
+		@if (\Request::is('admin/menu'))
+		<span class="bg-secondary text-white"><i class="fas fa-utensils mr-2"></i>Menu</span>
+		@elseif (\Request::is('admin/menu*'))
+		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.menu.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-utensils mr-2"></i>Menu</a>
+		@else
+		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.menu.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-utensils mr-2"></i>Menu</a>
+		@endif
+
 		{{-- ANNOUNCEMENT --}}
 		@if (\Request::is('admin/announcement'))
 		<span class="bg-secondary text-white"><i class="fas fa-bullhorn mr-2"></i>Announcements</span>

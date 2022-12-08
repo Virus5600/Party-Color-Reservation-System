@@ -96,6 +96,28 @@ Route::group(['prefix' => 'admin'], function() {
 			Route::get('/', 'InventoryController@index')->name('admin.inventory.index');
 		});
 
+		// MENU
+		Route::group(['prefix' =>  'menu', 'middleware' => ['permissions:menu_tab_access']], function() {
+			// Create
+			Route::group(['prefix' => 'create', 'middleware' => ['permissions:menu_tab_create']], function() {
+				Route::get('/', 'MenuController@create')->name('admin.menu.create');
+				Route::post('/store', 'MenuController@store')->name('admin.menu.store');
+			});
+
+			Route::group(['prefix' => '{id}'], function() {
+				// Show
+				Route::get('/', 'MenuController@show')->name('admin.menu.show');
+
+				// Edit
+				Route::group(['middleware' => ['permissions:menu_tab_edit']], function() {
+					Route::get('/edit', 'MenuController@edit')->name('admin.menu.edit');
+				});
+			});
+
+			// Index
+			Route::get('/', 'MenuController@index')->name('admin.menu.index');
+		});
+
 
 		// ANNOUNCEMENTS
 		Route::group(['prefix' => 'announcements', 'middleware' => ['permissions:announcements_tab_access']], function() {

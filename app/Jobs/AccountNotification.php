@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 
 use App\User;
 
+use Artisan;
 use Log;
 use Mail;
 

@@ -32,11 +32,6 @@ class InventoryController extends Controller
 	}
 
 	protected function store(Request $req) {
-		$existing = Inventory::withTrashed()->where('item_name', '=', $req->item_name)->first();
-
-		if ($existing)
-			return $this->update($req, $existing->id);
-
 		$validator = Validator::make($req->all(), [
 			'item_name' => 'required|string|max:255',
 			'quantity' => 'required|integer|max:4294967295',
@@ -59,6 +54,11 @@ class InventoryController extends Controller
 				->withErrors($validator)
 				->withInput();
 		}
+
+		$existing = Inventory::withTrashed()->where('item_name', '=', $req->item_name)->first();
+
+		if ($existing)
+			return $this->update($req, $existing->id);
 
 		try {
 			DB::beginTransaction();

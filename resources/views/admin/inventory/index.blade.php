@@ -16,7 +16,7 @@
 				<div class="col-12 col-md-8">
 					<div class="row">
 						{{-- ADD --}}
-						@if (Auth::user()->hasPermission('announcements_tab_create'))
+						@if (Auth::user()->hasPermission('inventory_tab_create'))
 						<div class="col-12 col-md text-center text-md-right ml-md-auto">
 							<a href="{{ route('admin.inventory.create') }}" class="btn btn-success m-auto"><i class="fa fa-plus-circle mr-2"></i>Add Item</a>
 						</div>
