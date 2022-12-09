@@ -9,6 +9,8 @@ class MenuItem extends Model
 {
 	use HasFactory;
 
+	protected $primaryKey = null;
+
 	protected $fillable = [
 		'menu_id',
 		'inventory_id',
@@ -21,6 +23,7 @@ class MenuItem extends Model
 	];
 
 	public $timestamps = false;
+	public $incrementing = false;
 
 	// Relationships
 	public function menu() { return $this->belongsTo('App\Menu', 'menu_id', 'id'); }

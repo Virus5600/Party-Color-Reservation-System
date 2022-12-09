@@ -14,13 +14,15 @@ class Menu extends Model
 
 	protected $fillable = [
 		'name',
-		'price'
+		'price',
+		'duration'
 	];
 	
 	protected $casts = [
-		'created_at',
-		'updated_at',
-		'deleted_at'
+		'created_at' => 'datetime: M d, Y h:i A',
+		'updated_at' => 'datetime: M d, Y h:i A',
+		'deleted_at' => 'datetime: M d, Y h:i A',
+		'duration' => 'datetime: H:i'
 	];
 
 	// Relationships

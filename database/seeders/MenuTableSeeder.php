@@ -15,8 +15,16 @@ class MenuTableSeeder extends Seeder
 	 */
 	public function run()
 	{
-		Menu::factory()
-			->count(2)
-			->create();
+		Menu::create([
+			'name' => 'BBQ Plan',
+			'price' => 3500,
+			'duration' => '02:00'
+		]);
+
+		Menu::create([
+			'name' => 'Drink All You Can',
+			'price' => 1200,
+			'duration' => '01:00'
+		]);
 	}
 }

@@ -34,12 +34,17 @@
 					<p class="h5">Includes: </p>
 
 					<ul class="list-group">
-						@foreach($menu->items as $i)
+						@forelse($menu->items as $i)
 						<li class="list-group-item">
 							<span class="float-left">{{ $i->item_name }}</span>
 							<span class="float-right">{{ $menu->menuItems()->where('inventory_id', '=', $i->id)->first()->amount . $i->measurement_unit }}</span>
 						</li>
-						@endforeach
+						@empty
+						<li class="list-group-item text-center">
+							<p>No ingredients yet!</p>
+							<a href="{{ route('admin.menu.edit', [$menu->id]) }}" class="btn btn-primary btn-sm">Add Ingredients</a>
+						</li>
+						@endforelse
 					</ul>
 				</div>
 				
