@@ -83,18 +83,48 @@
 				@for ($i = 0; $i < count($days); $i++)
 				<div class="col">
 					@foreach ($dateRange as $date)
-					{{-- TODO: If reservation exists 
-					<div class="row border d-flex align-items-center justify-content-center">
-						<i class="bi bi-circle text-danger"></i><br>
+					{{-- TODO: If reservation exists --}}
+					<div class="row border">
+						<div type="button" class="btn btn-link btn-block d-flex align-items-center justify-content-center" data-toggle="modal" data-target="#reservationModal" style="height: 1.5rem">
+							<i class="bi bi-circle text-danger"></i>
+						</div>
 					</div>
-					--}}
-					{{-- TODO: else --}}
-					<div class="row border d-flex align-items-center justify-content-center bg-light">
-						<i class="bi bi-x text-secondary"></i><br>
-					</div>
+					{{-- else --}}
+					<!-- <div class="row border bg-light">
+						<div class="btn-block d-flex align-items-center justify-content-center" style="height: 1.5rem">
+							<i class="bi bi-x text-secondary"></i>
+						</div>
+					</div> -->
+					
 					@endforeach
 				</div>
 				@endfor
+
+				{{-- Reservation Modal--}}
+				<!-- Modal -->
+				<div class="modal fade" id="reservationModal" tabindex="-1" role="dialog" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="exampleModalCenterTitle">Reservation Information</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+						<div class="modal-body">
+								'start_at': <br>
+								'end_at': <br>
+								'reserved_at': <br>
+								'pax': <br>
+								'contact_name':
+						</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
 			</div>
 		</div>
 	</div>
