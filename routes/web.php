@@ -111,6 +111,7 @@ Route::group(['prefix' => 'admin'], function() {
 				// Edit
 				Route::group(['middleware' => ['permissions:menu_tab_edit']], function() {
 					Route::get('/edit', 'MenuController@edit')->name('admin.menu.edit');
+					Route::post('/update', 'MenuController@update')->name('admin.menu.update');
 				});
 			});
 

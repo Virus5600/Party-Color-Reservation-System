@@ -58,7 +58,7 @@
 
 								{{-- EDIT --}}
 								@if (Auth::user()->hasPermission('menu_tab_edit'))
-								<a href="@{{ route('admin.menu.edit', [$m->id]) }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>
+								<a href="{{ route('admin.menu.edit', [$m->id]) }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>
 								@endif
 								
 								{{-- DELETE --}}

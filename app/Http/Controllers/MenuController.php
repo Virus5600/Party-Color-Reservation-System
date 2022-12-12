@@ -151,10 +151,23 @@ class MenuController extends Controller
 	}
 
 	protected function edit($id) {
+		$menu = Menu::find($id);
+
+		if ($menu == null) {
+			return redirect()
+				->route('admin.menu.index')
+				->with('flash_error', 'The menu either does not exists or is already deleted.');
+		}
+
+		$items = Inventory::get();
 		
+		return view('admin.menu.edit', [
+			'menu' => $menu,
+			'items' => $items
+		]);
 	}
 
-	protected function updated(Request $req, $id) {
+	protected function update($id) {
 
 	}
 }
