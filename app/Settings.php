@@ -27,7 +27,7 @@ class Settings extends Model
 		return $setting->value;
 	}
 
-	public static function getFile($key) {
+	public static function getFile($key=0) {
 		$setting = Settings::where('name', '=', $key)->first();
 
 		if ($setting->is_file)

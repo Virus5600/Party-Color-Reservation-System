@@ -19,7 +19,6 @@ class CreateReservationsTable extends Migration
 			$table->time('end_at');
 			$table->date('reserved_at');
 			$table->integer('pax');
-			$table->string('contact_name');
 			$table->timestamps();
 		});
 	}

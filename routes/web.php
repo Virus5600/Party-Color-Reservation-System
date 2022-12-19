@@ -56,7 +56,8 @@ Route::group(['prefix' => 'admin'], function() {
 		Route::group(['prefix' => 'reservations', 'middleware' => ['permissions:reservations_tab_access']], function() {
 			// Create
 			Route::group(['prefix' => 'create', 'middleware' => ['permissions:reservations_tab_create']], function() {
-				// Route::get()
+				Route::get('/', 'ReservationController@create')->name('admin.reservations.create');
+				Route::post('/store', 'ReservationController@store')->name('admin.reservations.store');
 			});
 
 			// Index

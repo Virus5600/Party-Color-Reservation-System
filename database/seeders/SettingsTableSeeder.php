@@ -45,5 +45,10 @@ class SettingsTableSeeder extends Seeder
 			'name' => 'email',
 			'value' => 'partycolor3f@gmail.com'
 		]);
+
+		Settings::create([
+			'name' => 'capacity',
+			'value' => '50'
+		]);
 	}
 }

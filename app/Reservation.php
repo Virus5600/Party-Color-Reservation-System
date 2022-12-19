@@ -14,7 +14,6 @@ class Reservation extends Model
 		'end_at',
 		'reserved_at',
 		'pax',
-		'contact_name',
 	];
 
 	protected $casts = [
@@ -36,5 +35,5 @@ class Reservation extends Model
 
 	// Relationships
 	public function menus() { return $this->belongsToMany('App\Menu', 'reservation_menu'); }
-	public function contactInformation() { return $this->hasOne('App\ContactInformation'); }
+	public function contactInformation() { return $this->hasMany('App\ContactInformation'); }
 }

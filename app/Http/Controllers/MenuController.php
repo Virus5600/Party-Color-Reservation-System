@@ -167,7 +167,117 @@ class MenuController extends Controller
 		]);
 	}
 
-	protected function update($id) {
+	protected function update(Request $req, $id) {
+		$menuItemValidation = [];
+		$amountValidation = [];
 
+		$menu = Menu::withTrashed()->where('name', '=', $req->menu_name)->first();
+		// Just update the existing entry
+		if (!$menu)
+			return redirect()
+				->route('admin.menu.index')
+				->with('flash_error', 'Menu either does not exists or is already deleted');
+
+		foreach ($req->menu_item as $k => $v) {
+			$menuItemValidation["menu_item.{$k}"] = "required_unless:amount.{$k},null|numeric|exists:inventories,id";
+			$amountValidation["amount.{$k}"] = "required_unless:menu_item.{$k},null|numeric|min:1|max:4294967295";
+		}
+
+		$validator = Validator::make($req->all(), array_merge([
+			'menu_name' => 'required|string|max:255',
+			'menu_item' => 'array|nullable',
+			'price' => 'required|numeric|min:0|max:4294967295',
+			'amount' => 'array|nullable',
+			'duration' => 'required|date_format:H:i|before_or_equal:12:00|after:00:00'
+		], $menuItemValidation, $amountValidation), [
+			'menu_name.required' => 'A menu name is required',
+			'menu_name.string' => 'The menu name should be a string',
+			'menu_name.max' => 'Menu name should not exceed 255 characters',
+			'menu_item.array' => '',
+			'menu_item.nullable' => '',
+			'price.required' => 'A price is required',
+			'price.numeric' => 'The price should consists of numbers only',
+			'price.min' => 'The minimum allowed price is ' . (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . '0.00 (Free)',
+			'price.max' => 'The maximum allowed price is ' . (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . number_format(4294967295, 2),
+			'amount.array' => '',
+			'amount.nullable' => '',
+			'duration.required' => 'Please set a duration for this menu',
+			'duration.date_format' => 'Please refrain from modifying the page',
+			'duration.before_or_equal' => 'Duration is capped at 12 hours',
+			'duration.after' => 'Minimum duration is 1 minute',
+			'menu_item.*.required_unless' => 'An item for this is required',
+			'menu_item.*.numeric' => 'Please provide a proper item',
+			'menu_item.*.exists' => 'The selected item does not exists',
+			'amount.*.required_unless' => 'An amount of this item is required',
+			'amount.*.numeric' => 'Please provide a proper amount',
+			'amount.*.min' => 'Minimum amount is capped to 1',
+			'amount.*.' => 'Maximum amount is capped to ' . number_format(4294967295),
+		]);
+
+		// Comporess the arrays
+		$newIndex = [];
+		$menuItem = [];
+		$amount = [];
+		for ($i = 0; $i < count($req->menu_item); $i++) {
+			if ($req->menu_item[$i] || $req->amount[$i] || ($req->amount[$i] > 0)) {
+				array_push($newIndex, $i);
+				array_push($menuItem, $req->menu_item[$i]);
+				array_push($amount, $req->amount[$i]);
+			}
+		}
+
+		// Replaces the old arrays with the new compressed one, adding their new indexes in the process as well to properly display validation messages
+		$req->merge([
+			'new_index' => $newIndex,
+			'menu_item' => $menuItem,
+			'amount' => $amount
+		]);
+
+		if ($validator->fails()) {
+			return redirect()
+				->back()
+				->withErrors($validator)
+				->withInput();
+		}
+
+		try {
+			DB::beginTransaction();
+
+			// Update menu information
+			$menu->name = $req->menu_name;
+			$menu->price = $req->price;
+			$menu->duration = $req->duration;
+
+			// Prepare the data to be synchronized with...
+			$sync = array();
+			for ($i = 0; $i < count($menuItem); $i++) {
+				if (array_key_exists($menuItem[$i], $sync)) {
+					$amount[$i] = $sync[$menuItem[$i]]['amount'] + $amount[$i];
+					$sync[$menuItem[$i]] = ['amount' => $amount[$i]];
+				}
+				else {
+					$sync[$menuItem[$i]] = ['amount' => $amount[$i]];
+				}
+			}
+
+			// Many-to-Many update (Menu Item update)	
+			$menu->items()->sync($sync);
+
+			// Saving...
+			$menu->save();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.menu.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->route('admin.menu.index')
+			->with('flash_success', "Successfully updated {$req->menu_name}");
 	}
 }

@@ -78,6 +78,7 @@ class UserController extends Controller
 				->with('flash_success', 'Logged In!');
 		}
 		else {
+			$msg = "";
 			if ($user) {
 				try {
 					DB::beginTransaction();

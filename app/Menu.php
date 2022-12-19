@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
+use Carbon\Carbon;
+
 use NumberFormatter;
 
 class Menu extends Model
@@ -34,5 +36,9 @@ class Menu extends Model
 		$locale = app()->currentLocale();
 		
 		return (new NumberFormatter("{$locale}@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . number_format($this->price, 2);
+	}
+
+	public function getFromDuration($format = "H:i") {
+		return Carbon::parse($this->duration)->format($format);
 	}
 }

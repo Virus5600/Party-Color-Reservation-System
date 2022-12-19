@@ -25,7 +25,7 @@
 		<div class="mx-auto col-12 col-lg-10">
 			<div class="card dark-shadow mb-5" id="inner-content">
 				<div class="card-body">
-					<form action="{{ route('admin.menu.store') }}" method="POST" enctype="multipart/form-data">
+					<form action="{{ route('admin.menu.update', [$menu->id]) }}" method="POST" enctype="multipart/form-data">
 						{{ csrf_field() }}
 
 						<div class="row">
@@ -58,13 +58,13 @@
 										<span class="input-group-text">Hour</span>
 									</div>
 									
-									<input class="form-control has-spinner text-right" type="number" name="duration_hour" id="duration_hour" min="0" max="12" value="{{ old('duration_hour') ? old('duration_hour') : "01" }}"/>
+									<input class="form-control has-spinner text-right" type="number" name="duration_hour" id="duration_hour" min="0" max="12" value="{{ $menu->getFromDuration("H") }}"/>
 									
 									<div class="input-group-prepend input-group-append">
 										<span class="input-group-text">:</span>
 									</div>
 									
-									<input class="form-control has-spinner" type="number" name="duration_min" id="duration_min" min="0" max="59" value="{{ old('duration_min') ? old('duration_min') : "00" }}"/>
+									<input class="form-control has-spinner" type="number" name="duration_min" id="duration_min" min="0" max="59" value="{{ $menu->getFromDuration("i") }}"/>
 
 									<div class="input-group-append">
 										<span class="input-group-text">Minute</span>
@@ -81,55 +81,53 @@
 								{{-- Dynamic form fields --}}
 								<div class="row" id="itemField">
 									@php ($index = 0)
-									@if (old('menu_item') || old('amount'))
-										{{-- Iterate through the old menu item values --}}
-										@foreach (old('menu_item') as $mi)
-										@php ($key = array_search($index, old('new_index')))
+									{{-- Iterate through the old menu item values --}}
+									@forelse ($menu->items as $mi)
+									<div class="col-12 col-md-4 my-2 position-relative" {{ $index == 0 ? 'id=origForm' : ''}}>
+										<div class="card h-100">
+											<div class="card-body">
+												<div class="form-group">
+													<label class="form-label" for="menu_item[]">Item Name</label><br>
 
-										<div class="col-12 col-md-4 my-2 position-relative" {{ $index == 0 ? 'id=origForm' : ''}}>
-											<div class="card h-100">
-												<div class="card-body">
-													<div class="form-group">
-														<label class="form-label" for="menu_item[]">Item Name</label><br>
+													<select class="show-tick select-picker w-100" name="menu_item[]">
+														<option data-hidden="true" data-default value="0" selected>Select</option>
+														@foreach ($items as $i)
+														<option value="{{ $i->id }}" data-subtext="{{ $i->measurement_unit }}" {{ $mi->id == $i->id ? 'selected' : '' }}>{{ $i->item_name }}</option>
+														@endforeach
+													</select>
 
-														<select class="show-tick select-picker w-100" name="menu_item[]">
-															<option data-hidden="true" value="0" {{ old("menu_item.{$index}") ? '' : 'selected' }}>Select</option>
-															@foreach ($items as $i)
-															<option value="{{ $i->id }}" data-subtext="{{ $i->measurement_unit }}" {{ old("menu_item.{$index}") == $i->id ? 'selected' : '' }}>{{ $i->item_name }}</option>
-															@endforeach
-														</select>
-														<br><span class="text-danger">{{ $errors->first("menu_item.".old("new_index")[$index]) }}</span>
-													</div>
+													<br><span class="text-danger validation">{{ $errors->first("menu_item.{$index}") }}</span>
+												</div>
 
-													<div class="form-group">
-														<label for="amount[]" class="form-label">Amount</label>
+												<div class="form-group">
+													<label for="amount[]" class="form-label">Amount</label>
 
-														<div class="input-group">
-															<div class="input-group-prepend">
-																<button type="button" class="btn btn-secondary quantity-decrement"><i class="fas fa-minus"></i></button>
-															</div>
-															<input type="number" class="form-control" min="0" max="4294967295" step="0.01" name="amount[]" value="{{ old("amount.{$index}") ? old("amount.{$index}") : '0' }}" />
-															<div class="input-group-append">
-																<span class="input-group-text unit-of-measurement">{{ old("menu_item.{$index}") ? $items->where('id', '=', old("menu_item.{$index}"))->first()->measurement_unit : "kg"}}</span>
-																<button type="button" class="btn btn-secondary quantity-increment"><i class="fas fa-plus"></i></button>
-															</div>
+													<div class="input-group">
+														<div class="input-group-prepend">
+															<button type="button" class="btn btn-secondary quantity-decrement"><i class="fas fa-minus"></i></button>
 														</div>
-														<span class="text-danger">{{ $errors->first("amount.".old("new_index")[$index]) }}</span>
+														<input type="number" class="form-control" min="0" max="4294967295" step="0.01" name="amount[]" value="{{ $mi->menuItem->amount }}" />
+														<div class="input-group-append">
+															<span class="input-group-text unit-of-measurement">{{ $mi->measurement_unit }}</span>
+															<button type="button" class="btn btn-secondary quantity-increment"><i class="fas fa-plus"></i></button>
+														</div>
 													</div>
+
+													<span class="text-danger validation">{{ $errors->first("amount.{$index}") }}</span>
 												</div>
 											</div>
-
-											@if ($index++ > 0)
-											<div class="position-absolute d-flex flex-row" style="top: calc(0rem); right: calc(1rem - 1px);">
-												<button type="button" class="rounded btn btn-white border-secondary-light" onclick="$(this).parent().parent().remove();">
-													<i class="fas fa-trash fa-sm text-danger"></i>
-												</button>
-											</div>
-											@endif
 										</div>
-										@endforeach
-										{{-- Menu item iteration end --}}
-									@else
+
+										@if ($index++ > 0)
+										<div class="position-absolute d-flex flex-row" style="top: calc(0rem); right: calc(1rem - 1px);">
+											<button type="button" class="rounded btn btn-white border-secondary-light" onclick="$(this).parent().parent().remove();">
+												<i class="fas fa-trash fa-sm text-danger"></i>
+											</button>
+										</div>
+										@endif
+									</div>
+									{{-- Menu item iteration end --}}
+									@empty
 									<div class="col-12 col-md-4 my-2 position-relative" id="origForm">
 										<div class="card h-100">
 											<div class="card-body">
@@ -142,7 +140,8 @@
 														<option value="{{ $i->id }}" data-subtext="{{ $i->measurement_unit }}">{{ $i->item_name }}</option>
 														@endforeach
 													</select>
-													<br><span class="text-danger">{{ $errors->first('menu_item.0') }}</span>
+
+													<br><span class="text-danger validation">{{ $errors->first('menu_item.0') }}</span>
 												</div>
 
 												<div class="form-group">
@@ -152,18 +151,19 @@
 														<div class="input-group-prepend">
 															<button type="button" class="btn btn-secondary quantity-decrement"><i class="fas fa-minus"></i></button>
 														</div>
-														<input type="number" class="form-control" min="0" max="4294967295" name="amount[]" step="0.01" value="{{ old('amount.1') ? old('amount.1') : '0' }}" />
+														<input type="number" class="form-control" min="0" max="4294967295" name="amount[]" step="0.01" value="{{ old('amount.0') ? old('amount.0') : '0' }}" />
 														<div class="input-group-append">
 															<span class="input-group-text unit-of-measurement">kg</span>
 															<button type="button" class="btn btn-secondary quantity-increment"><i class="fas fa-plus"></i></button>
 														</div>
 													</div>
-													<span class="text-danger">{{ $errors->first('amount.0') }}</span>
+
+													<span class="text-danger validation">{{ $errors->first('amount.0') }}</span>
 												</div>
 											</div>
 										</div>
 									</div>
-									@endif
+									@endforelse
 								</div>
 							</div>
 						</div>
@@ -204,10 +204,14 @@
 <script type="text/javascript" src="{{ asset('js/util/disable-on-submit.js') }}"></script>
 <script type="text/javascript">
 	$(document).ready(() => {
-		$("#is_active").prop("checked", {{ old('is_active') or "true" }});
-
 		$(document).on('click', '.quantity-decrement:not(.disabled)', (e, elm) => {
-			$(e.currentTarget).parent().parent().find('[name="amount[]"]').trigger('change', ['-', elm]);
+			let obj = $(e.currentTarget);
+			obj.parent().parent().find('[name="amount[]"]').trigger('change', ['-', elm]);
+			
+			if (obj.hasClass('disabled') && parseInt(obj.attr('data-id')) !== NaN) {
+				clearInterval(parseInt(obj.attr('data-id')));
+				obj.removeAttr('data-id');
+			}
 		}).on('mousedown', '.quantity-decrement:not(.disabled)', (e) => {
 			let obj = $(e.currentTarget);
 			let id = setInterval(() => {obj.trigger('click')}, 100);
@@ -220,7 +224,13 @@
 		});
 
 		$(document).on('click', '.quantity-increment:not(.disabled)', (e, elm) => {
-			$(e.currentTarget).parent().parent().find('[name="amount[]"]').trigger('change', ['+', elm]);
+			let obj = $(e.currentTarget);
+			obj.parent().parent().find('[name="amount[]"]').trigger('change', ['+', elm]);
+
+			if (obj.hasClass('disabled') && parseInt(obj.attr('data-id')) !== NaN) {
+				clearInterval(parseInt(obj.attr('data-id')));
+				obj.removeAttr('data-id');
+			}
 		}).on('mousedown', '.quantity-increment:not(.disabled)', (e) => {
 			let obj = $(e.currentTarget);
 			let id = setInterval(() => {obj.trigger('click')}, 100);
@@ -278,10 +288,11 @@
 
 			// Clone cleaning
 			clone.removeAttr('id');
+			clone.find(".validation").text("");
 			clone.find('.unit-of-measurement').text("kg");
 			clone.find('textarea, input').val("");
 			clone.find('input[name="amount[]"]').val(0);
-			$(clone.find('.option').removeAttr('selected').prop('selected', false)[0]).prop('selected', true);
+			$(clone.find('option').removeAttr('selected').prop('selected', false)[0]).prop('selected', true);
 			clone.find('.bootstrap-select').replaceWith(function() { return $('select', this); });
 			clone.find(".select-picker").selectpicker({
 				liveSearch: true,

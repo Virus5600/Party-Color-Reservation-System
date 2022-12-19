@@ -12,15 +12,17 @@ An attempt to access you account has been made!
 	<a href="{{ route("change-password.edit", [$args['token']]) }}">{{ route("change-password.edit", [$args['token']]) }}</a>
 </p>
 
+@php($ip = $user->locked_by == '::1' ? '192.168.0.1' : $user->locked_by)
+@php ($ipData = json_decode(file_get_contents("https://ip-api.io/json/{$ip}")))
+
 <label for="data">Your account is being accessed:</label>
 <div style="background-color: lightgray; padding: 1rem;">
 	<code id="data">
-		@php($ip = $user->locked_by == '::1' ? '103.5.2.102' : $user->locked)
-		IP: {{ json_decode(file_get_contents("https://ip-api.io/json/{$ip}"))->ip }}<br>
-		Country: {{ json_decode(file_get_contents("https://ip-api.io/json/{$ip}"))->country_name }}<br>
-		Region: {{ json_decode(file_get_contents("https://ip-api.io/json/{$ip}"))->region_name }}<br>
-		City: {{ json_decode(file_get_contents("https://ip-api.io/json/{$ip}"))->city }}<br>
-		ISP: {{ json_decode(file_get_contents("https://ip-api.io/json/{$ip}"))->organisation }}<br>
+		IP: {{ $ipData ? $ipData->ip : 'IP Not Valid' }}<br>
+		Country: {{ $ipData ? $ipData->country_name : 'IP Not Valid' }}<br>
+		Region: {{ $ipData ? $ipData->region_name : 'IP Not Valid' }}<br>
+		City: {{ $ipData ? $ipData->city : 'IP Not Valid' }}<br>
+		ISP: {{ $ipData ? $ipData->organisation : 'IP Not Valid' }}<br>
 	</code>
 </div>
 @endsection

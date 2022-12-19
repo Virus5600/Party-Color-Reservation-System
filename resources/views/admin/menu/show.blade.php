@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Inventory')
+@section('title', 'Menu')
 
 @section('content')
 <div class="container-fluid">
@@ -11,7 +11,7 @@
 				<div class="col-12">
 					<h1>
 						<a href="{{ route('admin.menu.index') }}" class="text-dark text-decoration-none font-weight-normal">
-							<i class="fas fa-chevron-left mr-2"></i>Inventory
+							<i class="fas fa-chevron-left mr-2"></i>Menu
 						</a>
 					</h1>
 				</div>

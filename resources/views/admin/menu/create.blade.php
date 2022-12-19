@@ -46,7 +46,7 @@
 									</div>
 									<input type="number" class="form-control" min="0" max="4294967295" step=".25" name="price" value="{{ old('price') ? number_format(old('price'), 2, ".", "") : number_format(0, 2, ".", "") }}">
 								</div>
-								<span class="text-danger">{{ $errors->first('price') }}</span>
+								<span class="text-danger validation">{{ $errors->first('price') }}</span>
 							</div>
 
 							{{-- DURATION --}}
@@ -71,7 +71,7 @@
 									</div>
 								</div>
 								<input type="hidden" name="duration" id="duration" value="{{ old('duration') ? old('duration') : "01:00" }}">
-								<span class="text-danger">{{ $errors->first('duration') }}</span>
+								<span class="text-danger validation">{{ $errors->first('duration') }}</span>
 							</div>
 
 							{{-- MENU ITEMS --}}
@@ -84,8 +84,6 @@
 									@if (old('menu_item') || old('amount'))
 										{{-- Iterate through the old menu item values --}}
 										@foreach (old('menu_item') as $mi)
-										@php ($key = array_search($index, old('new_index')))
-
 										<div class="col-12 col-md-4 my-2 position-relative" {{ $index == 0 ? 'id=origForm' : ''}}>
 											<div class="card h-100">
 												<div class="card-body">
@@ -98,7 +96,8 @@
 															<option value="{{ $i->id }}" data-subtext="{{ $i->measurement_unit }}" {{ old("menu_item.{$index}") == $i->id ? 'selected' : '' }}>{{ $i->item_name }}</option>
 															@endforeach
 														</select>
-														<br><span class="text-danger">{{ $errors->first("menu_item.".old("new_index")[$index]) }}</span>
+
+														<br><span class="text-danger validation">{{ $errors->first("menu_item.".old("new_index")[$index]) }}</span>
 													</div>
 
 													<div class="form-group">
@@ -114,7 +113,8 @@
 																<button type="button" class="btn btn-secondary quantity-increment"><i class="fas fa-plus"></i></button>
 															</div>
 														</div>
-														<span class="text-danger">{{ $errors->first("amount.".old("new_index")[$index]) }}</span>
+
+														<span class="text-danger validation">{{ $errors->first("amount.".old("new_index")[$index]) }}</span>
 													</div>
 												</div>
 											</div>
@@ -152,7 +152,7 @@
 														<div class="input-group-prepend">
 															<button type="button" class="btn btn-secondary quantity-decrement"><i class="fas fa-minus"></i></button>
 														</div>
-														<input type="number" class="form-control" min="0" max="4294967295" name="amount[]" step="0.01" value="{{ old('amount.1') ? old('amount.1') : '0' }}" />
+														<input type="number" class="form-control" min="0" max="4294967295" name="amount[]" step="0.01" value="{{ old('amount.0') ? old('amount.0') : '0' }}" />
 														<div class="input-group-append">
 															<span class="input-group-text unit-of-measurement">kg</span>
 															<button type="button" class="btn btn-secondary quantity-increment"><i class="fas fa-plus"></i></button>
@@ -204,10 +204,14 @@
 <script type="text/javascript" src="{{ asset('js/util/disable-on-submit.js') }}"></script>
 <script type="text/javascript">
 	$(document).ready(() => {
-		$("#is_active").prop("checked", {{ old('is_active') or "true" }});
-
 		$(document).on('click', '.quantity-decrement:not(.disabled)', (e, elm) => {
-			$(e.currentTarget).parent().parent().find('[name="amount[]"]').trigger('change', ['-', elm]);
+			let obj = $(e.currentTarget);
+			obj.parent().parent().find('[name="amount[]"]').trigger('change', ['-', elm]);
+			
+			if (obj.hasClass('disabled') && parseInt(obj.attr('data-id')) !== NaN) {
+				clearInterval(parseInt(obj.attr('data-id')));
+				obj.removeAttr('data-id');
+			}
 		}).on('mousedown', '.quantity-decrement:not(.disabled)', (e) => {
 			let obj = $(e.currentTarget);
 			let id = setInterval(() => {obj.trigger('click')}, 100);
@@ -220,7 +224,13 @@
 		});
 
 		$(document).on('click', '.quantity-increment:not(.disabled)', (e, elm) => {
-			$(e.currentTarget).parent().parent().find('[name="amount[]"]').trigger('change', ['+', elm]);
+			let obj = $(e.currentTarget);
+			obj.parent().parent().find('[name="amount[]"]').trigger('change', ['+', elm]);
+
+			if (obj.hasClass('disabled') && parseInt(obj.attr('data-id')) !== NaN) {
+				clearInterval(parseInt(obj.attr('data-id')));
+				obj.removeAttr('data-id');
+			}
 		}).on('mousedown', '.quantity-increment:not(.disabled)', (e) => {
 			let obj = $(e.currentTarget);
 			let id = setInterval(() => {obj.trigger('click')}, 100);
@@ -278,10 +288,11 @@
 
 			// Clone cleaning
 			clone.removeAttr('id');
+			clone.find(".validation").text("");
 			clone.find('.unit-of-measurement').text("kg");
 			clone.find('textarea, input').val("");
 			clone.find('input[name="amount[]"]').val(0);
-			$(clone.find('.option').removeAttr('selected').prop('selected', false)[0]).prop('selected', true);
+			$(clone.find('option').removeAttr('selected').prop('selected', false)[0]).prop('selected', true);
 			clone.find('.bootstrap-select').replaceWith(function() { return $('select', this); });
 			clone.find(".select-picker").selectpicker({
 				liveSearch: true,

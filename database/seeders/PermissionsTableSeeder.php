@@ -23,6 +23,18 @@ class PermissionsTableSeeder extends Seeder
 
 		Permission::create([
 			'parent_permission' => $reservationPerm->id,
+			'name' => 'Reservations Tab Create',
+			'slug' => 'reservations_tab_create'
+		]);
+
+		Permission::create([
+			'parent_permission' => $reservationPerm->id,
+			'name' => 'Reservations Tab Edit',
+			'slug' => 'reservations_tab_edit'
+		]);
+
+		Permission::create([
+			'parent_permission' => $reservationPerm->id,
 			'name' => 'Reservations Tab Respond',
 			'slug' => 'reservations_tab_respond'
 		]);
