@@ -42,7 +42,7 @@ class SettingsTableSeeder extends Seeder
 		]);
 
 		Settings::create([
-			'name' => 'email',
+			'name' => 'emails',
 			'value' => 'partycolor3f@gmail.com'
 		]);
 

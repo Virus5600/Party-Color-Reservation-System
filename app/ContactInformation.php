@@ -11,7 +11,6 @@ class ContactInformation extends Model
 		'contact_name'
 		'reservation_id',
 		'email',
-		'phone_numbers'
 	];
 
 	// Relationships

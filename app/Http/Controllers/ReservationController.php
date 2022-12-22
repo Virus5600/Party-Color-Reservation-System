@@ -23,5 +23,9 @@ class ReservationController extends Controller
 
 	protected function store(Request $req) {
 		dd($req);
+		
+		return redirect()
+			->back()
+			->withInput();
 	}
 }

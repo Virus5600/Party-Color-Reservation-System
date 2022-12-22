@@ -1,4 +1,4 @@
-<?php
+\<?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,7 +18,10 @@ class CreateReservationsTable extends Migration
 			$table->time('start_at');
 			$table->time('end_at');
 			$table->date('reserved_at');
+			$table->double('extension')->unsigned()->default(0);
+			$table->double('price')->unsigned();
 			$table->integer('pax');
+			$table->string('phone_numbers');
 			$table->timestamps();
 		});
 	}

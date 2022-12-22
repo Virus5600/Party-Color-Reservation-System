@@ -18,7 +18,6 @@ class CreateContactInformationTable extends Migration
 			$table->bigInteger('reservation_id')->unsigned();
 			$table->string('contact_name');
 			$table->string('email')->nullable();
-			$table->string('phone_numbers')->nullable();
 			$table->timestamps();
 		});
 	}

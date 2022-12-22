@@ -17,6 +17,12 @@ $(document).ready(() => {
 
 		$(e.currentTarget).addClass(`disabled cursor-default`);
 		$(e.currentTarget).attr('data-clicked', 'true');
+
+		setTimeout((event) => {
+			$(e.currentTarget).html(`Submit`)
+				.removeClass(`disabled cursor-default`)
+				.attr('data-clicked', 'false');
+		}, (120 * 1000));
 	});
 
 	$('form').on('submit', (e) => {$(this).find('[type=submit]').trigger('click');});

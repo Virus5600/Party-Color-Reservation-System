@@ -23,7 +23,7 @@ class InventoryController extends Controller
 	protected function create(Request $req) {
 		$measurement_unit = [];
 
-		foreach (Inventory::withTrashed()->get() as $i)
+		foreach (Inventory::select('measurement_unit')->withTrashed()->distinct()->get() as $i)
 			array_push($measurement_unit, $i->measurement_unit);
 
 		return view('admin.inventory.create', [
@@ -91,7 +91,7 @@ class InventoryController extends Controller
 		$measurement_unit = [];
 		$item = Inventory::withTrashed()->find($id);
 
-		foreach (Inventory::withTrashed()->get() as $i)
+		foreach (Inventory::select('measurement_unit')->withTrashed()->distinct()->get() as $i)
 			array_push($measurement_unit, $i->measurement_unit);
 
 		if ($item == null) {

@@ -51,7 +51,6 @@
 										<br>JPEG, JPG, PNG, WEBP
 									</small><br>
 									<small class="text-muted pt-0 mt-0"><b>MAX SIZE:</b> 5MB</small><br>
-									{{-- <a href="javascript:void(0);" class="btn btn-sm btn-secondary" id="revert-favicon"><i class="fas fa-share mr-2"></i>Revert to Original</a> --}}
 								</div>
 							</div>
 						</div>
@@ -67,15 +66,23 @@
 				<div class="col-12 col-lg-6">
 					<div class="form-group">
 						<label class="form-label">Website Name</label>
-						<input type="text" name="web-name" class="form-control" value="{{ App\Settings::getValue('web-name') == null ? 'Municipality of Taytay, Rizal' : App\Settings::getValue('web-name') }}" />
+						<input type="text" name="web-name" class="form-control" value="{{ App\Settings::getValue('web-name') == null ? 'Party Color' : App\Settings::getValue('web-name') }}" />
 						<span class="text-danger small">{{$errors->first('web-name')}}</span>
 					</div>
 
 					<div class="form-group text-counter-parent">
-						<label class="form-label">Website Description</label>
-						<textarea name="web-desc" class="form-control not-resizable text-counter-input" rows="3" data-max="255">{{ App\Settings::getValue('web-desc') == null ? 'The official website of Taytay Municipal' : App\Settings::getValue('web-desc') }}</textarea>
+						<label for="web-desc" class="form-label">Website Description</label>
+						<textarea name="web-desc" id="web-desc" class="form-control not-resizable text-counter-input" rows="3" data-max="255">{{ App\Settings::getValue('web-desc') == null ? 'The official website of Taytay Municipal' : App\Settings::getValue('web-desc') }}</textarea>
 						<span class="text-counter small">255</span>
 						<span class="text-danger small">{{$errors->first('web-desc')}}</span>
+					</div>
+				</div>
+
+				<div class="col-6 col-lg-3 mx-auto">
+					<div class="form-group">
+						<label for="capacity" class="form-label">Store Capacity</label>
+						<input type="number" class="form-control w-100" min="1" max="2147483647" name="capacity" id="capacity" value="{{ App\Settings::getValue('capacity') == null ? '50' : App\Settings::getValue('capacity') }}">
+						<span class="text-danger-small">{{$errors->first('capacity')}}</span>
 					</div>
 				</div>
 			</div>
@@ -87,9 +94,7 @@
 				{{-- PUBLIC CONTACT --}}
 				<div class="col-12 col-lg-6 form-group">
 					<label class="form-label">Telephone Number(s)</label>
-					<div data-tags-input-name="contacts" class="tag-input form-control">
-						{{ App\Settings::getValue('contacts') == null ? '080-3980-4560' : App\Settings::getValue('contacts') }}
-					</div>
+					<div data-tags-input-name="contacts" class="tag-input form-control">{{ App\Settings::getValue('contacts') == null ? '080-3980-4560' : App\Settings::getValue('contacts') }}</div>
 				</div>
 
 				{{-- PUBLIC EMAIL --}}

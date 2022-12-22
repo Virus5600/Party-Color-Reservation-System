@@ -13,7 +13,10 @@ class Reservation extends Model
 		'start_at',
 		'end_at',
 		'reserved_at',
+		'extension',
+		'price',
 		'pax',
+		'phone_numbers',
 	];
 
 	protected $casts = [
