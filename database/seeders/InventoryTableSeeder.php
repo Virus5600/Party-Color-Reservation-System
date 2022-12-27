@@ -15,8 +15,34 @@ class InventoryTableSeeder extends Seeder
 	 */
 	public function run()
 	{
-		Inventory::factory()
-			->count(5)
-			->create();
+		Inventory::create([
+			'item_name' => 'pork',
+			'quantity' => 50,
+			'measurement_unit' => 'kg'
+		]);
+
+		Inventory::create([
+			'item_name' => 'beef',
+			'quantity' => 50,
+			'measurement_unit' => 'kg'
+		]);
+
+		Inventory::create([
+			'item_name' => 'chicken',
+			'quantity' => 50,
+			'measurement_unit' => 'kg'
+		]);
+
+		Inventory::create([
+			'item_name' => 'coke',
+			'quantity' => 10,
+			'measurement_unit' => 'L'
+		]);
+
+		Inventory::create([
+			'item_name' => 'Iced Tea',
+			'quantity' => 10,
+			'measurement_unit' => 'L'
+		]);
 	}
 }
