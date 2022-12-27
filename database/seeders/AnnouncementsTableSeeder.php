@@ -15,7 +15,7 @@ class AnnouncementsTableSeeder extends Seeder
 	 */
 	public function run()
 	{
-		Announcement:create([
+		Announcement::create([
 			'id' => 1,
 			'poster' => "1-63ab36cd649ecポスター.png",
 			'title' => 'Halloween 15% Discount Promo',
