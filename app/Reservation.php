@@ -24,16 +24,12 @@ class Reservation extends Model
 	];
 
 	// Accessor
-	protected function start_at(): Attribute {
-		return Attribute::make(
-			get: fn ($value) => Carbon::createFromFormat('H:i:s', $value)->format('H:i'),
-		);
+	protected function getStartAtAttribute($value) {
+		return Carbon::createFromFormat('H:i:s', $value)->format('H:i');
 	}
 
-	protected function end_at(): Attribute {
-		return Attribute::make(
-			get: fn ($value) => Carbon::createFromFormat('H:i:s', $value)->format('H:i'),
-		);
+	protected function getEndAtAttribute($value) {
+		return Carbon::createFromFormat('H:i:s', $value)->format('H:i');
 	}
 
 	// Relationships

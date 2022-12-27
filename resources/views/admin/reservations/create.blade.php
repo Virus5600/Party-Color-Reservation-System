@@ -5,6 +5,7 @@
 @section('content')
 @php ($datetime = now()->timezone('Asia/Tokyo'))
 @php ($isEightPM = $datetime->gt('08:00 PM'))
+@php ($new_contact_index = Session::get("new_contact_index"))
 
 <div class="container-fluid">
 	<div class="row">
@@ -83,14 +84,22 @@
 											<span class="input-group-text">:</span>
 										</div>
 										
-										<input class="form-control has-spinner text-left" type="number" name="time_min" id="time_min" min="0" max="59" value="{{ old('time_min') ? old('time_min') : ($isEightPM ? "00" : $datetime->format('i')) }}" />
+										<input class="form-control has-spinner text-left" type="number" name="time_min" id="time_min" min="0" max="59" value="{{ old('time_min') ? old('time_min') : '00' }}" />
 
 										<div class="input-group-append">
 											<span class="input-group-text">Minute</span>
 										</div>
 									</div>
-									<input type="hidden" name="reservation_time" id="reservation_time" value="{{ old('reservation_time') ? old('reservation_time') : "01:00" }}" />
-									<span class="text-danger">{{ $errors->first('reservation_time') }}</span>
+									<input type="hidden" name="reservation_time" id="reservation_time" value="{{ old('reservation_time') ? old('reservation_time') : "17:00" }}" />
+									<span class="text-danger">
+										{{
+											(strlen($errors->first('reservation_time')) > 0 ? $errors->first('reservation_time') : 
+												(strlen($errors->first('time_hour')) > 0 ? $errors->first('time_hour') : 
+													(strlen($errors->first('time_min')) > 0 ? $errors->first('time_min') : '')
+												)
+											)
+										}}
+									</span>
 								</div>
 
 								{{-- EXTENSION --}}
@@ -139,7 +148,7 @@
 															</option>
 															@endforeach
 														</select>
-														<br><span class="text-danger validation">{{ $errors->first('menu.0') }}</span>
+														<br><span class="text-danger validation">{{ $errors->first('menu') }}</span>
 													</div>
 												</div>
 											</div>
@@ -163,15 +172,16 @@
 									
 									<div class="form-group">
 										<label for="phone_numbers" class="form-label">Contact Number</label>
-										<div data-tags-input-name="phone_numbers" class="tag-input form-control">{{ old("phone_numbers") }}</div>
+										<div data-tags-input-name="phone_numbers" class="tag-input form-control">{{ old("phone_numbers") ? implode(", ", old("phone_numbers")) : '' }}</div>
 										<span class="text-danger validation">{{ $errors->first("phone_numbers") }}</span>
 									</div>
 
 									{{-- Dynamic form fields --}}
 									<div class="row" id="contactField">
 										@php ($index = 0)
-										@if (old('contact'))
-											{{-- TODO: CREATE THE CONTACT INFORMATION FORM --}}
+										{{-- IF CONTACT --}}
+										@if (old('contact_name') || old('contact_email'))
+											@php($new_contact_index = Session::get('new_contact_index'))
 											@foreach (old('contact_name') as $c)
 											<div class="col-12 col-md-4 my-2 position-relative" {{ $index == 0 ? 'id=origContactForm' : '' }}>
 												<div class="card h-100">
@@ -179,13 +189,13 @@
 														<div class="form-group">
 															<label for="contact_name[]" class="form-label">Contact Name</label>
 															<input name="contact_name[]" class="form-control" type="text" value="{{ old("contact_name.{$index}") }}" />
-															<span class="text-danger validation">{{ $errors->first("contact_name." . old("new_menu_index")[$index]) }}</span>
+															<span class="text-danger validation">{{ $errors->first("contact_name.{$new_contact_index[$index]}") }}</span>
 														</div>
 
 														<div class="form-group">
 															<label for="contact_email[]" class="form-label">Email</label>
-															<input type="text" class="form-control" name="contact_email[]" value="{{ old(" contact_email.{$index}") }}" />
-															<span class="text-danger validation">{{ $errors->first("contact_email." . old("new_menu_index")[$index]) }}</span>
+															<input type="text" class="form-control" name="contact_email[]" value="{{ old("contact_email.{$index}") }}" />
+															<span class="text-danger validation">{{ $errors->first("contact_email.{$new_contact_index[$index]}") }}</span>
 														</div>
 													</div>
 												</div>
@@ -199,6 +209,7 @@
 												@endif
 											</div>
 											@endforeach
+										{{-- ELSE CONTACT --}}
 										@else
 										<div class="col-12 col-md-4 my-2 position-relative" id="origContactForm">
 											<div class="card h-100">
@@ -211,19 +222,11 @@
 
 													<div class="form-group">
 														<label for="contact_email[]" class="form-label">Email</label>
-														<input type="text" class="form-control" name="contact_email[]" value="{{ old(" contact_email.0") }}" />
+														<input type="text" class="form-control" name="contact_email[]" value="{{ old("contact_email.0") }}" />
 														<span class="text-danger validation">{{ $errors->first("contact_email.0") }}</span>
 													</div>
 												</div>
 											</div>
-
-											@if ($index++ > 0)
-											<div class="position-absolute d-flex flex-row" style="top: calc(0rem); right: calc(1rem - 1px);">
-												<button type="button" class="rounded btn btn-white border-secondary-light" onclick="$(this).parent().parent().remove();">
-													<i class="fas fa-trash fa-sm text-danger"></i>
-												</button>
-											</div>
-											@endif
 										</div>
 										@endif
 									</div>
@@ -317,9 +320,11 @@
 
 	$(document).ready(() => {	
 		// Add contact
-		$(document).on('click', '#addContact', (e) => { let obj = $
-		(e.currentTarget); let field = $("#contactField"); let orig = $
-		('#origContactForm'); let clone = orig.clone();
+		$(document).on('click', '#addContact', (e) => {
+			let obj = $(e.currentTarget);
+			let field = $("#contactField");
+			let orig = $('#origContactForm');
+			let clone = orig.clone();
 
 			// Clone cleaning
 			clone.removeAttr('id');
@@ -344,7 +349,7 @@
 		$('.select-picker').selectpicker({
 			liveSearch: true,
 			style: "btn-white border-secondary-light"
-		});
+		}).trigger('change').trigger('change.bs.select');
 
 		// Pricing related shits
 		{
@@ -373,10 +378,10 @@
 				}
 				else
 					price.val('0');
-			});
+			}).trigger('changed.bs.select');
 
 			// Pax on change
-			$(document).on('change keyup keypress', '#pax, #extension', (e) => { $("#menu").trigger('changed.bs.select') });
+			$(document).on('change keyup keypress', '#pax, #extension', (e) => { $("#menu").trigger('changed.bs.select') }).trigger('change');
 		}
 
 		// Time update
@@ -388,7 +393,7 @@
 
 			let date = new Date(time);
 			timeE.val(`${`0${date.getUTCHours()}`.slice(-2)}:${`0${date.getUTCMinutes()}`.slice(-2)}`);
-		});
+		}).trigger('change');
 
 		// Duration update
 		$(document).on('keyup keydown keypress change click', '#duration_min, #duration_hour', (e) => {
@@ -399,7 +404,7 @@
 
 			let date = new Date(time);
 			durationE.val(`${`0${date.getUTCHours()}`.slice(-2)}:${`0${date.getUTCMinutes()}`.slice(-2)}`);
-		});
+		}).trigger('change');
 
 		// Tagging
 		$('.tag-input').tagging({

@@ -27,6 +27,11 @@ class Menu extends Model
 		'duration' => 'datetime: H:i'
 	];
 
+	// Accessor
+	public function getDurationAttribute($value) {
+		return Carbon::createFromFormat('H:i:s', $value)->format("H:i");
+	}
+
 	// Relationships
 	public function items() { return $this->belongsToMany('App\Inventory', 'menu_items', 'menu_id', 'inventory_id'); }
 	public function menuItems() { return $this->hasMany('App\MenuItem', 'menu_id', 'id'); }
@@ -34,7 +39,6 @@ class Menu extends Model
 	// Custom Functions
 	public function getPrice() {
 		$locale = app()->currentLocale();
-		
 		return (new NumberFormatter("{$locale}@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . number_format($this->price, 2);
 	}
 
