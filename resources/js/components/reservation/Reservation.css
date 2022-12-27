@@ -1,0 +1,40 @@
+.Reservation {
+  text-align: center;
+}
+
+.Reservation-title {
+  background-color: #873131;
+  padding: 20px;
+}
+
+.Reservation-title h1 {
+  font-size: 25vw;
+  font-style: italic;
+  font-weight: bold;
+  -webkit-text-fill-color: #F24141;
+  text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
+  text-shadow: 2px 2px 4px white;
+}
+
+.Reservation-title button {
+  font-size: 10vw;
+  color: #9B3636;
+  font-style: italic;
+  font-weight: bold;
+  background-color: #FFE600;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 2px 2px black;
+  padding-left: 50px;
+  padding-right: 50px;
+  text-shadow: 2px 2px 4px white;
+
+}
+
+/* Note: If you do not specify a font size, 
+the default size for normal text, 
+like paragraphs, is 16px (16px=1em). */
+
+/* Viewport is the browser window size. 
+1vw = 1% of viewport width. 
+If the viewport is 50cm wide, 1vw is 0.5cm. */
