@@ -1,0 +1,59 @@
+.AnnouncementTitle {
+  text-align: center;
+  background-color: #184D6A;
+  padding: 5px;
+}
+
+.AnnouncementTitle h1 {
+  color: white;
+  font-size: 5vw;
+  font-weight: bold;
+  padding: 0;
+  margin: 0;
+}
+
+.AnnouncementList .image {
+  /* height: 200px;
+  width: 300px; */
+}
+
+.AnnouncementList .image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+
+.AnnouncementItem {
+  background-color: #1C374B;
+  padding: 25px;
+  border-bottom: 1px solid black;
+}
+
+.AnnouncementItem span {
+  font-size: 2vw;
+  color: #F1E7E7;
+  margin: 0;
+}
+
+.AnnouncementItem h2 {
+  font-size: 3vw;
+  color: white;
+  font-weight: 900;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.AnnouncementItem p {
+  font-size: 2.5vw;
+  color: white;
+  text-align:left;
+  
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3; 
+  -webkit-box-orient: vertical;
+}
