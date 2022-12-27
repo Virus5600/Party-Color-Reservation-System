@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Announcement;
 use App\User;
 
 use DB;
@@ -273,6 +274,14 @@ class ApiController extends Controller
 		return response()->json([
 			'type' => 'empty',
 			'message' => 'Unknown category: ' . $req->type
+		]);
+	}
+
+	protected function fetchAnnouncements(Request $req) {
+		$announcements = Announcement::get();
+
+		return response()->json([
+			'announcements' => $announcements
 		]);
 	}
 }

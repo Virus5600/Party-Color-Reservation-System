@@ -1,7 +1,7 @@
 {
     "/js/app.js": "/js/app.js",
-    "/js/scripts.js": "/js/scripts.js",
-    "/css/app.css": "/css/app.css",
+    "/js/lib-scripts.js": "/js/lib-scripts.js",
+    "/css/lib-styles.css": "/css/lib-styles.css",
     "/css/lib/fullcalendar/fullcalendar.css": "/css/lib/fullcalendar/fullcalendar.css",
     "/js/lib/fullcalendar/fullcalendar.js": "/js/lib/fullcalendar/fullcalendar.js"
 }

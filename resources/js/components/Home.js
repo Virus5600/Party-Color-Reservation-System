@@ -6,12 +6,12 @@ import Announcement from './announcement/Announcement';
 import AboutUs from './about/aboutus';
 
 const Home = () => (
-  <>
-    <Carousel />
-    <Reservation />
-    <Announcement />
-    <AboutUs />
-  </>
+	<>
+		<Carousel />
+		<Reservation />
+		<Announcement />
+		<AboutUs />
+	</>
 );
 
 export default Home;

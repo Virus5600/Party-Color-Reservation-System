@@ -59,7 +59,7 @@
 				@forelse ($announcements as $a)
 				<tr class="enlarge-on-hover">
 					<td class="text-center align-middle mx-auto">
-						<img src="{{ $a->getPoster() }}" alt="{{ $a->title }}" class="img img-fluid user-icon mx-auto rounded">
+						<img src="{{ $a->getPoster() }}" alt="{{ $a->title }}" class="img img-fluid user-icon mx-auto rounded" data-fallback-image="{{ asset('uploads/announcements/default.png') }}">
 					</td>
 					<td class="text-center align-middle mx-auto font-weight-bold"><i class="fas fa-circle {{ $a->is_draft ? 'text-info' : 'text-success' }} mr-2"></i>{{ $a->title }}</td>
 					<td class="text-center align-middle mx-auto">{{ $a->created_at->locale('en_US')->translatedFormat('M d, Y') }}</td>

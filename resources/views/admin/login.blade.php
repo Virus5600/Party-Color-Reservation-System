@@ -28,12 +28,12 @@
 		<meta name="og:image" content="{{asset('/images/meta-banner.jpg')}}">
 
 		{{-- CSS --}}
-		<link href="{{ asset('css/app.css') }}" rel="stylesheet">
+		<link href="{{ asset('css/lib-styles.css') }}" rel="stylesheet">
 		<link href="{{ asset('css/style.css') }}" rel="stylesheet">
 		<link href="{{ asset('css/login.css') }}" rel="stylesheet">
 
 		{{-- JQUERY / SWEETALERT 2 / SLICK CAROUSEL --}}
-		<script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
+		<script type="text/javascript" src="{{ asset('js/lib-scripts.js') }}"></script>
 
 		{{-- Removes the code that shows up when script is disabled/not allowed/blocked --}}
 		<script type="text/javascript" id="for-js-disabled-js">$('head').append('<style id="for-js-disabled">#js-disabled { display: none; }</style>');$(document).ready(function() {$('#js-disabled').remove();$('#for-js-disabled').remove();$('#for-js-disabled-js').remove();});</script>

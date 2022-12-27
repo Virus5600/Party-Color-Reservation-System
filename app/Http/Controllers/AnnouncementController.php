@@ -94,7 +94,7 @@ class AnnouncementController extends Controller
 			if ($req->has('image')) {
 				$destination = 'uploads/announcements/'.$announcement->id;
 				$fileType = $req->file('image')->getClientOriginalExtension();
-				$image = $slug . "-" . uniqid() . "ポスター." . $fileType;
+				$image = $announcement->id . "-" . uniqid() . "ポスター." . $fileType;
 				$req->file('image')->move($destination, $image);
 
 				$announcement->poster = $image;
