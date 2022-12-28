@@ -128,7 +128,7 @@
 
 @section('scripts')
 <script type="text/javascript">
-	var calendar, calendarWrapper, events;
+	var calendar, calendarWrapper;
 
 	$(document).ready(() => {
 		$("#fullscreen_trigger").on('click', (e) => {
@@ -159,7 +159,20 @@
 </script>
 <script type="text/javascript" src="{{ asset('js/lib/fullcalendar/fullcalendar.js') }}"></script>
 <script type="text/javascript" id="calendarScript">
-	events = [
+	const events = [
+		@foreach($reservations as $r)
+			@php ($menuName = "")
+			@foreach($r->menus as $m)
+				@php ($menuName .= " {$m->name},")
+				@php ($menuName = trim($menuName))
+			@endforeach
+		{
+			title: "{{ substr($menuName, 0, strlen($menuName)-1) }} - Reservation for {{ $r->contactInformation()->first()->contact_name }}",
+			start: "{{ \Carbon\Carbon::parse("$r->reserved_at $r->start_at")->format("Y-m-d\TH:i:s") }}",
+			end: "{{ \Carbon\Carbon::parse("$r->reserved_at $r->end_at")->format("Y-m-d\TH:i:s") }}",
+			color: 
+		},
+		@endforeach
 	];
 
 	$(document).ready(() => {

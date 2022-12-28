@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ContactInformation extends Model
 {
 	protected $fillable = [
-		'contact_name'
+		'contact_name',
 		'reservation_id',
 		'email',
 	];

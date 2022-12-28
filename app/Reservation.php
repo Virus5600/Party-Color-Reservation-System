@@ -32,7 +32,11 @@ class Reservation extends Model
 		return Carbon::createFromFormat('H:i:s', $value)->format('H:i');
 	}
 
+	protected function getReservedAtAttribute($value) {
+		return Carbon::createFromFormat('Y-m-d', $value)->format('Y-m-d');
+	}
+
 	// Relationships
-	public function menus() { return $this->belongsToMany('App\Menu', 'reservation_menu'); }
+	public function menus() { return $this->belongsToMany('App\Menu', 'reservation_menus'); }
 	public function contactInformation() { return $this->hasMany('App\ContactInformation'); }
 }

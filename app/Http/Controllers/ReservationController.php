@@ -20,7 +20,12 @@ use Validator;
 class ReservationController extends Controller
 {
 	protected function index(Request $req) {
-		return view('admin.reservations.index');
+		$reservations = Reservation::with("menus")->get();
+		// dd($reservations);
+
+		return view('admin.reservations.index', [
+			'reservations' => $reservations
+		]);
 	}
 
 	protected function create() {
@@ -50,9 +55,9 @@ class ReservationController extends Controller
 			'menu' => "required|array|min:1",
 			'menu.*' => "required|numeric|exists:menus,id",
 			'phone_numbers' => "required|array|min:1",
-			'phone_numbers.*' => "required|numeric|distinct",
 			'contact_name' => "required_unless:contact_email,null|array|min:1",
 			'contact_email' => "required_unless:contact_name,null|array|min:1",
+			'contact_email.*' => "distinct:ignore_case",
 		], [
 			"reservation_date.required" => "Reservation date is required",
 			"reservation_date.date" => "Reservation date should be a date",
@@ -84,28 +89,47 @@ class ReservationController extends Controller
 			"contact_email.required_unless" => "Contact email is required",
 			"contact_email.array" => "Malformed contact email, please resubmit",
 			"contact_email.min" => "At least 1 contact is required",
+			"contact_email.*.distinct" => "Contact email already provided",
 		]);
 		$validatorInvalid = $validator->fails();
+
+		$iterations = $req->phone_numbers ? count($req->phone_numbers) : 0;
+		$phoneInvalid = false;
+		for ($i = 0; $i < $iterations; $i++) {
+			$phoneValidator = Validator::make($req->only(["phone_numbers"]), [
+				"phone_numbers.{$i}" => array("required", "regex:/^\+*(?=.{7,14})[\d\s-]{7,15}$/", "distinct", "max:15"),
+			], [
+				"phone_numbers.{$i}.required" => "The phone number is required",
+				"phone_numbers.{$i}.regex" => "Please put a proper phone number",
+				"phone_numbers.{$i}.distinct" => "This number is already delcared",
+				"phone_numbers.{$i}.max" => "Phone numbers is capped at 15 characters only",
+			]);
+
+			if ($phoneValidator->fails()) {
+				$phoneInvalid = true;
+				$validator->messages()->merge($phoneValidator->messages());
+			}
+		}
 
 		$iterations = max(count($req->contact_name), count($req->contact_email));
 		$contactInvalid = false;
 		for ($i = 0; $i < $iterations; $i++) {
 			$contactValidator = Validator::make($req->only(['contact_name', 'contact_email']), [
-				"contact_name.{$i}" => "required_unless:contact_email.{$i},null|string|max:255",
-				"contact_email.{$i}" => "required_unless:contact_name.{$i},null|email|max:255"
+				"contact_name.{$i}" => "required_unless:contact_email.{$i},null|nullable|string|max:255",
+				"contact_email.{$i}" => "required_unless:contact_name.{$i},null|nullable|email|distinct:ignore_case|max:255"
 			], [
 				"contact_name.{$i}.required_unless" => "Contact name is required",
 				"contact_name.{$i}.string" => "Contact name should be a string",
 				"contact_name.{$i}.max" => "Contact name is capped at 255",
 				"contact_email.{$i}.required_unless" => "Contact email is required",
-				"contact_email.{$i}.string" => "Contact email should be a valid email",
+				"contact_email.{$i}.email" => "Contact email should be a valid email",
+				"contact_email.{$i}.distinct" => "Contact email already provided",
 				"contact_email.{$i}.max" => "Contact email is capped at 255",
 			]);
 
 			if ($contactValidator->fails()) {
 				$contactInvalid = true;
 				$validator->messages()->merge($contactValidator->messages());
-				// $validator->errors()->merge($contactValidator->errors());
 			}
 		}
 
@@ -125,7 +149,7 @@ class ReservationController extends Controller
 			'contact_email' => $contactEmails
 		]);
 
-		if ($validatorInvalid || $contactInvalid)
+		if ($validatorInvalid || $contactInvalid || $phoneInvalid)
 			return redirect()
 				->back()
 				->withErrors($validator->messages()->merge($validator->messages()))
@@ -136,24 +160,48 @@ class ReservationController extends Controller
 			DB::beginTransaction();
 
 			$menu = [];
+			$hoursToAdd = 0;
+			$minutesToAdd = 0;
 			foreach ($req->menu as $mi) {
 				$menu["{$mi}"] = Menu::find($mi);
+				
+				$hoursComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("H");
+				$hoursToAdd = max(Carbon::parse($menu["{$mi}"]->duration)->format("H"), $hoursToAdd);
+
+				$minutesComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("i");
+				$minutesToAdd = max($minutesComparisonVal, $minutesToAdd);
 			}
-			dd($menu);
 
 			$start_at = Carbon::parse("{$req->reservation_date} {$req->time_hour}:{$req->time_min}");
-			$end_at = $start_at->addHours(0);
-			dd($end_at);
+			$end_at = Carbon::parse("{$req->reservation_date} {$req->time_hour}:{$req->time_min}")
+				->addHours($hoursToAdd)->addMinutes($minutesToAdd);
+			$price = 0;
+
+			foreach ($menu as $v)
+				$price += $v->price;
+			$price += ($req->extension * 500);
 
 			$reservation = Reservation::create([
 				'start_at' => $start_at,
 				'end_at' => $end_at,
 				'reserved_at' => $req->reservation_date,
-				'extension' => $req->extensions,
+				'extension' => $req->extension,
 				'price' => $price,
 				'pax' => $req->pax,
 				'phone_numbers' => implode("|", $req->phone_numbers)
 			]);
+
+			$reservation->menus()->attach($req->menu);
+
+
+			$iterations = max(count($req->contact_name), count($req->contact_email));
+			for ($i = 0; $i < $iterations; $i++) {
+				$ci = ContactInformation::create([
+					'contact_name' => $req->contact_name["{$i}"],
+					'email' => $req->contact_email["{$i}"],
+					'reservation_id' => $reservation->id
+				]);
+			}
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -165,9 +213,8 @@ class ReservationController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
-
 		return redirect()
-			->back()
-			->withInput();
+			->route('admin.reservations.index')
+			->with('flash_success', 'Successfully added a new reservation');
 	}
 }

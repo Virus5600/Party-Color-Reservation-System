@@ -13,10 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/email', function() {
-	return view('layouts.emails.account.changed-password');
-});
-
 // Route::fallback('PageController@fallback')->name('fallback');
 Route::get('/login', 'UserController@redirectLogin')->name('redirectLogin');
 
