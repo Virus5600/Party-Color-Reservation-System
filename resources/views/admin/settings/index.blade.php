@@ -17,7 +17,7 @@
 
 	<div class="card dark-shadow flex-fill py-2 px-3 mb-3" id="inner-content">
 		@if (Auth::user()->hasPermission('settings_tab_edit'))
-		<form method="POST" action="{{ route('admin.settings.update') }}" class="form">
+		<form method="POST" action="{{ route('admin.settings.update') }}" class="form" enctype="multipart/form-data">
 		@else
 		<form class="form" readonly>
 		@endif
@@ -50,7 +50,7 @@
 										<b>FORMATS ALLOWED:</b>
 										<br>JPEG, JPG, PNG, WEBP
 									</small><br>
-									<small class="text-muted pt-0 mt-0"><b>MAX SIZE:</b> 5MB</small>
+									<small class="text-muted pt-0 mt-0"><b>MAX SIZE:</b> 5MB</small><br>
 								</div>
 							</div>
 						</div>
@@ -66,15 +66,23 @@
 				<div class="col-12 col-lg-6">
 					<div class="form-group">
 						<label class="form-label">Website Name</label>
-						<input type="text" name="web-name" class="form-control" value="{{ App\Settings::getValue('web-name') == null ? 'Municipality of Taytay, Rizal' : App\Settings::getValue('web-name') }}" />
+						<input type="text" name="web-name" class="form-control" value="{{ App\Settings::getValue('web-name') == null ? 'Party Color' : App\Settings::getValue('web-name') }}" />
 						<span class="text-danger small">{{$errors->first('web-name')}}</span>
 					</div>
 
 					<div class="form-group text-counter-parent">
-						<label class="form-label">Website Description</label>
-						<textarea name="web-desc" class="form-control not-resizable text-counter-input" rows="3" data-max="255">{{ App\Settings::getValue('web-desc') == null ? 'The official website of Taytay Municipal' : App\Settings::getValue('web-desc') }}</textarea>
+						<label for="web-desc" class="form-label">Website Description</label>
+						<textarea name="web-desc" id="web-desc" class="form-control not-resizable text-counter-input" rows="3" data-max="255">{{ App\Settings::getValue('web-desc') == null ? 'The official website of Taytay Municipal' : App\Settings::getValue('web-desc') }}</textarea>
 						<span class="text-counter small">255</span>
 						<span class="text-danger small">{{$errors->first('web-desc')}}</span>
+					</div>
+				</div>
+
+				<div class="col-6 col-lg-3 mx-auto">
+					<div class="form-group">
+						<label for="capacity" class="form-label">Store Capacity</label>
+						<input type="number" class="form-control w-100" min="1" max="2147483647" name="capacity" id="capacity" value="{{ App\Settings::getValue('capacity') == null ? '50' : App\Settings::getValue('capacity') }}">
+						<span class="text-danger-small">{{$errors->first('capacity')}}</span>
 					</div>
 				</div>
 			</div>
@@ -86,15 +94,15 @@
 				{{-- PUBLIC CONTACT --}}
 				<div class="col-12 col-lg-6 form-group">
 					<label class="form-label">Telephone Number(s)</label>
-					<div data-tags-input-name="contacts" class="tag-input form-control">
-						{{ App\Settings::getValue('contacts') == null ? '080-3980-4560' : App\Settings::getValue('contacts') }}
-					</div>
+					<div data-tags-input-name="contacts" class="tag-input form-control">{{ App\Settings::getValue('contacts') == null ? '080-3980-4560' : App\Settings::getValue('contacts') }}</div>
 				</div>
 
 				{{-- PUBLIC EMAIL --}}
 				<div class="col-12 col-lg-6 form-group">
 					<label class="form-label">Email Address</label>
-					<input type="text" name="email" class="form-control" value="{{ App\Settings::getValue('email') == null ? 'information@taytayrizal.gov.ph' : App\Settings::getValue('email') }}" />
+					<div data-tags-input-name="emails" class="tag-input form-control tags-remove-prefix" data-forbidden-chars='["," , "_", "?"]'>
+						{{ App\Settings::getValue('emails') == null ? 'partycolor3f@gmail.com' : App\Settings::getValue('emails') }}
+					</div>
 				</div>
 
 				{{-- ADDRESS --}}
@@ -119,7 +127,9 @@
 <style type="text/css">
 	.tag-input.form-control {
 		padding: 0.375rem 0.75rem;
-		height: calc(1.5em + 0.75rem + 2px);
+		height: auto;
+		display: flex;
+		flex-wrap: wrap;
 	}
 
 	div.tag {
@@ -132,11 +142,11 @@
 
 	div.tag, div.tag > * {
 		background-color: var(--primary);
-		margin: 0 0.5rem;
+		margin: 0.25rem 0.5rem;
 	}
 
 	div.tag .tag-i {
-		top: 40%;
+		top: 25%;
 		right: 0.25rem;
 		color: #fff;
 		transition: 0.25s;
@@ -158,13 +168,19 @@
 <script type="text/javascript">
 	$(document).ready(() => {
 		$('.tag-input').tagging({
-			'edit-on-delete': false
+			'edit-on-delete': true
 		});
+
+		$('.tags-remove-prefix span').text('').addClass('mx-1');
 
 		@if (Auth::user()->hasPermission('settings_tab_edit'))
 		$('#revert').on('click', (e) => {
 			location.reload();
 		});
+
+		// $('#revert-favicon').on('click', (e) => {
+		// 	Swal.fire();
+		// });
 		@else
 		$.each($('form').find('input, textarea'), (k, v) => {
 			$(v).prop('readonly', true);

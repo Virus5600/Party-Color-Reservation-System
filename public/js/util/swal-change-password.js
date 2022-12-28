@@ -1,7 +1,6 @@
 $(document).ready(() => {
 	$(document).on('click', '.change-password', (e) => {
 		let obj = $(e.currentTarget);
-		console.log(obj.attr('data-scp'));
 		let data = JSON.parse(obj.attr('data-scp'));
 
 		if(typeof data.preventDefault == 'undefined')
@@ -76,7 +75,7 @@ $(document).ready(() => {
 				if (p.length < 8) {
 					Swal.showValidationMessage(`Password should be at least 8 characters`);
 				}
-				else if (!p.match(/([a-z])([0-9])/gi)) {
+				else if (!p.match(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]*$/gi)) {
 					Swal.showValidationMessage(`Password must contain at least 1 letter and 1 number`);
 				}
 				else if (cp.length <= 0) {

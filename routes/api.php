@@ -19,3 +19,6 @@ Route::post('/admin-search/{id}', 'ApiController@adminSearch')->name('adminSearc
 
 // Removing Image
 Route::post('/remove-image', 'ApiController@removeImage')->name('removeImage');
+
+// Fetching Announcements
+Route::get('/user/fetch-announcements', 'ApiController@fetchAnnouncements')->name('user.fetch-announcements');

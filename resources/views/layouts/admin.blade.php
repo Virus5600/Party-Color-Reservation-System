@@ -11,7 +11,7 @@
 		<meta name="type" content="website">
 		<meta name="title" content="{{ env('APP_NAME') }}">
 		<meta name="description" content="{{ env('APP_DESC') }}">
-		<meta name="image" content="{{ asset('images/meta-banner.jpg') }}">
+		<meta name="image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
 		<meta name="keywords" content="{{ env('APP_KEYW') }}">
 		<meta name="application-name" content="{{ env('APP_NAME') }}">
 
@@ -19,26 +19,26 @@
 		<meta name="twitter:card" content="summary_large_image">
 		<meta name="twitter:title" content="{{ env('APP_NAME') }}">
 		<meta name="twitter:description" content="{{ env('APP_DESC') }}">
-		<meta name="twitter:image" content="{{asset('/images/meta-banner.jpg')}}">
+		<meta name="twitter:image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
 
 		{{-- OG META --}}
 		<meta name="og:url" content="{{Request::url()}}">
 		<meta name="og:type" content="website">
 		<meta name="og:title" content="{{ env('APP_NAME') }}">
 		<meta name="og:description" content="{{ env('APP_DESC') }}">
-		<meta name="og:image" content="{{asset('/images/meta-banner.jpg')}}">
+		<meta name="og:image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
 
 		@yield('meta')
 
 		{{-- CSS --}}
-		<link href="{{ asset('css/app.css') }}" rel="stylesheet">
+		<link href="{{ asset('css/lib-styles.css') }}" rel="stylesheet">
 		<link href="{{ asset('css/style.css') }}" rel="stylesheet">
 		<link href="{{ asset('css/admin.css') }}" rel="stylesheet">
 
 		@yield('css')
 
 		{{-- JQUERY / SWEETALERT 2 / SLICK CAROUSEL / FONTAWESOME 6 / SUMMERNOTE / TAGGING JS --}}
-		<script type="text/javascript" src="{{ asset('js/scripts.js') }}"></script>
+		<script type="text/javascript" src="{{ asset('js/lib-scripts.js') }}"></script>
 
 		{{-- Removes the code that shows up when script is disabled/not allowed/blocked --}}
 		<script type="text/javascript" id="for-js-disabled-js">$('head').append('<style id="for-js-disabled">#js-disabled { display: none; }</style>');$(document).ready(function() {$('#js-disabled').remove();$('#for-js-disabled').remove();$('#for-js-disabled-js').remove();});</script>

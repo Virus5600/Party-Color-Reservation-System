@@ -14,9 +14,9 @@
 		@if (\Request::is('admin/reservation'))
 		<span class="bg-secondary text-white"><i class="fas fa-calendar-alt mr-2"></i>Reservations</span>
 		@elseif (\Request::is('admin/reservation*'))
-		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.dashboard') }}" aria-hidden="false" aria-label="Reservation"><i class="fas fa-calendar-alt mr-2"></i>Reservation</a>
+		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.reservations.index') }}" aria-hidden="false" aria-label="Reservation"><i class="fas fa-calendar-alt mr-2"></i>Reservation</a>
 		@else
-		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.dashboard') }}" aria-hidden="false" aria-label="Reservation"><i class="fas fa-calendar-alt mr-2"></i>Reservation</a>
+		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.reservations.index') }}" aria-hidden="false" aria-label="Reservation"><i class="fas fa-calendar-alt mr-2"></i>Reservation</a>
 		@endif
 
 		{{-- INVENTORY --}}
@@ -26,6 +26,15 @@
 		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.inventory.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-boxes mr-2"></i>Inventory</a>
 		@else
 		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.inventory.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-boxes mr-2"></i>Inventory</a>
+		@endif
+
+		{{-- MENU --}}
+		@if (\Request::is('admin/menu'))
+		<span class="bg-secondary text-white"><i class="fas fa-utensils mr-2"></i>Menu</span>
+		@elseif (\Request::is('admin/menu*'))
+		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.menu.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-utensils mr-2"></i>Menu</a>
+		@else
+		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.menu.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-utensils mr-2"></i>Menu</a>
 		@endif
 
 		{{-- ANNOUNCEMENT --}}

@@ -20,4 +20,12 @@ $(document).ready(() => {
 			icons.hide.removeClass('d-none');
 		}
 	});
+
+	$('#forgotPassword').on('click', (e) => {
+		let obj = $(e.currentTarget);
+		let input = $('[name=email]');
+
+		if (input.val().trim().length > 0)
+			obj.attr('href', `${obj.attr('href')}?e=${input.val()}`);
+	});
 });

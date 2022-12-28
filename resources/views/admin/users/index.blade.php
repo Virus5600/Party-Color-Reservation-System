@@ -106,16 +106,16 @@
 
 								{{-- STATUS [DELETE] --}}
 								@if (Auth::user()->hasPermission('users_tab_delete'))
-									@if ($u->deleted_at == null)
-									<a href="@{{ route('admin.users.delete', [$u->id]) }}" class="dropdown-item"><i class="fas fa-trash mr-2"></i>Deactivate</a>
+									@if ($u->trashed())
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.users.restore', [$u->id]) }}', undefined, 'Are you sure you want to activate this?');" class="dropdown-item"><i class="fas fa-toggle-on mr-2"></i>Activate</a>
 									@else
-									<a href="@{{ route('admin.users.restore', [$u->id]) }}" class="dropdown-item"><i class="fas fa-recycle mr-2"></i>Activate</a>
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.users.delete', [$u->id]) }}', undefined, 'Are you sure you want to deactivate this?');" class="dropdown-item"><i class="fas fa-toggle-off mr-2"></i>Deactivate</a>
 									@endif
 								@endif
 
 								{{-- DELETE [PERMANENT DELETE] --}}
 								@if (Auth::user()->hasPermission('users_tab_perma_delete'))
-								<a href="@{{ route('admin.users.permaDelete', [$u->id]) }}" class="dropdown-item"><i class="fas fa-fire-alt mr-2"></i>Delete</a>
+								<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.users.permaDelete', [$u->id]) }}', undefined, 'Are you sure you want to delete this?')" class="dropdown-item"><i class="fas fa-trash mr-2"></i>Delete</a>
 								@endif
 							</div>
 						</div>
@@ -137,6 +137,7 @@
 @endsection
 
 @section('scripts')
+<script type="text/javascript" src="{{ asset('js/util/confirm-leave.js') }}"></script>
 {{-- To someone who will handle this... if you can make this part more secure, I will be glad! QwQ --}}
 <script type="text/javascript" src="{{ asset('js/util/swal-change-password.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/login.js') }}"></script>

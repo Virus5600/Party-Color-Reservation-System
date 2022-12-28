@@ -41,6 +41,7 @@ class User extends Authenticatable
 	// Relationships
 	protected function announcements() { return $this->hasMany('App\Announcement'); }
 	protected function type() { return $this->belongsTo('App\Type'); }
+	protected function passwordReset() { return $this->belongsTo('App\PasswordReset', 'email', 'email'); }
 
 	// Custom Function
 	public function permissions() {

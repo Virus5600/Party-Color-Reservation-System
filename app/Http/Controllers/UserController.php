@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
+use App\Jobs\AccountNotification;
+
+use App\PasswordReset;
 use App\Permission;
 use App\Type;
 use App\TypePermission;
@@ -20,6 +23,7 @@ use Hash;
 use Location;
 use Log;
 use Mail;
+use Session;
 use Validator;
 
 class UserController extends Controller
@@ -74,6 +78,7 @@ class UserController extends Controller
 				->with('flash_success', 'Logged In!');
 		}
 		else {
+			$msg = "";
 			if ($user) {
 				try {
 					DB::beginTransaction();
@@ -84,7 +89,26 @@ class UserController extends Controller
 					}
 					else {
 						if ($user->locked == 0) {
-							// DO THE MAILING HERE. THIS IS TO SEND AN EMAIL ONLY ONCE
+							// Generates a password reset link if there are no other instances of this email in this table.
+							if (PasswordReset::where('email', '=', $user->email)->get()->count() <= 0) {
+								PasswordReset::insert([
+									'email' => $user->email,
+									'created_at' => now()->timezone('Asia/Manila')
+								]);
+								$pr = PasswordReset::where('email', '=', $user->email)->first();
+								$pr->generateToken()->generateExpiration();
+							}
+							// Otherwise, fetch the row to use the already generated data
+							else {
+								$pr = PasswordReset::where('email', '=', $user->email)->first();
+							}
+							
+							$args = [
+								"subject" => "Your account has been locked!",
+								"token" => $pr->token,
+								"recipients" => [$user->email]
+							];
+							AccountNotification::dispatch($user, "locked", $args);
 						}
 
 						$user->locked = 1;
@@ -111,6 +135,7 @@ class UserController extends Controller
 	protected function logout() {
 		if (Auth::check()) {
 			auth()->logout();
+			Session::flush();
 			return redirect(route('home'))->with('flash_success', 'Logged out!');
 		}
 		return redirect()->route('admin.dashboard')->with('flash_error', 'Something went wrong, please try again.');
@@ -127,7 +152,7 @@ class UserController extends Controller
 
 	protected function create() {
 		$types = Type::get();
-		$password = Str::random(25);
+		$password = str_shuffle(Str::random(25) . str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT));
 
 		return view('admin.users.create', [
 			'types' => $types,
@@ -142,7 +167,7 @@ class UserController extends Controller
 			'last_name' => array('required', 'string', 'max:255'),
 			'email' => 'required|email|string|max:255',
 			'type' => 'required|numeric|exists:types,id',
-			'password' => array('required', 'string', 'min:8', 'max:255', 'regex:/^[a-zA-Z]+[0-9]+$/'),
+			'password' => array('required', 'string', 'min:8', 'max:255', 'regex:/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]*$/'),
 			'avatar' => 'max:5120|mimes:jpeg,jpg,png,webp|nullable',
 		], [
 			'first_name.required' => 'The first or given name is required',
@@ -185,7 +210,7 @@ class UserController extends Controller
 				// Store the image
 				$destination = 'uploads/users';
 				$fileType = $req->file('avatar')->getClientOriginalExtension();
-				$avatar = $req->first_name . '-' . $req->last_name . "-DP." . $fileType;
+				$avatar = $req->first_name . '-' . $req->last_name . "-DP-" . uniqid() . "." . $fileType;
 				$req->file('avatar')->move($destination, $avatar);
 
 				// Save the file name to the table
@@ -203,6 +228,16 @@ class UserController extends Controller
 				'password' => Hash::make($req->password),
 				'type_id' => $req->type
 			]);
+
+			// MAILING
+			$reqArgs = $req->except('avatar');
+			$args = [
+				'subject' => 'Account Created',
+				'req' => $reqArgs,
+				'email' => $req->email,
+				'recipients' => [$req->email, Auth::user()->email]
+			];
+			AccountNotification::dispatch($user, "creation", $args)->afterCommit();
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -292,7 +327,7 @@ class UserController extends Controller
 				$avatar = null;
 				$destination = 'uploads/users';
 				$fileType = $req->file('avatar')->getClientOriginalExtension();
-				$avatar = $req->first_name . '-' . $req->last_name . "-DP." . $fileType;
+				$avatar = $req->first_name . '-' . $req->last_name . "-DP-" . uniqid() . "." . $fileType;
 				$req->file('avatar')->move($destination, $avatar);
 
 				// Save the file name to the table
@@ -356,6 +391,18 @@ class UserController extends Controller
 			DB::beginTransaction();
 
 			$user->password = Hash::make($req->password);
+
+			$args = [
+				'subject' => 'Password Changed',
+				'recipients' => [$user->email],
+				'email' => $user->email,
+				'password' => $req->password,
+				'type' => 'admin-change'
+			];
+
+			// Uses past-tense due to password is now changed
+			AccountNotification::dispatch($user, "changed-password", $args);
+
 			$user->save();
 
 			DB::commit();
@@ -530,5 +577,93 @@ class UserController extends Controller
 			->with('flash_success', 'Successfully updated ' . trim($user->getName()) . '\'s permissions');
 	}
 
+	protected function delete(Request $req, $id) {
+		$user = User::find($id);
 
+		if ($user == null) {
+			return redirect()
+				->route('admin.user.index')
+				->with('flash_error', 'The user either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();			
+			$user->delete();
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.user.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->back()
+			->with('flash_success', 'Successfully deactivated account.');
+	}
+
+	protected function restore(Request $req, $id) {
+		$user = User::withTrashed()->find($id);
+
+		if ($user == null) {
+			return redirect()
+				->route('admin.user.index')
+				->with('flash_error', 'The account either does not exists or is already deleted permanently.');
+		}
+		else if (!$user->trashed()) {
+			return redirect()
+				->back()
+				->with('flash_error', 'The account is already activated.');
+		}
+
+		try {
+			DB::beginTransaction();
+			$user->restore();
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.user.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->back()
+			->with('flash_success', 'Successfully re-activated account.');
+	}
+
+	protected function permaDelete(Request $req, $id) {
+		$user = User::withTrashed()->find($id);
+
+		if ($user == null) {
+			return redirect()
+				->route('admin.users.index')
+				->with('flash_error', 'The account either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();
+
+			if ($user->avatar != 'default.png')
+					File::delete(public_path() . '/uploads/users/' . $user->avatar);
+			$user->forceDelete();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.users.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->route('admin.users.index')
+			->with('flash_success', 'Successfully removed the user permanently');
+	}
 }

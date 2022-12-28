@@ -8,6 +8,7 @@ use App\Settings;
 
 use DB;
 use Exception;
+use File;
 use Log;
 use Validator;
 
@@ -23,7 +24,7 @@ class SettingsController extends Controller
 			'web-desc' => 'required|string|max:255',
 			'address' => 'required|string|max:255',
 			'contact' => 'string|max:255',
-			'email' => 'required|email|string|max:255',
+			'email' => 'string|max:255',
 			'web-logo' => 'max:5120|mimes:jpeg,jpg,png,webp|nullable'
 		], [
 			'web-name.required' => 'Website Name is required',
@@ -38,8 +39,8 @@ class SettingsController extends Controller
 			'contact.string' => 'Contact should be a string of characters',
 			'contact.max' => 'Contact should not exceed 255 characters',
 			'email.required' => 'The email is required',
-			'email.email' => 'Invalid email address',
-			'email.string' => 'Inavlid email address',
+			// 'email.*.email' => 'Invalid email address',
+			// 'email.*.string' => 'Inavlid email address',
 			'email.max' => 'Emails must not exceed 255 characters',
 			'web-logo.max' => 'Image should be below 5MB',
 			'web-logo.mimes' => 'Selected file doesn\'t match the allowed image formats',
@@ -55,11 +56,23 @@ class SettingsController extends Controller
 			DB::beginTransaction();
 
 			foreach ($req->except('_token') as $k => $v) {
-				if ($k == 'contacts') {
+				if ($k == 'contacts' || $k == 'emails') {
 					$v = implode(', ', $v);
 				}
 				else if ($k == 'web-logo') {
-					continue;
+					if ($req->has($k)) {
+						$setting = Settings::where('name', '=', $k)->first();
+
+						if ($setting->value != 'default.png')
+							File::delete(public_path() . "/uploads/settings/{$setting->value}");
+						
+						$destination = "uploads/settings";
+						$fileType = $req->file($k)->getClientOriginalExtension();
+						$v = "favicon.{$fileType}";
+						$req->file($k)->move($destination, $v);
+					}
+					else
+						continue;
 				}
 
 				$setting = Settings::where('name', '=', $k)->first();

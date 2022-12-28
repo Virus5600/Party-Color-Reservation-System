@@ -12,7 +12,6 @@ use DB;
 use DOMDocument;
 use Exception;
 use File;
-use Location;
 use Log;
 use Mail;
 use Storage;
@@ -95,7 +94,7 @@ class AnnouncementController extends Controller
 			if ($req->has('image')) {
 				$destination = 'uploads/announcements/'.$announcement->id;
 				$fileType = $req->file('image')->getClientOriginalExtension();
-				$image = $slug . "-" . uniqid() . "ポスター." . $fileType;
+				$image = $announcement->id . "-" . uniqid() . "ポスター." . $fileType;
 				$req->file('image')->move($destination, $image);
 
 				$announcement->poster = $image;
@@ -219,7 +218,6 @@ class AnnouncementController extends Controller
 		]);
 
 		if ($validator->fails()) {
-			Log::debug($validator->messages());
 			return redirect()
 				->back()
 				->withErrors($validator)
@@ -254,7 +252,7 @@ class AnnouncementController extends Controller
 			$dom = new DOMDocument('1.0', 'UTF-8');
 			$dom->encoding = 'utf-8';
 			$dom->loadHtml(mb_convert_encoding("<div>{$req->content}</div>", 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
-			Log::debug("Content: {$req->content}");
+			// Log::debug("Content: {$req->content}");
 			
 			$images = $dom->getElementsByTagName('img');
 			foreach($images as $i) {
@@ -303,7 +301,7 @@ class AnnouncementController extends Controller
 
 			$announcement->content = substr($content, strlen("<div>"), strlen("{$content}") - strlen("<div></div>"));
 			$announcement->save();
-			Log::debug("Updated Content: {$announcement->content}");
+			// Log::debug("Updated Content: {$announcement->content}");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -456,7 +454,7 @@ class AnnouncementController extends Controller
 
 			$announcement->forceDelete();
 			if ($poster != null)
-				File::delete(public_path() . '/uploads/announcements/' . $id . '/' . $poster);
+				File::deleteDirectory(public_path() . '/uploads/announcements/' . $id);
 
 			DB::commit();
 		} catch (Exception $e) {

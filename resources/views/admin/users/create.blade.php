@@ -105,6 +105,7 @@
 													<i class="fas fa-eye-slash" id="hide"></i>
 												</button>
 											</div>
+											<br><span class="text-danger small">{{$errors->first('password')}}</span>
 										</div>
 									</div>
 

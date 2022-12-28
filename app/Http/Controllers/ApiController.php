@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Announcement;
 use App\User;
 
 use DB;
@@ -133,6 +134,7 @@ class ApiController extends Controller
 				->orWhere('types.name', 'LIKE', $toSearch)
 				->select('users.id', DB::raw("CONCAT(first_name, ' ', last_name) as user_name"), 'types.name', 'email', 'avatar')
 				->get();
+
 			$content_order = ['name', 'email'];
 			$data_length = 5;
 
@@ -272,6 +274,14 @@ class ApiController extends Controller
 		return response()->json([
 			'type' => 'empty',
 			'message' => 'Unknown category: ' . $req->type
+		]);
+	}
+
+	protected function fetchAnnouncements(Request $req) {
+		$announcements = Announcement::get();
+
+		return response()->json([
+			'announcements' => $announcements
 		]);
 	}
 }

@@ -23,7 +23,7 @@ class InventoryController extends Controller
 	protected function create(Request $req) {
 		$measurement_unit = [];
 
-		foreach (Inventory::withTrashed()->get() as $i)
+		foreach (Inventory::select('measurement_unit')->withTrashed()->distinct()->get() as $i)
 			array_push($measurement_unit, $i->measurement_unit);
 
 		return view('admin.inventory.create', [
@@ -32,11 +32,6 @@ class InventoryController extends Controller
 	}
 
 	protected function store(Request $req) {
-		$existing = Inventory::withTrashed()->where('item_name', '=', $req->item_name)->first();
-
-		if ($existing)
-			return $this->update($req, $existing->id);
-
 		$validator = Validator::make($req->all(), [
 			'item_name' => 'required|string|max:255',
 			'quantity' => 'required|integer|max:4294967295',
@@ -59,6 +54,11 @@ class InventoryController extends Controller
 				->withErrors($validator)
 				->withInput();
 		}
+
+		$existing = Inventory::withTrashed()->where('item_name', '=', $req->item_name)->first();
+
+		if ($existing)
+			return $this->update($req, $existing->id);
 
 		try {
 			DB::beginTransaction();
@@ -88,7 +88,11 @@ class InventoryController extends Controller
 	}
 
 	protected function edit(Request $req, $id) {
+		$measurement_unit = [];
 		$item = Inventory::withTrashed()->find($id);
+
+		foreach (Inventory::select('measurement_unit')->withTrashed()->distinct()->get() as $i)
+			array_push($measurement_unit, $i->measurement_unit);
 
 		if ($item == null) {
 			return redirect()
@@ -97,7 +101,8 @@ class InventoryController extends Controller
 		}
 
 		return view('admin.inventory.edit', [
-			'item' => $item
+			'item' => $item,
+			'measurement_unit' => $measurement_unit
 		]);
 	}
 
@@ -162,6 +167,53 @@ class InventoryController extends Controller
 		return redirect()
 			->route('admin.inventory.index')
 			->with('flash_success', 'Successfully updated item.');
+	}
+
+	protected function increase(Request $req, $id) {
+		$item = Inventory::withTrashed()->find($id);
+
+		if ($item == null) {
+			return redirect()
+				->route('admin.inventory.index')
+				->with('flash_error', 'The item either does not exists or is already deleted.');
+		}
+
+		$validator = Validator::make($req->all(), [
+			'quantity' => 'required|integer|max:4294967295',
+		], [
+			'quantity.required' => 'Quantity is required',
+			'quantity.integer' => 'Quantity should be a number',
+			'quantity.max' => 'Quantity should not exceed 4,294,967,295',
+		]);
+
+		if ($validator->fails()) {
+			Log::debug($validator->messages());
+			return response()
+				->json([
+					''
+				]);
+		}
+
+		try {
+			DB::beginTransaction();
+
+			$item->quantity = $item->quantity + $req->quantity;
+			$item->save();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.inventory.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return response()
+			->json([
+				''
+			]);
 	}
 
 	protected function delete(Request $req, $id) {
@@ -234,11 +286,7 @@ class InventoryController extends Controller
 
 		try {
 			DB::beginTransaction();
-
-			$id = $item->id;
-
 			$item->forceDelete();
-
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
