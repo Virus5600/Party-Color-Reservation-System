@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 07, 2022 at 01:19 PM
+-- Generation Time: Dec 29, 2022 at 03:56 AM
 -- Server version: 5.7.36
--- PHP Version: 7.4.26
+-- PHP Version: 8.0.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,6 +20,26 @@ SET time_zone = "+00:00";
 --
 -- Database: `pcrs`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `activity_logs`
+--
+
+DROP TABLE IF EXISTS `activity_logs`;
+CREATE TABLE IF NOT EXISTS `activity_logs` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `action` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_marked` tinyint(4) NOT NULL DEFAULT '0',
+  `reason` mediumtext COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
 
@@ -42,7 +62,14 @@ CREATE TABLE IF NOT EXISTS `announcements` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `announcements_user_id_foreign` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Dumping data for table `announcements`
+--
+
+INSERT INTO `announcements` (`id`, `poster`, `title`, `slug`, `summary`, `content`, `is_draft`, `user_id`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, '1-63ab36cd649ecポスター.png', 'Halloween 15% Discount Promo', 'Halloween_15%_Discount_Promo', 'Limited time discount available this Holloween!', '<p>BBQ &amp; Drinks Plan<p>Adult - Senior High: &#65509;3,500 to &#65509; 2,975 BBQ &amp; Drinks Plan</p></p>', 0, 1, NULL, '2022-12-28 19:55:48', '2022-12-28 19:55:48');
 
 -- --------------------------------------------------------
 
@@ -64,6 +91,42 @@ CREATE TABLE IF NOT EXISTS `announcement_content_images` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `contact_information`
+--
+
+DROP TABLE IF EXISTS `contact_information`;
+CREATE TABLE IF NOT EXISTS `contact_information` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `reservation_id` bigint(20) UNSIGNED NOT NULL,
+  `contact_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `failed_jobs`
+--
+
+DROP TABLE IF EXISTS `failed_jobs`;
+CREATE TABLE IF NOT EXISTS `failed_jobs` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `inventories`
 --
 
@@ -78,7 +141,89 @@ CREATE TABLE IF NOT EXISTS `inventories` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `inventories_item_name_unique` (`item_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Dumping data for table `inventories`
+--
+
+INSERT INTO `inventories` (`id`, `item_name`, `quantity`, `measurement_unit`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 'Pork', 50, 'kg', NULL, '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(2, 'Beef', 50, 'kg', NULL, '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(3, 'Chicken', 50, 'kg', NULL, '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(4, 'Coke', 10, 'L', NULL, '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(5, 'Iced Tea', 10, 'L', NULL, '2022-12-28 19:55:48', '2022-12-28 19:55:48');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jobs`
+--
+
+DROP TABLE IF EXISTS `jobs`;
+CREATE TABLE IF NOT EXISTS `jobs` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `queue` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `attempts` tinyint(3) UNSIGNED NOT NULL,
+  `reserved_at` int(10) UNSIGNED DEFAULT NULL,
+  `available_at` int(10) UNSIGNED NOT NULL,
+  `created_at` int(10) UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `jobs_queue_index` (`queue`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `menus`
+--
+
+DROP TABLE IF EXISTS `menus`;
+CREATE TABLE IF NOT EXISTS `menus` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `price` double UNSIGNED NOT NULL DEFAULT '0',
+  `duration` time NOT NULL DEFAULT '01:00:00',
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Dumping data for table `menus`
+--
+
+INSERT INTO `menus` (`id`, `name`, `price`, `duration`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 'BBQ Plan', 3500, '02:00:00', NULL, '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(2, 'Drink All You Can', 1200, '01:00:00', NULL, '2022-12-28 19:55:48', '2022-12-28 19:55:48');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `menu_items`
+--
+
+DROP TABLE IF EXISTS `menu_items`;
+CREATE TABLE IF NOT EXISTS `menu_items` (
+  `menu_id` bigint(20) UNSIGNED NOT NULL,
+  `inventory_id` bigint(20) UNSIGNED NOT NULL,
+  `amount` double(8,2) UNSIGNED NOT NULL,
+  KEY `menu_items_menu_id_foreign` (`menu_id`),
+  KEY `menu_items_inventory_id_foreign` (`inventory_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Dumping data for table `menu_items`
+--
+
+INSERT INTO `menu_items` (`menu_id`, `inventory_id`, `amount`) VALUES
+(1, 1, 5.00),
+(1, 2, 5.00),
+(1, 3, 5.00),
+(2, 4, 5.00),
+(2, 5, 5.00);
 
 -- --------------------------------------------------------
 
@@ -92,23 +237,31 @@ CREATE TABLE IF NOT EXISTS `migrations` (
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=178 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `migrations`
 --
 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
-(168, '2014_10_11_999997_create_permissions_table', 1),
-(169, '2014_10_11_999998_create_types_table', 1),
-(170, '2014_10_11_999999_create_type_permissions_table', 1),
-(171, '2014_10_12_000000_create_users_table', 1),
-(172, '2014_10_12_100000_create_password_resets_table', 1),
-(173, '2022_10_10_135607_create_user_permissions_table', 1),
-(174, '2022_10_14_012146_create_settings_table', 1),
-(175, '2022_10_21_135542_create_announcements_table', 1),
-(176, '2022_10_25_053030_create_announcement_content_images_table', 1),
-(177, '2022_11_03_151133_create_inventories_table', 1);
+(1, '2014_10_11_999997_create_permissions_table', 1),
+(2, '2014_10_11_999998_create_types_table', 1),
+(3, '2014_10_11_999999_create_type_permissions_table', 1),
+(4, '2014_10_12_000000_create_users_table', 1),
+(5, '2014_10_12_100000_create_password_resets_table', 1),
+(6, '2022_10_10_135607_create_user_permissions_table', 1),
+(7, '2022_10_14_012146_create_settings_table', 1),
+(8, '2022_10_21_135542_create_announcements_table', 1),
+(9, '2022_10_25_053030_create_announcement_content_images_table', 1),
+(10, '2022_11_03_151133_create_inventories_table', 1),
+(11, '2022_11_25_071509_create_reservations_table', 1),
+(12, '2022_11_27_171832_create_jobs_table', 1),
+(13, '2022_11_28_061431_create_failed_jobs_table', 1),
+(14, '2022_12_03_153243_create_contact_information_table', 1),
+(15, '2022_12_06_055129_create_menus_table', 1),
+(16, '2022_12_06_063713_create_menu_items_table', 1),
+(17, '2022_12_06_084348_create_reservation_menus_table', 1),
+(18, '2022_12_18_085848_create_activity_logs_table', 1);
 
 -- --------------------------------------------------------
 
@@ -119,9 +272,10 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 DROP TABLE IF EXISTS `password_resets`;
 CREATE TABLE IF NOT EXISTS `password_resets` (
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `expires_at` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  KEY `password_resets_email_index` (`email`)
+  UNIQUE KEY `password_resets_email_unique` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
@@ -139,40 +293,85 @@ CREATE TABLE IF NOT EXISTS `permissions` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `permissions`
 --
 
 INSERT INTO `permissions` (`id`, `parent_permission`, `name`, `slug`, `created_at`, `updated_at`) VALUES
-(1, NULL, 'Reservations Tab Access', 'reservations_tab_access', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(2, 1, 'Reservations Tab Respond', 'reservations_tab_respond', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(3, 1, 'Reservations Tab Delete', 'reservations_tab_delete', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(4, 1, 'Reservations Tab Perma Delete', 'reservations_tab_perma_delete', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(5, NULL, 'Inventory Tab Access', 'inventory_tab_access', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(6, 5, 'Inventory Tab Create', 'inventory_tab_create', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(7, 5, 'Inventory Tab Edit', 'inventory_tab_edit', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(8, 5, 'Inventory Tab Delete', 'inventory_tab_delete', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(9, 5, 'Inventory Tab Perma Delete', 'inventory_tab_perma_delete', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(10, NULL, 'Announcements Tab Access', 'announcements_tab_access', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(11, 10, 'Announcements Tab Create', 'announcements_tab_create', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(12, 10, 'Announcements Tab Edit', 'announcements_tab_edit', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(13, 10, 'Announcements Tab Publish', 'announcements_tab_publish', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(14, 10, 'Announcements Tab Unpublish', 'announcements_tab_unpublish', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(15, 10, 'Announcements Tab Send Mail', 'announcements_tab_send_mail', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(16, 10, 'Announcements Tab Delete', 'announcements_tab_delete', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(17, 10, 'Announcements Tab Perma Delete', 'announcements_tab_perma_delete', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(18, NULL, 'Users Tab Access', 'users_tab_access', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(19, 18, 'Users Tab Create', 'users_tab_create', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(20, 18, 'Users Tab Edit', 'users_tab_edit', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(21, 18, 'Users Tab Permissions', 'users_tab_permissions', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(22, 18, 'Users Tab Delete', 'users_tab_delete', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(23, 18, 'Users Tab Perma Delete', 'users_tab_perma_delete', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(24, NULL, 'Permissions Tab Access', 'permissions_tab_access', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(25, 24, 'Permissions Tab Manage', 'permissions_tab_manage', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(26, NULL, 'Settings Tab Access', 'settings_tab_access', '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(27, 26, 'Settings Tab Edit', 'settings_tab_edit', '2022-11-07 05:19:30', '2022-11-07 05:19:30');
+(1, NULL, 'Reservations Tab Access', 'reservations_tab_access', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(2, 1, 'Reservations Tab Create', 'reservations_tab_create', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(3, 1, 'Reservations Tab Edit', 'reservations_tab_edit', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(4, 1, 'Reservations Tab Respond', 'reservations_tab_respond', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(5, 1, 'Reservations Tab Delete', 'reservations_tab_delete', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(6, 1, 'Reservations Tab Perma Delete', 'reservations_tab_perma_delete', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(7, NULL, 'Inventory Tab Access', 'inventory_tab_access', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(8, 7, 'Inventory Tab Create', 'inventory_tab_create', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(9, 7, 'Inventory Tab Edit', 'inventory_tab_edit', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(10, 7, 'Inventory Tab Delete', 'inventory_tab_delete', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(11, 7, 'Inventory Tab Perma Delete', 'inventory_tab_perma_delete', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(12, NULL, 'Menu Tab Access', 'menu_tab_access', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(13, 12, 'Menu Tab Create', 'menu_tab_create', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(14, 12, 'Menu Tab Edit', 'menu_tab_edit', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(15, 12, 'Menu Tab Delete', 'menu_tab_delete', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(16, 12, 'Menu Tab Perma Delete', 'menu_tab_perma_delete', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(17, NULL, 'Announcements Tab Access', 'announcements_tab_access', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(18, 17, 'Announcements Tab Create', 'announcements_tab_create', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(19, 17, 'Announcements Tab Edit', 'announcements_tab_edit', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(20, 17, 'Announcements Tab Publish', 'announcements_tab_publish', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(21, 17, 'Announcements Tab Unpublish', 'announcements_tab_unpublish', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(22, 17, 'Announcements Tab Send Mail', 'announcements_tab_send_mail', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(23, 17, 'Announcements Tab Delete', 'announcements_tab_delete', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(24, 17, 'Announcements Tab Perma Delete', 'announcements_tab_perma_delete', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(25, NULL, 'Users Tab Access', 'users_tab_access', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(26, 25, 'Users Tab Create', 'users_tab_create', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(27, 25, 'Users Tab Edit', 'users_tab_edit', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(28, 25, 'Users Tab Permissions', 'users_tab_permissions', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(29, 25, 'Users Tab Delete', 'users_tab_delete', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(30, 25, 'Users Tab Perma Delete', 'users_tab_perma_delete', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(31, NULL, 'Permissions Tab Access', 'permissions_tab_access', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(32, 31, 'Permissions Tab Manage', 'permissions_tab_manage', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(33, NULL, 'Settings Tab Access', 'settings_tab_access', '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(34, 33, 'Settings Tab Edit', 'settings_tab_edit', '2022-12-28 19:55:48', '2022-12-28 19:55:48');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reservations`
+--
+
+DROP TABLE IF EXISTS `reservations`;
+CREATE TABLE IF NOT EXISTS `reservations` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `start_at` time NOT NULL,
+  `end_at` time NOT NULL,
+  `reserved_at` date NOT NULL,
+  `extension` double UNSIGNED NOT NULL DEFAULT '0',
+  `price` double UNSIGNED NOT NULL,
+  `pax` int(11) NOT NULL,
+  `phone_numbers` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `archived` tinyint(4) NOT NULL DEFAULT '0',
+  `approved` tinyint(4) NOT NULL DEFAULT '0',
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reservation_menus`
+--
+
+DROP TABLE IF EXISTS `reservation_menus`;
+CREATE TABLE IF NOT EXISTS `reservation_menus` (
+  `reservation_id` bigint(20) UNSIGNED NOT NULL,
+  `menu_id` bigint(20) UNSIGNED NOT NULL,
+  KEY `reservation_menus_reservation_id_foreign` (`reservation_id`),
+  KEY `reservation_menus_menu_id_foreign` (`menu_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
 
@@ -190,19 +389,20 @@ CREATE TABLE IF NOT EXISTS `settings` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `settings_name_unique` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `settings`
 --
 
 INSERT INTO `settings` (`id`, `name`, `value`, `is_file`, `created_at`, `updated_at`) VALUES
-(1, 'web-logo', 'default.png', 1, '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(2, 'web-name', 'Party Color', 0, '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(3, 'web-desc', 'Party Color website that offers reservation for barbecue plan, promos etc', 0, '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(4, 'address', '2-2-12 Nakahara Building 3F Tsuboya Naha city Okinawa, Japan', 0, '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(5, 'contacts', '080-3980-4560', 0, '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(6, 'email', 'partycolor3f@gmail.com', 0, '2022-11-07 05:19:30', '2022-11-07 05:19:30');
+(1, 'web-logo', 'default.png', 1, '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(2, 'web-name', 'Party Color', 0, '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(3, 'web-desc', 'Party Color website that offers reservation for barbecue plan, promos etc', 0, '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(4, 'address', '2-2-12 Nakahara Building 3F Tsuboya Naha city Okinawa, Japan', 0, '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(5, 'contacts', '080-3980-4560', 0, '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(6, 'emails', 'partycolor3f@gmail.com', 0, '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(7, 'capacity', '50', 0, '2022-12-28 19:55:48', '2022-12-28 19:55:48');
 
 -- --------------------------------------------------------
 
@@ -225,9 +425,9 @@ CREATE TABLE IF NOT EXISTS `types` (
 --
 
 INSERT INTO `types` (`id`, `name`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, 'Master Admin', NULL, '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(2, 'Manager', NULL, '2022-11-07 05:19:30', '2022-11-07 05:19:30'),
-(3, 'Staff', NULL, '2022-11-07 05:19:30', '2022-11-07 05:19:30');
+(1, 'Master Admin', NULL, '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(2, 'Manager', NULL, '2022-12-28 19:55:48', '2022-12-28 19:55:48'),
+(3, 'Staff', NULL, '2022-12-28 19:55:48', '2022-12-28 19:55:48');
 
 -- --------------------------------------------------------
 
@@ -275,6 +475,13 @@ INSERT INTO `type_permissions` (`type_id`, `permission_id`) VALUES
 (1, 25),
 (1, 26),
 (1, 27),
+(1, 28),
+(1, 29),
+(1, 30),
+(1, 31),
+(1, 32),
+(1, 33),
+(1, 34),
 (2, 1),
 (2, 2),
 (2, 3),
@@ -292,9 +499,16 @@ INSERT INTO `type_permissions` (`type_id`, `permission_id`) VALUES
 (2, 15),
 (2, 16),
 (2, 17),
-(3, 5),
-(3, 6),
-(3, 7);
+(2, 18),
+(2, 19),
+(2, 20),
+(2, 21),
+(2, 22),
+(2, 23),
+(2, 24),
+(3, 7),
+(3, 8),
+(3, 9);
 
 -- --------------------------------------------------------
 
@@ -330,7 +544,8 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` VALUES (1,'アドミン',NULL,'アカウント',NULL,'privatelaravelmailtester@gmail.com','default.png',1,0,0,NULL,'$2y$10$LnJboRQu0UECfYfntsVNeu8IhpN.2.afPdoer7G7Nga66klHKIN5a','2022-11-07 22:17:21',NULL,NULL,'2022-11-07 05:19:30','2022-11-07 14:17:21'),(2,'Mark Angelo',NULL,'Equias',NULL,'equiasmg@students.national-u.edu.ph','default.png',1,0,0,NULL,'$2y$10$/iBCkkkpmqLT2ptcj3mCvOkaxfetTfGHD1ExOplDNs1eumFOuj706','2022-11-07 22:08:37',NULL,NULL,'2022-11-07 13:53:30','2022-11-07 14:08:37'),(3,'Jaymar',NULL,'Cezar',NULL,'cezarjr@students.national-u.edu.ph','default.png',1,0,0,NULL,'$2y$10$5.p873oJg0Yzh4LKCg5ni.SAv9k8EHZ.HzPHos3mAf7Fj/GSTxbUC','2022-11-07 22:23:35',NULL,NULL,'2022-11-07 13:54:45','2022-11-07 14:23:35'),(4,'John Michael',NULL,'Elbambo',NULL,'elbambojt@students.national-u.edu.ph','default.png',1,0,0,NULL,'$2y$10$2O7NC9/OEw/d9kjYCREqBuLIeSoDTVWPokQhszl0GhckV0X6JmL4u',NULL,NULL,NULL,'2022-11-07 13:55:31','2022-11-07 13:55:31'),(5,'Kenji',NULL,'Sugino',NULL,'suginok@students.national-u.edu.ph','default.png',1,0,0,NULL,'$2y$10$Yq/hyxN3P5lv2eykAd7O1Oqugk8komtTlTWggS9hsCYLO0n10Sduy','2022-11-07 22:13:03',NULL,NULL,'2022-11-07 13:58:22','2022-11-07 14:26:54');
+INSERT INTO `users` (`id`, `first_name`, `middle_name`, `last_name`, `suffix`, `email`, `avatar`, `type_id`, `login_attempts`, `locked`, `locked_by`, `password`, `last_auth`, `remember_token`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 'アドミン', NULL, 'アカウント', NULL, 'privatelaravelmailtester@gmail.com', 'Karl Satchi-Navida-DP.png', 1, 0, 0, NULL, '$2y$10$13HjywdaQx5/SkP6GSkGD.JfzO01fNPNPCRR3Ac6KOfGnI/A2hoye', NULL, NULL, NULL, '2022-12-28 19:55:48', '2022-12-28 19:55:48');
 
 -- --------------------------------------------------------
 
@@ -361,6 +576,26 @@ ALTER TABLE `announcements`
 --
 ALTER TABLE `announcement_content_images`
   ADD CONSTRAINT `announcement_content_images_announcement_id_foreign` FOREIGN KEY (`announcement_id`) REFERENCES `announcements` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `menu_items`
+--
+ALTER TABLE `menu_items`
+  ADD CONSTRAINT `menu_items_inventory_id_foreign` FOREIGN KEY (`inventory_id`) REFERENCES `inventories` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `menu_items_menu_id_foreign` FOREIGN KEY (`menu_id`) REFERENCES `menus` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `password_resets`
+--
+ALTER TABLE `password_resets`
+  ADD CONSTRAINT `password_resets_email_foreign` FOREIGN KEY (`email`) REFERENCES `users` (`email`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `reservation_menus`
+--
+ALTER TABLE `reservation_menus`
+  ADD CONSTRAINT `reservation_menus_menu_id_foreign` FOREIGN KEY (`menu_id`) REFERENCES `menus` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `reservation_menus_reservation_id_foreign` FOREIGN KEY (`reservation_id`) REFERENCES `reservations` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `type_permissions`
