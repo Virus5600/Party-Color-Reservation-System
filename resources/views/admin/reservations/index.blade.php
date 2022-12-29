@@ -170,7 +170,7 @@
 			title: "{{ substr($menuName, 0, strlen($menuName)-1) }} - Reservation for {{ $r->contactInformation()->first()->contact_name }}",
 			start: "{{ \Carbon\Carbon::parse("$r->reserved_at $r->start_at")->format("Y-m-d\TH:i:s") }}",
 			end: "{{ \Carbon\Carbon::parse("$r->reserved_at $r->end_at")->format("Y-m-d\TH:i:s") }}",
-			color: 
+			data_id: "{{ $r->id }}",
 		},
 		@endforeach
 	];
@@ -350,6 +350,102 @@
 			},
 			// EVENTS
 			events: events,
+			selectable: true,
+			eventClick: function (e, el) {
+				var data = e.event.extendedProps
+				let htmlContent = `<div class="spinner-border text-dark" role="status"><span class="sr-only">Loading...</span></div>`;
+
+				$.get(`{{ route('admin.reservations.show', [""]) }}/${data.data_id}`, (response) => {
+					if (response.success) {
+						let reservation = response.reservation;
+						let date = new Date(reservation.reserved_at);
+						let createdAt = new Date(reservation.created_at);
+						let dateOpt = {year: 'numeric', month: 'long', day: 'numeric'};
+						let fulldateOpt = {year: 'numeric', month: 'long', day: 'numeric', hours: '2-digits'};
+
+						let phoneNumbers = ``;
+						for (let pn of reservation.phone_numbers.split("|"))
+							phoneNumbers += `<a href="tel:${pn}">${pn}</a>, `;
+						phoneNumbers = phoneNumbers.trim();
+						phoneNumbers = phoneNumbers.substring(0, phoneNumbers.length-1);
+
+						htmlContent = `
+							<div class="card">
+								<h4 class="card-header d-flex">
+									<span class="mr-auto">${date.toLocaleDateString('{{ app()->currentLocale() }}', dateOpt)} ${reservation.start_at} - ${reservation.end_at}</span>
+									<span class="ml-auto">{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) }} ${parseFloat(reservation.price).toFixed(2)}</span>
+								</h4>
+								
+								<div class="card-body">
+									<div class="row text-left">
+										<div class="col-12 col-lg-6">
+											<p><b>Pax:</b> &times;${reservation.pax} people${reservation.pax > 1 ? 's' : ''}</p>
+											<p><b>Created:</b> ${createdAt.toLocaleDateString('{{ app()->currentLocale() }}', fulldateOpt)}</p>
+										</div>
+										
+										<div class="col-12 col-lg-6">
+											<p><b>Extension:</b> ${reservation.extension * 60} min (${reservation.extension} hrs)</p>
+											<p><b>Phone Numbers:</b> ${phoneNumbers}</p>
+										</div>
+									</div>
+								</div>
+								
+								<div class="card-body text-left">
+									<div class="row">
+										<div class="col-12 col-lg-6">
+											<h3>Menus</h3>
+
+											<ul>`;
+						for (let m of reservation.menus)
+							htmlContent += `<li>${m.name}</li>`;
+						htmlContent += `
+											</ul>
+										</div>
+
+										<div class="col-12 col-lg-6">
+											<h3>Contacts</h3>
+											
+											<ul>`;
+						for (let c of reservation.contact_information)
+							htmlContent += `<li>${c.contact_name} [<a href="mailto:${c.email}">${c.email}</a>]</li>`;
+						htmlContent += 	`
+											</ul>
+										</div>
+									</div>
+								</div>
+
+								<div class="card-footer">
+									<div class="btn-group" role="group" aria-label="Actions">
+										<a href="{{ route('admin.reservations.edit', [""]) }}/${reservation.id}" class="btn btn-primary">Edit</a>
+										<a href="{{ route('admin.reservations.delete', [""]) }}/${reservation.id}" class="btn btn-danger">Remove</a>
+									</div>
+								</div>
+							</div>
+						`;
+					}
+					else {
+						htmlContent = `
+							<h3 class="text-center">${response.message}</h3>
+						`;
+					}
+
+					Swal.update({
+						html: htmlContent,
+					});
+				}).fail((response) => {
+					console.log(response);
+				});
+
+				Swal.fire({
+					titleText: `${e.event._def.title}`,
+					html: htmlContent,
+					allowOutsideClick: false,
+					showConfirmButton: false,
+					showCloseButton: true,
+					focusConfirm: false,
+					width: `75%`,
+				});
+			}
 		});
 
 		calendar.render();

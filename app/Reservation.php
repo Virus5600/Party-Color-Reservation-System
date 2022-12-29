@@ -17,6 +17,9 @@ class Reservation extends Model
 		'price',
 		'pax',
 		'phone_numbers',
+		'archived',
+		'approved',
+		'reason',
 	];
 
 	protected $casts = [

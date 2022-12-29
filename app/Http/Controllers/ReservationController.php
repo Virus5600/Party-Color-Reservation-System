@@ -21,7 +21,6 @@ class ReservationController extends Controller
 {
 	protected function index(Request $req) {
 		$reservations = Reservation::with("menus")->get();
-		// dd($reservations);
 
 		return view('admin.reservations.index', [
 			'reservations' => $reservations
@@ -216,5 +215,40 @@ class ReservationController extends Controller
 		return redirect()
 			->route('admin.reservations.index')
 			->with('flash_success', 'Successfully added a new reservation');
+	}
+
+	protected function show($id) {
+		$reservation = Reservation::with(['menus', 'contactInformation'])->find($id);
+
+		if ($reservation == null) {
+			return response()
+				->json([
+					'success' => false,
+					'message' => 'The reservation either does not exists or is already deleted'
+				]);
+		}
+
+		return response()
+			->json([
+				'success' => true,
+				'message' => 'Reservation found',
+				"reservation" => $reservation
+			]);
+	}
+
+	protected function edit($id) {
+		$reservation = Reservation::with(['menus', 'contactInformation'])->find($id);
+
+		if ($reservation == null) {
+			return redirect()
+				->route('admin.reservations.index')
+				->with('flash_error', 'The reservations either does not exists or is already deleted.');
+		}
+	}
+
+	protected function update(Request $req, $id) {
+	}
+
+	protected function delete($id) {
 	}
 }

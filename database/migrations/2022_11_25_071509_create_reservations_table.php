@@ -22,6 +22,9 @@ class CreateReservationsTable extends Migration
 			$table->double('price')->unsigned();
 			$table->integer('pax');
 			$table->string('phone_numbers');
+			$table->tinyInteger('archived')->default(0);
+			$table->tinyInteger('approved')->default(0);
+			$table->string('reason')->nullable();
 			$table->timestamps();
 		});
 	}
