@@ -35,9 +35,16 @@
 
 					<ul class="list-group">
 						@forelse($menu->items as $i)
+						@php ($mi = $menu->menuItems()->where('inventory_id', '=', $i->id)->first())
 						<li class="list-group-item">
 							<span class="float-left">{{ $i->item_name }}</span>
-							<span class="float-right">{{ $menu->menuItems()->where('inventory_id', '=', $i->id)->first()->amount . $i->measurement_unit }}</span>
+							<span class="float-right">
+							@if ($mi->is_unlimited == 1)
+								Unlimited
+							@else
+								{{ $mi->amount . $i->measurement_unit }}
+							@endif
+							</span>
 						</li>
 						@empty
 						<li class="list-group-item text-center">

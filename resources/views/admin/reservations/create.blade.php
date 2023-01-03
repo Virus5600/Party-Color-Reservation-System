@@ -318,7 +318,7 @@
 		});
 	};
 
-	$(document).ready(() => {	
+	$(document).ready(() => {
 		// Add contact
 		$(document).on('click', '#addContact', (e) => {
 			let obj = $(e.currentTarget);
@@ -339,8 +339,6 @@
 				style: "btn-white border-secondary-light"
 			});
 
-			console.log(orig.attr("data-min-1").toLowerCase());
-			console.log(orig.attr("data-min-1").toLowerCase() == 'true');
 			if (orig.attr("data-min-1").toLowerCase() == 'true') {
 				clone.removeProp("required")
 					.find("textarea, input, select")

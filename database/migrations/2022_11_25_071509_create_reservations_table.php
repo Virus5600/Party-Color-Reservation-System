@@ -24,6 +24,7 @@ class CreateReservationsTable extends Migration
 			$table->string('phone_numbers');
 			$table->tinyInteger('archived')->default(0);
 			$table->tinyInteger('approved')->default(0);
+			$table->tinyInteger('cancelled')->default(0);
 			$table->string('reason')->nullable();
 			$table->timestamps();
 		});

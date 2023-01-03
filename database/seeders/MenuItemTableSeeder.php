@@ -36,13 +36,15 @@ class MenuItemTableSeeder extends Seeder
 		MenuItem::create([
 			'menu_id' => 2,
 			'inventory_id' => 4,
-			'amount' => 5
+			'amount' => 0,
+			'is_unlimited' => 1
 		]);
 
 		MenuItem::create([
 			'menu_id' => 2,
 			'inventory_id' => 5,
-			'amount' => 5
+			'amount' => 0,
+			'is_unlimited' => 1
 		]);
 	}
 }

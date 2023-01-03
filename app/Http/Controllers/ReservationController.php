@@ -160,7 +160,7 @@ class ReservationController extends Controller
 
 			$menu = [];
 			$hoursToAdd = 0;
-			$minutesToAdd = 0;
+			$minutesToAdd = ($req->extension * 60);
 			foreach ($req->menu as $mi) {
 				$menu["{$mi}"] = Menu::find($mi);
 				
@@ -178,6 +178,7 @@ class ReservationController extends Controller
 
 			foreach ($menu as $v)
 				$price += $v->price;
+			$price *= $req->pax;
 			$price += ($req->extension * 500);
 
 			$reservation = Reservation::create([
@@ -192,7 +193,6 @@ class ReservationController extends Controller
 
 			$reservation->menus()->attach($req->menu);
 
-
 			$iterations = max(count($req->contact_name), count($req->contact_email));
 			for ($i = 0; $i < $iterations; $i++) {
 				$ci = ContactInformation::create([
@@ -200,6 +200,15 @@ class ReservationController extends Controller
 					'email' => $req->contact_email["{$i}"],
 					'reservation_id' => $reservation->id
 				]);
+			}
+
+			// Reduce the inventoy for realtime update
+			foreach ($reservation->menus as $m) {
+				$response = $m->reduceInventory();
+
+				if (!$response->success) {
+					throw new Exception($response->message);
+				}
 			}
 
 			DB::commit();
@@ -219,6 +228,8 @@ class ReservationController extends Controller
 
 	protected function show($id) {
 		$reservation = Reservation::with(['menus', 'contactInformation'])->find($id);
+		$colorCode = $reservation->getStatusColorCode($reservation->getOverallStatus());
+		$status = $reservation->getStatusText($reservation->getOverallStatus());
 
 		if ($reservation == null) {
 			return response()
@@ -232,7 +243,9 @@ class ReservationController extends Controller
 			->json([
 				'success' => true,
 				'message' => 'Reservation found',
-				"reservation" => $reservation
+				'reservation' => $reservation,
+				'colorCode' => $colorCode,
+				'status' => $status
 			]);
 	}
 
@@ -244,6 +257,8 @@ class ReservationController extends Controller
 				->route('admin.reservations.index')
 				->with('flash_error', 'The reservations either does not exists or is already deleted.');
 		}
+
+		// TODO: Finish reservation pages
 	}
 
 	protected function update(Request $req, $id) {

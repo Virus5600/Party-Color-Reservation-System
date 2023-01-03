@@ -76,11 +76,13 @@ class MenuController extends Controller
 		$newIndex = [];
 		$menuItem = [];
 		$amount = [];
+		$isUnlimited = [];
 		for ($i = 0; $i < count($req->menu_item); $i++) {
 			if ($req->menu_item[$i] || $req->amount[$i] || ($req->amount[$i] > 0)) {
 				array_push($newIndex, $i);
 				array_push($menuItem, $req->menu_item[$i]);
 				array_push($amount, $req->amount[$i]);
+				array_push($isUnlimited, $req->is_unlimited[$i]);
 			}
 		}
 
@@ -117,7 +119,8 @@ class MenuController extends Controller
 				MenuItem::create([
 					'menu_id' => $menu->id,
 					'inventory_id' => $menuItem[$i],
-					'amount' => $amount[$i]
+					'amount' => $amount[$i],
+					'is_unlimited' => $isUnlimited[$i]
 				]);
 			}
 

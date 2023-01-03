@@ -21,15 +21,50 @@
 						<div class="col-12 col-md-6 text-center text-md-right mx-auto mr-lg-0 ml-lg-auto my-auto">
 							<a href="{{ route('admin.reservations.create') }}" class="btn btn-success m-auto"><i class="fa fa-plus-circle mr-2"></i>Add Reservation</a>
 						</div>
-
-						{{-- SEARCH --}}
-						{{-- @include('components.admin.admin-search', ['type' => 'reservations']) --}}
 					</div>
 				</div>
 				{{-- Controls End --}}
 			</div>
 		</div>
 	</div>
+
+	{{-- STATUS --}}
+	<div class="row">
+		<div class="col-12 col-md-6">
+			<h5>Approval Status:</h5>
+			<div class="row">
+				<div class="col-3 col-sm-2 col-md-3 col-xl-2 text-center">
+					<label class="forn-label"><i class="fas fa-circle mr-2 text-warning"></i>Pending</label>
+				</div>
+
+				<div class="col-3 col-sm-2 col-md-3 col-xl-2 text-center">
+					<label class="forn-label"><i class="fas fa-circle mr-2 text-success"></i>Approved</label>
+				</div>
+				
+				<div class="col-3 col-sm-2 col-md-3 col-xl-2 text-center">
+					<label class="forn-label"><i class="fas fa-circle mr-2 text-danger"></i>Rejected</label>
+				</div>
+			</div>
+		</div>
+		
+		<div class="col-12 col-md-6">
+			<h5>Booking Status:</h5>
+			<div class="row">
+				<div class="col-3 col-sm-2 col-md-3 col-xl-2 text-center">
+					<label class="forn-label"><i class="fas fa-circle mr-2 text-info"></i>Coming</label>
+				</div>
+
+				<div class="col-3 col-sm-2 col-md-3 col-xl-2 text-center">
+					<label class="forn-label"><i class="fas fa-circle mr-2 text-primary"></i>Happening</label>
+				</div>
+				
+				<div class="col-3 col-sm-2 col-md-3 col-xl-2 text-center">
+					<label class="forn-label"><i class="fas fa-circle mr-2 text-secondary"></i>Done</label>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{-- STATUS END --}}
 
 	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3" id="reservation_details">
 		<span id="fullscreen_trigger" class="position-relative show-expand d-lg-none" data-target="#reservation_details" data-affected="#calendar_container">
@@ -171,6 +206,7 @@
 			start: "{{ \Carbon\Carbon::parse("$r->reserved_at $r->start_at")->format("Y-m-d\TH:i:s") }}",
 			end: "{{ \Carbon\Carbon::parse("$r->reserved_at $r->end_at")->format("Y-m-d\TH:i:s") }}",
 			data_id: "{{ $r->id }}",
+			color: "{{ $r->getStatusColorCode($r->getOverallStatus()) }}"
 		},
 		@endforeach
 	];
@@ -299,8 +335,21 @@
 			},
 			// INITIALIZATION
 			datesSet: (args) => {
+				if (args.view.type == 'dayGridMonth') {
+					calendar.setOption('dayHeaderFormat', {
+						weekday: `short`
+					});
+				}
+				else {
+					calendar.setOption('dayHeaderFormat', {
+						weekday: `${$("#calendar").width() < 992 ? 'short' : 'long'}`,
+						month: `numeric`,
+						day: `numeric`,
+					});
+				}
+
 				let toolbar = $(`
-					<div class="fc-header-toolbar fc-toolbar fc-toolbar-ltr">
+					<div class="fc-header-toolbar fc-toolbar fc-toolbar-ltr" id="customToolbar">
 						<div class="fc-toolbar-chunk">
 							<h2 class="fc-toolbar-title" id="fc-dom-1"></h2>
 						</div>
@@ -347,10 +396,12 @@
 
 				$("#listWeek").on('click', (e) => { calendar.changeView("listWeek"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
 				$("#listDay").on('click', (e) => { calendar.changeView("listDay"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
+				
+				setTimeout(() => {$("#calendar > .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr").not('#customToolbar').remove();}, 0);
 			},
 			// EVENTS
 			events: events,
-			selectable: true,
+			selectable: false,
 			eventClick: function (e, el) {
 				var data = e.event.extendedProps
 				let htmlContent = `<div class="spinner-border text-dark" role="status"><span class="sr-only">Loading...</span></div>`;
@@ -368,6 +419,9 @@
 							phoneNumbers += `<a href="tel:${pn}">${pn}</a>, `;
 						phoneNumbers = phoneNumbers.trim();
 						phoneNumbers = phoneNumbers.substring(0, phoneNumbers.length-1);
+
+						let editURL = '{{ route('admin.reservations.edit', ["$1"]) }}'.replace("%241", reservation.id);
+						let deleteURL = '{{ route('admin.reservations.delete', ["$1"]) }}'.replace("%241", reservation.id);
 
 						htmlContent = `
 							<div class="card">
@@ -413,11 +467,25 @@
 										</div>
 									</div>
 								</div>
+								
+								<div class="card-body text-left m-0 p-0">
+									<div class="card">
+										<h3 class="card-header" style="color: white; background-color: ${response.colorCode}">Reservation Status (${response.status})</h3>`;
+						if (response.colorCode == "#dc3545") {
+							htmlContent += `
+										<div class="card-body">
+											<h4>Reason:</h4>
+											<p>${reservation.reason}</p>
+										</div>`;
+						}
+						htmlContent += `
+									</div>
+								</div>
 
 								<div class="card-footer">
 									<div class="btn-group" role="group" aria-label="Actions">
-										<a href="{{ route('admin.reservations.edit', [""]) }}/${reservation.id}" class="btn btn-primary">Edit</a>
-										<a href="{{ route('admin.reservations.delete', [""]) }}/${reservation.id}" class="btn btn-danger">Remove</a>
+										<a href="${editURL}" class="btn btn-primary">Edit</a>
+										<a href="${deleteURL}" class="btn btn-danger">Remove</a>
 									</div>
 								</div>
 							</div>
@@ -439,7 +507,8 @@
 				Swal.fire({
 					titleText: `${e.event._def.title}`,
 					html: htmlContent,
-					allowOutsideClick: false,
+					allowOutsideClick: true,
+					allowEscapeKey: true,
 					showConfirmButton: false,
 					showCloseButton: true,
 					focusConfirm: false,
@@ -449,6 +518,8 @@
 		});
 
 		calendar.render();
+
+		var interval = setInterval(() => {$("#calendar > .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr").not('#customToolbar').remove();}, 0);
 	});
 </script>
 @endsection
