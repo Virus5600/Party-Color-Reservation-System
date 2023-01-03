@@ -89,10 +89,14 @@ class Reservation extends Model
 		$approvalStatus = $this->getApprovalStatus();
 		$reservationStatus = $this->getStatus();
 
-		if ($approvalStatus == ApprovalStatus::Approved)
+		if ($approvalStatus == ApprovalStatus::Approved) {
 			return $reservationStatus;
-		else
+		}
+		else {
+			if ($approvalStatus == ApprovalStatus::Pending && ($reservationStatus == Status::Happening || $reservationStatus == Status::Done))
+				return Status::Ghosted;
 			return $approvalStatus;
+		}
 	}
 
 	public function getStatusColorCode($status) {
@@ -132,6 +136,9 @@ class Reservation extends Model
 			case Status::Done:
 				return "Done";
 
+			case Status::Ghosted:
+				return "Ghosted";
+
 			case Status::Cancelled:
 				return "Cancelled";
 
@@ -156,7 +163,8 @@ abstract class Status {
 	const Happening = 1;
 	const Done = 2;
 	const Cancelled = 3;
-	const NonExistent = 4;
+	const Ghosted = 4;
+	const NonExistent = 5;
 }
 
 abstract class ApprovalStatus {

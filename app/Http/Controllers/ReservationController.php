@@ -253,12 +253,19 @@ class ReservationController extends Controller
 		$reservation = Reservation::with(['menus', 'contactInformation'])->find($id);
 
 		if ($reservation == null) {
+			Log::info("No such reservation.", ["id" => $id, "reservation" => $reservation]);
 			return redirect()
 				->route('admin.reservations.index')
 				->with('flash_error', 'The reservations either does not exists or is already deleted.');
 		}
 
-		// TODO: Finish reservation pages
+		$menus = Menu::get();
+
+		return view('admin.reservations.edit', [
+			'reservation' => $reservation,
+			'menus' => $menus
+		]);
+		// TODO: Finish edit page
 	}
 
 	protected function update(Request $req, $id) {

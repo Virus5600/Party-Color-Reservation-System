@@ -29,40 +29,14 @@
 	</div>
 
 	{{-- STATUS --}}
+	<h5>Status Legend:</h5>
 	<div class="row">
-		<div class="col-12 col-md-6">
-			<h5>Approval Status:</h5>
-			<div class="row">
-				<div class="col-3 col-sm-2 col-md-3 col-xl-2 text-center">
-					<label class="forn-label"><i class="fas fa-circle mr-2 text-warning"></i>Pending</label>
-				</div>
-
-				<div class="col-3 col-sm-2 col-md-3 col-xl-2 text-center">
-					<label class="forn-label"><i class="fas fa-circle mr-2 text-success"></i>Approved</label>
-				</div>
-				
-				<div class="col-3 col-sm-2 col-md-3 col-xl-2 text-center">
-					<label class="forn-label"><i class="fas fa-circle mr-2 text-danger"></i>Rejected</label>
-				</div>
-			</div>
-		</div>
-		
-		<div class="col-12 col-md-6">
-			<h5>Booking Status:</h5>
-			<div class="row">
-				<div class="col-3 col-sm-2 col-md-3 col-xl-2 text-center">
-					<label class="forn-label"><i class="fas fa-circle mr-2 text-info"></i>Coming</label>
-				</div>
-
-				<div class="col-3 col-sm-2 col-md-3 col-xl-2 text-center">
-					<label class="forn-label"><i class="fas fa-circle mr-2 text-primary"></i>Happening</label>
-				</div>
-				
-				<div class="col-3 col-sm-2 col-md-3 col-xl-2 text-center">
-					<label class="forn-label"><i class="fas fa-circle mr-2 text-secondary"></i>Done</label>
-				</div>
-			</div>
-		</div>
+		<label class="text-center col col-md-2 col-xl-2"><i class="fas fa-square mr-2 text-warning"></i>Pending</label>		
+		<label class="text-center col col-md-2 col-xl-2"><i class="fas fa-square mr-2 text-danger"></i>Rejected/Cancelled</label>		
+		<label class="text-center col col-md-4 col-xl-2"><i class="fas fa-square mr-2 text-info"></i>Coming</label>
+		<label class="text-center col col-md-2 col-xl-2"><i class="fas fa-square mr-2 text-primary"></i>Happening</label>		
+		<label class="text-center col col-md-2 col-xl-2"><i class="fas fa-square mr-2 text-secondary"></i>Done</label>
+		<label class="text-center col col-md-2 col-xl-2"><i class="fas fa-square mr-2" style="color: #1e2b37;"></i>Others</label>
 	</div>
 	{{-- STATUS END --}}
 
@@ -286,7 +260,7 @@
 				}
 
 				let = toolbar = $(`
-					<div class="fc-header-toolbar fc-toolbar fc-toolbar-ltr">
+					<div class="fc-header-toolbar fc-toolbar fc-toolbar-ltr" id="customToolbar">
 						<div class="fc-toolbar-chunk">
 						</div>
 
