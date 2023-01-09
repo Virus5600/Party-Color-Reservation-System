@@ -9,23 +9,23 @@
 
 		{{-- SITE META --}}
 		<meta name="type" content="website">
-		<meta name="title" content="{{ env('APP_NAME') }}">
-		<meta name="description" content="{{ env('APP_DESC') }}">
+		<meta name="title" content="{{ App\Settings::getValue('web-name') }}">
+		<meta name="description" content="{{ App\Settings::getValue('web-desc') }}">
 		<meta name="image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
 		<meta name="keywords" content="{{ env('APP_KEYW') }}">
-		<meta name="application-name" content="{{ env('APP_NAME') }}">
+		<meta name="application-name" content="{{ App\Settings::getValue('web-name') }}">
 
 		{{-- TWITTER META --}}
 		<meta name="twitter:card" content="summary_large_image">
-		<meta name="twitter:title" content="{{ env('APP_NAME') }}">
-		<meta name="twitter:description" content="{{ env('APP_DESC') }}">
+		<meta name="twitter:title" content="{{ App\Settings::getValue('web-name') }}">
+		<meta name="twitter:description" content="{{ App\Settings::getValue('web-desc') }}">
 		<meta name="twitter:image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
 
 		{{-- OG META --}}
 		<meta name="og:url" content="{{Request::url()}}">
 		<meta name="og:type" content="website">
-		<meta name="og:title" content="{{ env('APP_NAME') }}">
-		<meta name="og:description" content="{{ env('APP_DESC') }}">
+		<meta name="og:title" content="{{ App\Settings::getValue('web-name') }}">
+		<meta name="og:description" content="{{ App\Settings::getValue('web-desc') }}">
 		<meta name="og:image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
 
 		@yield('meta')

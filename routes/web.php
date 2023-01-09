@@ -66,6 +66,18 @@ Route::group(['prefix' => 'admin'], function() {
 					Route::post('/update', 'ReservationController@update')->name('admin.reservations.update');
 				});
 
+				// Status
+				Route::group(['prefix' => 'status', 'middleware' => 'permissions:reservations_tab_respond'], function() {
+					// Reject
+					Route::post('/reject', 'ReservationController@reject')->name('admin.reservations.status.reject');
+
+					// Accept
+					Route::get('/accept', 'ReservationController@accept')->name('admin.reservations.status.accept');
+
+					// Pending
+					Route::get('/pending', 'ReservationController@pending')->name('admin.reservations.status.pending');
+				});
+
 				// Delete
 				Route::group(['middleware' => ['permissions:reservations_tab_delete']], function() {
 					Route::get('/delete', 'ReservationController@delete')->name('admin.reservations.delete');

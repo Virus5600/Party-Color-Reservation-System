@@ -19,6 +19,19 @@ class Settings extends Model
 		return Settings::where('name', '=', $key)->first();
 	}
 
+	public static function valueToJson($key) {
+		$setting = Settings::where('name', '=', $key)->first();
+
+		if ($setting == null)
+			return null;
+
+		$toRet = array();
+		foreach(preg_split("/\,\s*/", $setting->value) as $v) {
+			array_push($toRet, array("value" => trim($v)));
+		}
+		return json_encode($toRet);
+	}
+
 	public static function getValue($key) {
 		$setting = Settings::where('name', '=', $key)->first();
 

@@ -3,9 +3,9 @@
 @section('title', 'Reservation')
 
 @section('content')
-@php ($datetime = now()->timezone('Asia/Tokyo'))
-@php ($isEightPM = $datetime->gt('08:00 PM'))
-@php ($new_contact_index = Session::get("new_contact_index"))
+@php($datetime = now()->timezone('Asia/Tokyo'))
+@php($isEightPM = $datetime->gt('08:00 PM'))
+@php($new_contact_index = Session::get("new_contact_index"))
 
 <div class="container-fluid">
 	<div class="row">
@@ -171,9 +171,16 @@
 									<p class="h5">Contacts</p>
 									
 									<div class="form-group">
-										<label for="phone_numbers" class="form-label">Contact Number</label>
-										<div data-tags-input-name="phone_numbers" class="tag-input form-control" required>{{ old("phone_numbers") ? implode(", ", old("phone_numbers")) : '' }}</div>
-										<span class="text-danger text-wrap validation">{{ $errors->first("phone_numbers") }}</span>
+										<label for="phone_numbers" class="form-label">Contact Number(s)</label>
+
+										<input name="phone_numbers" id="phone_numbers" class="customLook custom-scrollbar form-control" value="{{ old('phone_numbers') ? implode(",", old('phone_numbers')) : '' }}" required>
+										<span class="text-danger text-wrap validation">
+											@if ($errors->first("phone_numbers"))
+											{{ $errors->first("phone_numbers") }}
+											@else
+											{{ $errors->first("phone_numbers.*") }}
+											@endif
+										</span>
 									</div>
 
 									{{-- Dynamic form fields --}}
@@ -247,55 +254,7 @@
 @endsection
 
 @section('css')
-<style type="text/css">
-	/* Chrome, Safari, Edge, Opera */
-	input:not(.has-spinner)::-webkit-outer-spin-button,
-	input:not(.has-spinner)::-webkit-inner-spin-button {
-		-webkit-appearance: none;
-		margin: 0;
-	}
-
-	/* Firefox */
-	input[type=number] {
-		-moz-appearance: textfield;
-	}
-
-	/* Tagging JS Custom Styling START */
-	.tag-input.form-control {
-		padding: 0.375rem 0.75rem;
-		height: auto;
-		display: flex;
-		flex-wrap: wrap;
-	}
-
-	div.tag {
-		padding: 0;
-		padding-right: 1.75rem;
-	}
-
-	div.tag:first-child { margin-left: 0.125rem; }
-	div.tag:last-child { margin-right: 0.125rem; }
-
-	div.tag, div.tag > * {
-		background-color: var(--primary);
-		margin: 0.25rem 0.5rem;
-	}
-
-	div.tag .tag-i {
-		top: 25%;
-		right: 0.25rem;
-		color: #fff;
-		transition: 0.25s;
-	}
-
-	div.tag .tag-i:hover {
-		color: rgb(255 255 255 / 75%);
-		text-decoration: none;
-	}
-
-	div.tag span { padding: 0; }
-	/* Tagging JS Custom Styling END */
-</style>
+<link rel="stylesheet" type="text/css" href="{{ asset('css/custom-tagify.css') }}" />
 @endsection
 
 @section('scripts')
@@ -358,7 +317,7 @@
 		// Select Picker
 		$('.select-picker').selectpicker({
 			liveSearch: true,
-			liveSearchStyle: "startsWith",
+			liveSearchStyle: "contains",
 			style: "btn-white border-secondary-light",
 		}).trigger('change').trigger('change.bs.select');
 		$('.select-picker').find("input[type=search]").addClass("dont-validate");
@@ -418,41 +377,12 @@
 			durationE.val(`${`0${date.getUTCHours()}`.slice(-2)}:${`0${date.getUTCMinutes()}`.slice(-2)}`);
 		}).trigger('change');
 
-		// Tagging
-		$('.tag-input').tagging({
-			'edit-on-delete': true,
-			'forbidden-chars': "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz,./<>?;':\"[]{}|\\`~!@#$%^&*()_= ".split(""),
-			'forbidden-chars-callback': window.swalAlert,
-			'no-duplicate': true,
-			'no-duplicate-callback': window.swalAlert,
-			'no-duplicate-text': "Duplicate tags",
-			'tag-on-blur': false,
-			'type-zone-class': 'type-zone form-control py-0 my-1 dont-validate'
+		// Tagify
+		$('#phone_numbers').tagify({
+			keepInvalidTags: true,
+			originalInputValueFormat: v => v.map(item => item.value).join(","),
+			pattern: /^\+*(?=.{7,14})[\d\s-]{7,15}$/
 		});
-
-		$('.tag-input, .tag-input .type-zone').blur();
-
-		$(document).on('keyup keydown keypress', '.tag-input .type-zone', (e) => {
-			let key = e.key;
-			let specialKeys = ["Cancel", "Backspace", "Tab", "Clear", "Enter", "Shift", "Control", "Alt", "Pause", "CapsLock", "Unidentified", "Escape", "PageUp", "PageDown", "End", "Home", "ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown", "Insert", "Delete", "Meta", "ContextMenu", "NumLock", "ScrollLock", "AudioVolumeDown", "AudioVolumeUp", "MediaTrackNext", "MediaTrackPrevious", "MediaPlayPause", "LaunchMail", "AudioVolumeMute", "AudioVolumeDown", "AudioVolumeUp", "AltGraph"];
-			let allowedKeys = "+-1234567890".split("").concat(specialKeys);
-			for (i = 1; i <= 32; i++)
-				allowedKeys.push(`F${i}`);
-
-			if (!allowedKeys.includes(key)) {
-				if (!((e.keyCode == 65 || e.keyCode == 67 || e.keyCode == 86 || e.keyCode == 88 || e.keyCode == 89 || e.keyCode == 90) && (e.ctrlKey === true || e.metaKey === true))) {
-					e.preventDefault();
-					e.stopPropagation();
-				}
-			}
-
-			if ($(e.currentTarget).val().length > 15) {
-				$(e.currentTarget).val($(e.currentTarget).val().substring(0, 15));
-			}
-		});
-
 	});
-
-	$('.tag-input, .tag-input .type-zone').blur();
 </script>
 @endsection

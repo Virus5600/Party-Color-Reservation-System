@@ -1,0 +1,18 @@
+.customLook {
+	--tag-bg: var(--primary);
+	--tag-hover: var(--info);
+	--tag-text-color: var(--white);
+	--tag-remove-btn-color: var(--white);
+	--tag-invalid-bg: var(--danger);
+	--tag-invalid-color: var(--danger);
+	--tag-remove-btn-bg--hover: var(--pink);
+	--tag-remove-bg: var(--pink);
+	--tag-pad: 0.125rem 0.5rem;
+
+	display: flex;
+	flex-wrap: wrap;
+	padding: 0.0625rem 0.75rem;
+	line-height: 1.5;
+	height: auto;
+	min-height: calc(1.5em + 0.75rem + 2px);
+}

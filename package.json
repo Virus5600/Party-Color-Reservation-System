@@ -20,6 +20,7 @@
         "@testing-library/jest-dom": "^5.16.5",
         "@testing-library/react": "^13.4.0",
         "@testing-library/user-event": "^13.5.0",
+        "@yaireo/tagify": "^4.17.6",
         "axios": "^1.2.1",
         "babel-preset-react": "^6.24.1",
         "bootstrap": "npm:bootstrap@^5.2.2",
@@ -42,7 +43,6 @@
         "sass-loader": "^13.1.0",
         "summernote": "^0.8.18",
         "sweetalert2": "^10.16.9",
-        "taggingJS": "github:sniperwolf/taggingJS",
         "web-vitals": "^2.1.4",
         "webpack-cli": "^4.10.0"
     },

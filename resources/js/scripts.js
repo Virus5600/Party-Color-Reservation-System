@@ -5,8 +5,9 @@ try {
 	// jQuery UI
 	require('jquery-ui/dist/jquery-ui.min.js');
 
-	// Tagging JS
-	require('taggingJS/tagging.min.js');
+	// Tagify
+	// require('@yaireo/tagify/dist/tagify.min.js');
+	const Tagify = window.Tagify = require('@yaireo/tagify/dist/jQuery.tagify.min.js');
 
 	// popper.js
 	window.Popper = require('popper.js');
@@ -27,6 +28,9 @@ try {
 	// Summernote
 	require('summernote/dist/summernote-bs4.min.js');
 	require('summernote/dist/lang/summernote-ja-JP.min.js');
+
+	// Setting user language
+	window.lang = (window.navigator.userLanguage || window.navigator.language);
 } catch (e) {
 	console.error(e);
 }
