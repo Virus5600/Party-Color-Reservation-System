@@ -71,7 +71,7 @@ class ReservationController extends Controller
 			if ($end_at->gt($closing)) {
 				$toSubtract = $end_at->diffInMinutes($closing) / 60;
 
-				$customMessage = new MessageBag(["extension" => "Extension made the reservation exceed closing time. Remove {$toSubtract} hours."]);
+				$customMessage = new MessageBag(["extension" => "Extension made the reservation exceed closing time. Remove {$toSubtract} hours"]);
 				
 				return redirect()
 					->back()
@@ -247,7 +247,6 @@ class ReservationController extends Controller
 			}
 
 			$reservation->menus()->sync($req->menu);
-			Log::debug($reservation->contactInformation()->toSql());
 			$reservation->contactInformation()->delete();
 
 
@@ -285,13 +284,51 @@ class ReservationController extends Controller
 	}
 
 	protected function delete($id) {
-		$reservation = Reservation::with(['menus', 'contactInformation'])->find($id);
+		$reservation = Reservation::withTrashed()->find($id);
 
 		if ($reservation == null) {
 			Log::info("No such reservation.", ["id" => $id, "reservation" => $reservation]);
 			return redirect()
 				->route('admin.reservations.index')
-				->with('flash_error', 'The reservations either does not exists or is already deleted.');
+				->with('flash_error', 'The reservations either does not exists or is already deleted');
+		}
+
+		try {
+			DB::beginTransaction();
+
+			// Return the inventory for realtime update
+			foreach ($reservation->menus as $m) {
+				$response = $m->returnInventory();
+
+				if (!$response->success) {
+					throw new Exception($response->message);
+				}
+			}
+
+			$reservation->forceDelete();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+
+			return redirect()
+				->route('admin.reservations.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		return redirect()
+			->route('admin.reservations.index')
+			->with('flash_success', 'Successfully removed reservation request');
+	}
+
+	protected function archive($id) {
+		$reservation = Reservation::find($id);
+
+		if ($reservation == null) {
+			Log::info("No such reservation.", ["id" => $id, "reservation" => $reservation]);
+			return redirect()
+				->route('admin.reservations.index')
+				->with('flash_error', 'The reservations either does not exists or is already deleted');
 		}
 
 		try {

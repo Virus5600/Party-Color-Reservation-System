@@ -2,12 +2,12 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light position-sticky position-lg-relative dark-shadow py-0 px-3" style="z-index: 1000;">
 	<div class="container-fluid">
 		{{-- Branding --}}
-		<a class="navbar-brand m-0 py-0" href="{{route('admin.dashboard')}}" style="height: auto;">
+		<a class="navbar-brand mx-auto mx-lg-0 py-0" href="{{route('admin.dashboard')}}" style="height: auto;">
 			<img src="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}" style="max-height: 3.25rem;" class="m-0 p-0" alt="{{ App\Settings::getInstance('web-logo')->value }}" data-fallback-img="{{ asset('uploads/settings/default.png') }}" />
 			Party Color
 		</a>
 
-		<div class="d-flex flex-row">
+		<div class="d-flex flex-row mx-auto mx-lg-0">
 			{{-- Navbar contents --}}
 			<div class="navbar-collapse" id="navbar">
 				<div class="ml-auto">

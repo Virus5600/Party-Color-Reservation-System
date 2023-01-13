@@ -35,7 +35,7 @@ $(document).ready(() => {
 			endTime: endTime,
 		},
 		// SLOT OPTIONS
-		slotMinTime: '09:00:00',
+		slotMinTime: '14:00:00',
 		slotMaxTime: '24:00:00',
 		slotLabelFormat: {
 			hour: 'numeric',
@@ -80,11 +80,11 @@ $(document).ready(() => {
 
 					<div class="fc-toolbar-chunk">
 						<div class="fc-button-group">
-							<button type="button" title="Previous week" aria-pressed="false" class="fc-prev-button fc-button fc-button-primary">
+							<button type="button" title="Previous" aria-pressed="false" class="fc-prev-button fc-button fc-button-primary">
 								<span class="fc-icon fc-icon-chevron-left"></span>
 							</button>
-							<button type="button" title="This week" ${$(calendar).find('.fc-day-today').length > 0 ? 'disabled=""' : ''} aria-pressed="false" class="fc-today-button fc-button fc-button-primary">Today</button>
-							<button type="button" title="Next week" aria-pressed="false" class="fc-next-button fc-button fc-button-primary">
+							<button type="button" title="Today" ${$(calendar.el).find('.fc-day-today').length > 0 ? 'disabled=""' : ''} aria-pressed="false" class="fc-today-button fc-button fc-button-primary">Today</button>
+							<button type="button" title="Next" aria-pressed="false" class="fc-next-button fc-button fc-button-primary">
 								<span class="fc-icon fc-icon-chevron-right"></span>
 							</button>
 						</div>
@@ -107,12 +107,12 @@ $(document).ready(() => {
 				</div>
 			`);
 
-			$("#calendar > .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr").not('#customToolbar:last').remove();
+			$("#calendar > .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr").not('#customToolbar:first').remove();
 			$("#calendar").prepend(toolbar);
 
-			$(".fc-prev-button").on('click', (e) => { calendar.prev(); $(".fc-today-button").prop('disabled', $('.fc-day-today').length > 0); });
-			$(".fc-today-button").on('click', (e) => { calendar.today(); });
-			$(".fc-next-button").on('click', (e) => { calendar.next(); $(".fc-today-button").prop('disabled', $('.fc-day-today').length > 0); });
+			$(".fc-prev-button").one('click', (e) => { calendar.prev(); $(".fc-today-button").prop('disabled', $('.fc-day-today').length > 0); });
+			$(".fc-today-button").one('click', (e) => { calendar.today(); $(e.currentTarget).prop('disabled', true); });
+			$(".fc-next-button").one('click', (e) => { calendar.next(); $(".fc-today-button").prop('disabled', $('.fc-day-today').length > 0); });
 
 			$("#dayGridMonth").on('click', (e) => { calendar.changeView("dayGridMonth"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
 			$("#timeGridWeek").on('click', (e) => { calendar.changeView("timeGridWeek"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
@@ -120,7 +120,9 @@ $(document).ready(() => {
 
 			$("#listWeek").on('click', (e) => { calendar.changeView("listWeek"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
 			$("#listDay").on('click', (e) => { calendar.changeView("listDay"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
-			$("#calendar > .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr").not('#customToolbar:last').remove();
+			$("#calendar > .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr").not('#customToolbar:first').remove();
+
+			$('.fc-event').css('box-shadow', '0px 3px 10px #00000080');
 		},
 		// INITIALIZATION
 		datesSet: (args) => {
@@ -145,11 +147,11 @@ $(document).ready(() => {
 
 					<div class="fc-toolbar-chunk">
 						<div class="fc-button-group">
-							<button type="button" title="Previous week" aria-pressed="false" class="fc-prev-button fc-button fc-button-primary">
+							<button type="button" title="Previous" aria-pressed="false" class="fc-prev-button fc-button fc-button-primary">
 								<span class="fc-icon fc-icon-chevron-left"></span>
 							</button>
-							<button type="button" title="This week" disabled="" aria-pressed="false" class="fc-today-button fc-button fc-button-primary">Today</button>
-							<button type="button" title="Next week" aria-pressed="false" class="fc-next-button fc-button fc-button-primary">
+							<button type="button" title="Today" ${$(calendar.el).find('.fc-day-today').length > 0 ? 'disabled=""' : ''} aria-pressed="false" class="fc-today-button fc-button fc-button-primary">Today</button>
+							<button type="button" title="Next" aria-pressed="false" class="fc-next-button fc-button fc-button-primary">
 								<span class="fc-icon fc-icon-chevron-right"></span>
 							</button>
 						</div>
@@ -172,12 +174,12 @@ $(document).ready(() => {
 				</div>
 			`);
 
-			$("#calendar > .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr").not('#customToolbar:last').remove();
+			$("#calendar > .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr").not('#customToolbar:first').remove();
 			$("#calendar").prepend(toolbar);
 
-			$(".fc-prev-button").on('click', (e) => { calendar.prev(); $(".fc-today-button").prop('disabled', $('.fc-day-today').length > 0); });
-			$(".fc-today-button").on('click', (e) => { calendar.today(); });
-			$(".fc-next-button").on('click', (e) => { calendar.next(); $(".fc-today-button").prop('disabled', $('.fc-day-today').length > 0); });
+			$(".fc-prev-button").one('click', (e) => { calendar.prev(); $(".fc-today-button").prop('disabled', $('.fc-day-today').length > 0); });
+			$(".fc-today-button").one('click', (e) => { calendar.today(); $(e.currentTarget).prop('disabled', true); });
+			$(".fc-next-button").one('click', (e) => { calendar.next(); $(".fc-today-button").prop('disabled', $('.fc-day-today').length > 0); });
 
 			$("#dayGridMonth").on('click', (e) => { calendar.changeView("dayGridMonth"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
 			$("#timeGridWeek").on('click', (e) => { calendar.changeView("timeGridWeek"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
@@ -186,7 +188,9 @@ $(document).ready(() => {
 			$("#listWeek").on('click', (e) => { calendar.changeView("listWeek"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
 			$("#listDay").on('click', (e) => { calendar.changeView("listDay"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
 			
-			$("#calendar > .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr").not('#customToolbar:last').remove();
+			$("#calendar > .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr").not('#customToolbar:first').remove();
+
+			$('.fc-event').css('box-shadow', '0px 3px 10px #00000080');
 		},
 		// EVENTS
 		events: events,
@@ -290,7 +294,7 @@ $(document).ready(() => {
 					else
 						htmlContent += `<a href="${editReservation.replace('%241', data.data_id)}" class="btn btn-primary">Edit</a>`;
 					htmlContent += `
-									<a href="javascript:void(0);" onclick="confirmLeave(${deleteReservation.replace('%241', data.data_id)})" class="btn btn-danger">Remove</a>
+									<button onclick="confirmLeave('${deleteReservation.replace('%241', data.data_id)}')" class="btn btn-danger">Remove</button>
 								</div>
 
 								<div class="btn-group" role="group" aria-label="Status Actions" id="statusActionButtons">`;
@@ -335,7 +339,7 @@ $(document).ready(() => {
 
 	calendar.render();
 
-	var interval = setInterval(() => {$("#calendar > .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr").not('#customToolbar').remove();}, 0);
+	var interval = setInterval(() => {$("#calendar > .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr").not('#customToolbar:first').remove();}, 0);
 });
 
 const updateCalendar = async function(id, route, reqType = 'get', shouldConfirm = false, message = 'Are you sure about that?') {

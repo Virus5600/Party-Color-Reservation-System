@@ -18,14 +18,15 @@ class CreateReservationsTable extends Migration
 			$table->time('start_at');
 			$table->time('end_at');
 			$table->date('reserved_at');
-			$table->double('extension')->unsigned()->default(0);
-			$table->double('price')->unsigned();
+			$table->decimal('extension', 4, 2)->unsigned()->default(0);
+			$table->decimal('price', 17, 2)->unsigned();
 			$table->integer('pax');
 			$table->string('phone_numbers');
 			$table->tinyInteger('archived')->default(0);
-			$table->tinyInteger('approved')->default(0);
-			$table->tinyInteger('cancelled')->default(0);
+			$table->string('status')->default('pending');
+			$table->tinyInteger('items_returned')->default(1);
 			$table->string('reason')->nullable();
+			$table->softDeletes();
 			$table->timestamps();
 		});
 	}

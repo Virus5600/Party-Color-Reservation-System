@@ -14,7 +14,7 @@ use Validator;
 class Reservation extends Model
 {
 	use SoftDeletes;
-	
+
 	protected $fillable = [
 		'start_at',
 		'end_at',
@@ -24,13 +24,13 @@ class Reservation extends Model
 		'pax',
 		'phone_numbers',
 		'archived',
-		'approved',
-		'cancelled',
+		'status',
 		'reason',
 	];
 
 	protected $casts = [
-		'reserved_at' => 'date'
+		'reserved_at' => 'datetime',
+		'deleted_at' => 'datetime',
 	];
 
 	// Accessor

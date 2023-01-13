@@ -189,7 +189,7 @@
 			start: "{{ \Carbon\Carbon::parse("$r->reserved_at $r->start_at")->format("Y-m-d\TH:i:s") }}",
 			end: "{{ \Carbon\Carbon::parse("$r->reserved_at $r->end_at")->format("Y-m-d\TH:i:s") }}",
 			data_id: "{{ $r->id }}",
-			color: "{{ $r->getStatusColorCode($r->getOverallStatus()) }}",
+			color: "{{ $r->getStatusColorCode($r->getOverallStatus()) }}"
 		},
 		@endforeach
 	];
@@ -206,9 +206,13 @@
 	const showReservation = '{{ route('admin.reservations.show', ["$1"]) }}';
 	const editReservation = '{{ route('admin.reservations.edit', ["$1"]) }}';
 	const deleteReservation = '{{ route('admin.reservations.delete', ["$1"]) }}';
+	
 	const approveReservation = '{{ route('admin.reservations.status.accept', ['$1']) }}';
 	const rejectReservation = '{{ route('admin.reservations.status.reject', ['$1']) }}';
 	const pendingReservation = '{{ route('admin.reservations.status.pending', ['$1']) }}';
+	
+	const archiveReservation = '{{ route('admin.reservations.archive', ['$1']) }}';
+	const restoreReservation = '{{ route('admin.reservations.restore', ['$1']) }}';
 
 	const reservationFetchOne = '{{ route('reservations.fetch-event', ['$1']) }}';
 

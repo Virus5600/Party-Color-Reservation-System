@@ -78,10 +78,12 @@ Route::group(['prefix' => 'admin'], function() {
 					Route::get('/pending', 'ReservationController@pending')->name('admin.reservations.status.pending');
 				});
 
-				// Delete
+				// Delete/Archive
 				Route::group(['middleware' => ['permissions:reservations_tab_delete']], function() {
-					Route::get('/delete', 'ReservationController@delete')->name('admin.reservations.delete');
+					Route::get('/archive', 'ReservationController@archive')->name('admin.reservations.archive');
 					Route::get('/restore', 'ReservationController@restore')->name('admin.reservations.restore');
+
+					Route::get('/delete', 'ReservationController@delete')->name('admin.reservations.delete');
 				});
 			});
 
