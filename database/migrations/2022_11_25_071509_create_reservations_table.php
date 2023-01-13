@@ -4,6 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+use App\Enum\ApprovalStatus;
+
 class CreateReservationsTable extends Migration
 {
 	/**
@@ -23,7 +25,7 @@ class CreateReservationsTable extends Migration
 			$table->integer('pax');
 			$table->string('phone_numbers');
 			$table->tinyInteger('archived')->default(0);
-			$table->string('status')->default('pending');
+			$table->string('status')->default(ApprovalStatus::Pending);
 			$table->tinyInteger('items_returned')->default(1);
 			$table->string('reason')->nullable();
 			$table->softDeletes();

@@ -7,6 +7,9 @@ use Illuminate\Support\MessageBag;
 
 use Carbon\Carbon;
 
+use App\Enum\ApprovalStatus;
+use App\Enum\Status;
+
 use App\ContactInformation;
 use App\Inventory;
 use App\Menu;
@@ -371,7 +374,7 @@ class ReservationController extends Controller
 		try {
 			DB::beginTransaction();
 
-			if ($reservation->approved == -1) {
+			if ($reservation->items_returned == 1) {
 				// Reduce the inventoy for realtime update
 				foreach ($reservation->menus as $m) {
 					$response = $m->reduceInventory();
@@ -380,9 +383,11 @@ class ReservationController extends Controller
 						throw new Exception($response->message);
 					}
 				}
+
+				$reservation->items_returned = 0;
 			}
 
-			$reservation->approved = 1;
+			$reservation->status = ApprovalStatus::Approved;
 			$reservation->reason = null;
 			$reservation->save();
 
@@ -438,7 +443,7 @@ class ReservationController extends Controller
 		try {
 			DB::beginTransaction();
 
-			if ($reservation->approved > -1) {
+			if ($reservation->items_returned == 0) {
 				// Return the inventory for realtime update
 				foreach ($reservation->menus as $m) {
 					$response = $m->returnInventory();
@@ -447,10 +452,12 @@ class ReservationController extends Controller
 						throw new Exception($response->message);
 					}
 				}
+
+				$reservation->items_returned = 1;
 			}
 
 			$reservation->reason = $req->reason;
-			$reservation->approved = -1;
+			$reservation->status = ApprovalStatus::Rejected;
 			$reservation->save();
 
 			DB::commit();
@@ -490,7 +497,7 @@ class ReservationController extends Controller
 		try {
 			DB::beginTransaction();
 
-			if ($reservation->approved == -1) {
+			if ($reservation->items_returned == 1) {
 				// Reduce the inventoy for realtime update
 				foreach ($reservation->menus as $m) {
 					$response = $m->reduceInventory();
@@ -499,15 +506,18 @@ class ReservationController extends Controller
 						throw new Exception($response->message);
 					}
 				}
+
+				$reservation->items_returned = 0;
 			}
 
-			$reservation->approved = 0;
+			$reservation->status = ApprovalStatus::Pending;
 			$reservation->reason = null;
 			$reservation->save();
 
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
+			Log::error($e);
 
 			return response()
 				->json([

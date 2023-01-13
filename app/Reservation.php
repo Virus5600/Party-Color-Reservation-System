@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 use Carbon\Carbon;
 
+use App\Enum\ApprovalStatus;
+use App\Enum\Status;
+
 use Log;
 use Validator;
 
@@ -26,6 +29,7 @@ class Reservation extends Model
 		'archived',
 		'status',
 		'reason',
+		'items_returned',
 	];
 
 	protected $casts = [
@@ -75,22 +79,11 @@ class Reservation extends Model
 		}
 	}
 
-	public function getApprovalStatus() {
-		$approved = $this->approved;
-
-		if ($this->cancelled == 1)
-			return Status::Cancelled;
-
-		if ($approved == -1)
-			return ApprovalStatus::Rejected;
-		else if ($approved == 1)
-			return ApprovalStatus::Approved;
-		else
-			return ApprovalStatus::Pending;
-	}
-
 	public function getOverallStatus() {
-		$approvalStatus = $this->getApprovalStatus();
+		if ($this->trashed())
+			return "#1e2b37";
+
+		$approvalStatus = $this->status;
 		$reservationStatus = $this->getStatus();
 
 		if ($approvalStatus == ApprovalStatus::Approved) {
@@ -104,6 +97,10 @@ class Reservation extends Model
 	}
 
 	public function getStatusColorCode($status) {
+
+		if ($this->trashed())
+			return "#1e2b37";
+
 		switch ($status) {
 			case Status::Coming:
 				return "#17a2b8";
@@ -130,6 +127,9 @@ class Reservation extends Model
 	}
 
 	public function getStatusText($status) {
+		if ($this->trashed())
+			return "Archived";
+
 		switch ($status) {
 			case Status::Coming:
 				return "Coming";
@@ -265,20 +265,4 @@ class Reservation extends Model
 			'newContactIndex' => $newContactIndex
 		];
 	}
-}
-
-// ENUMS
-abstract class Status {
-	const Coming = 0;
-	const Happening = 1;
-	const Done = 2;
-	const Cancelled = 3;
-	const Ghosted = 4;
-	const NonExistent = 5;
-}
-
-abstract class ApprovalStatus {
-	const Pending = 10;
-	const Approved = 11;
-	const Rejected = 12;
 }

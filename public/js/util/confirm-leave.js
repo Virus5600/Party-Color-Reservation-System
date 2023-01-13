@@ -31,6 +31,6 @@ async function confirmLeaveApi(title = "Are you sure?", message = "You might hav
 		confirmButtonText: 'Yes',
 		denyButtonText: 'No'
 	}).then((result) => {
-		return this;
+		return result;
 	});
 }

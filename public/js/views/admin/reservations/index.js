@@ -351,13 +351,14 @@ const updateCalendar = async function(id, route, reqType = 'get', shouldConfirm 
 		confirmed = await confirmLeaveApi(undefined, message);
 	}
 
-	if (confirmed) {
+	if (confirmed.isConfirmed) {
 		if (typeof route != 'undefined') {
 			let swalInfo;
 
 			if (reqType == 'get') {
 				skipUpdate = true;
 				$.get(route, (response) => {
+					console.log(response);
 					if (response.success) {
 						updateBG();
 
