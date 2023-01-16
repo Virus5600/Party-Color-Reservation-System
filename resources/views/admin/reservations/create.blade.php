@@ -383,6 +383,11 @@
 			originalInputValueFormat: v => v.map(item => item.value).join(","),
 			pattern: /^\+*(?=.{7,14})[\d\s-]{7,15}$/
 		});
+
+		$(`form`).on('submit', (e) => {
+			let obj = $(e.currentTarget);
+			let tagified = obj.find(`.tagify`);
+		});
 	});
 </script>
 @endsection

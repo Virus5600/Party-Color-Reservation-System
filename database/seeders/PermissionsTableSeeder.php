@@ -75,11 +75,11 @@ class PermissionsTableSeeder extends Seeder
 			'slug' => 'inventory_tab_delete'
 		]);
 
-		Permission::create([
-			'parent_permission' => $invPerm->id,
-			'name' => 'Inventory Tab Perma Delete',
-			'slug' => 'inventory_tab_perma_delete'
-		]);
+		// Permission::create([
+		// 	'parent_permission' => $invPerm->id,
+		// 	'name' => 'Inventory Tab Perma Delete',
+		// 	'slug' => 'inventory_tab_perma_delete'
+		// ]);
 
 		// MENU
 		$menuPerm = Permission::create([
@@ -105,11 +105,11 @@ class PermissionsTableSeeder extends Seeder
 			'slug' => 'menu_tab_delete'
 		]);
 
-		Permission::create([
-			'parent_permission' => $menuPerm->id,
-			'name' => 'Menu Tab Perma Delete',
-			'slug' => 'menu_tab_perma_delete'
-		]);
+		// Permission::create([
+		// 	'parent_permission' => $menuPerm->id,
+		// 	'name' => 'Menu Tab Perma Delete',
+		// 	'slug' => 'menu_tab_perma_delete'
+		// ]);
 
 		// ANNOUNCEMENTS
 		 $annPerm = Permission::create([

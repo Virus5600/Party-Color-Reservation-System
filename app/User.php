@@ -46,7 +46,7 @@ class User extends Authenticatable
 	// Custom Function
 	public function permissions() {
 		$perms = UserPermission::where('user_id', '=', $this->id)->get();
-		if ($this->isUsingTypePermissions())
+		if ($perms->count() <= 0)
 			$perms = $this->type->permissions;
 
 		return $perms;
@@ -58,9 +58,11 @@ class User extends Authenticatable
 
 	public function hasPermission(...$permissions) {
 		$matches = 0;
+		$usingTypePermissions = $this->isUsingTypePermissions();
+		$perms = $this->permissions();
 
-		foreach ($this->permissions() as $p) {
-			if ($this->isUsingTypePermissions()) {
+		foreach ($perms as $p) {
+			if ($usingTypePermissions) {
 				if (in_array($p->slug, $permissions)) {
 					$matches += 1;
 				}
@@ -76,8 +78,11 @@ class User extends Authenticatable
 	}
 
 	public function hasSomePermission(...$permissions) {
-		foreach ($this->permissions() as $p) {
-			if ($this->isUsingTypePermissions()) {
+		$usingTypePermissions = $this->isUsingTypePermissions();
+		$perms = $this->permissions();
+
+		foreach ($perms as $p) {
+			if ($usingTypePermissions) {
 				if (in_array($p->slug, $permissions)) {
 					return true;
 				}

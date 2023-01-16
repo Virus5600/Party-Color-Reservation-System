@@ -3,7 +3,7 @@
 	<div class="container-fluid">
 		{{-- Branding --}}
 		<a class="navbar-brand mx-auto mx-lg-0 py-0" href="{{route('admin.dashboard')}}" style="height: auto;">
-			<img src="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}" style="max-height: 3.25rem;" class="m-0 p-0" alt="{{ App\Settings::getInstance('web-logo')->value }}" data-fallback-img="{{ asset('uploads/settings/default.png') }}" />
+			<img src="{{ $webLogo }}" style="max-height: 3.25rem;" class="m-0 p-0" alt="{{ $webLogoInstance->value }}" data-fallback-img="{{ asset('uploads/settings/default.png') }}" />
 			Party Color
 		</a>
 

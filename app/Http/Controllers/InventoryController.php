@@ -286,7 +286,9 @@ class InventoryController extends Controller
 
 		try {
 			DB::beginTransaction();
+			
 			$item->forceDelete();
+			
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();

@@ -47,11 +47,17 @@
 		@endif
 
 		{{-- ADMIN SETTING AREA --}}
-		@if (Auth::user()->hasSomePermission('users_tab_access', 'permissions_tab_access', 'settings_tab_access'))
+		@php
+		$userAccess = Auth::user()->hasPermission('users_tab_access');
+		$permsAccess = Auth::user()->hasPermission('permissions_tab_access');
+		$settingsAccess = Auth::user()->hasPermission('settings_tab_access');
+		@endphp
+
+		@if ($userAccess || $permsAccess || $settingsAccess)
 			<hr class="w-100 custom-hr">
 
 			{{-- USERS --}}
-			@if (Auth::user()->hasPermission('users_tab_access'))
+			@if ($userAccess)
 				@if (\Request::is('admin/users'))
 				<span class="bg-secondary text-white"><i class="fas fa-user-alt mr-2"></i>Users</span>
 				@elseif (\Request::is('admin/users*'))
@@ -62,7 +68,7 @@
 			@endif
 
 			{{-- PERMISSIONS --}}
-			@if (Auth::user()->hasPermission('permissions_tab_access'))
+			@if ($permsAccess)
 				@if (\Request::is('admin/permissions'))
 				<span class="bg-secondary text-white"><i class="fas fa-lock mr-2"></i>Permissions</span>
 				@elseif (\Request::is('admin/permissions*'))
@@ -73,7 +79,7 @@
 			@endif
 
 			{{-- SETTINGS --}}
-			@if (Auth::user()->hasPermission('settings_tab_access'))
+			@if ($settingsAccess)
 				@if (\Request::is('admin/settings'))
 				<span class="bg-secondary text-white"><i class="fas fa-cog mr-2"></i>Settings</span>
 				@elseif (\Request::is('admin/settings*'))

@@ -8,9 +8,11 @@
 	--tag-remove-btn-bg--hover: var(--pink);
 	--tag-remove-bg: var(--pink);
 	--tag-pad: 0.125rem 0.5rem;
+	--tag--max-width: 10rem;
 
 	display: flex;
-	flex-wrap: wrap;
+	word-wrap: normal;
+	white-space: nowrap;
 	padding: 0.0625rem 0.75rem;
 	line-height: 1.5;
 	height: auto;

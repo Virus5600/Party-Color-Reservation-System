@@ -23,8 +23,7 @@ class Permissions
 			return redirect()->intended();
 
 		$user = Auth::user();
-
-		if($user->hasPermission($permissions)) {
+		if ($user->hasPermission($permissions)) {
 			return $next($request);
 		}
 		else {

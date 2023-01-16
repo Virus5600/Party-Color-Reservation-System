@@ -104,8 +104,6 @@ Route::group(['prefix' => 'admin'], function() {
 				Route::group(['middleware' => ['permissions:inventory_tab_edit']], function() {
 					Route::get('/edit', 'InventoryController@edit')->name('admin.inventory.edit');
 					Route::post('/update', 'InventoryController@update')->name('admin.inventory.update');
-
-					Route::post('/increase', 'InventoryController@increase')->name('admin.inventory.increase');
 				});
 
 				// Delete
@@ -113,13 +111,6 @@ Route::group(['prefix' => 'admin'], function() {
 					Route::get('/delete', 'InventoryController@delete')->name('admin.inventory.delete');
 					Route::get('/restore', 'InventoryController@restore')->name('admin.inventory.restore');
 				});
-				
-				// Permanent Delete
-				Route::get('/perma-delete', 'InventoryController@permaDelete')->name('admin.inventory.permaDelete')->middleware('permissions:inventory_tab_perma_delete');
-				
-				// Publishing and Unpublishing
-				// Route::get('/publish', 'InventoryController@publish')->name('admin.inventory.publish')->middleware('permissions:inventory_tab_publish');
-				// Route::get('/unpublish', 'InventoryController@unpublish')->name('admin.inventory.unpublish')->middleware('permissions:inventory_tab_unpublish');
 			});
 
 			// Index

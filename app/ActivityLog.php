@@ -19,26 +19,31 @@ class ActivityLog extends Model
 	];
 
 	// Relationship
-	protected function user() { return $this->belongsTo('App\User'); }
+	private function user() { return $this->belongsTo('App\User'); }
 
 	// Custom Functions
 	public function userF() {
 		if ($this->isValidUser())
 			return $this->user;
 		else
-			return null;
+			return $this->email;
 	}
 
 	public static function log($action, $user_id = null) {
-		if ($user_id == null && Auth::check())
+		if ($user_id == null && Auth::check()) {
 			$user_id = Auth::user()->id;
-		else if ($user_id == null && !Auth::check())
-			$user_id = 0;
+			$email = Auth::user()->email;
+		}
+		else if ($user_id == null && !Auth::check()) {
+			$user_id = 0
+			$email = null;
+		}
 
 		ActivityLog::create([
 			'user_id' => $user_id,
 			'address' => Request::ip(),
-			'action' => $action
+			'action' => $action,
+			'email' => $email
 		]);
 	}
 

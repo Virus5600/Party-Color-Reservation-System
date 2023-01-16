@@ -50,15 +50,22 @@ class Menu extends Model
 	}
 
 	public function reduceInventory() {
+		$notReduced = [];
 		$response = json_decode(json_encode([
 			"success" => true,
-			"message" => "Successfully reduced {$this->name}'s menu items"
+			"message" => "Successfully reduced {$this->name}'s menu items",
+			"notReduced" => []
 		]));
 
 		try {
 			DB::beginTransaction();
 
 			foreach($this->items as $i) {
+				if ($i->trashed()) {
+					array_push($notReduced, $i->item_name);
+					continue;
+				}
+
 				$i->quantity = $i->quantity - $this->menuItems()->where('inventory_id', '=', $i->id)->first()->amount;
 				$i->save();
 			}
@@ -73,19 +80,27 @@ class Menu extends Model
 			return $response;
 		}
 
+		$response->notReduced = $notReduced;
 		return $response;
 	}
 
 	public function returnInventory() {
+		$notReturned = [];
 		$response = json_decode(json_encode([
 			"success" => true,
-			"message" => "Successfully returned {$this->name}'s menu items"
+			"message" => "Successfully returned {$this->name}'s menu items",
+			"notReturned" => []
 		]));
 
 		try {
 			DB::beginTransaction();
 
 			foreach($this->items as $i) {
+				if ($i->trashed()) {
+					array_push($notReturned, $i->item_name);
+					continue;
+				}
+
 				$i->quantity = $i->quantity + $this->menuItems()->where('inventory_id', '=', $i->id)->first()->amount;
 				$i->save();
 			}
@@ -100,6 +115,7 @@ class Menu extends Model
 			return $response;
 		}
 
+		$response->notReturned = $notReturned;
 		return $response;
 	}
 }
