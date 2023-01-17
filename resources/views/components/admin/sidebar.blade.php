@@ -46,6 +46,15 @@
 		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.announcements.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-bullhorn mr-2"></i>Announcements</a>
 		@endif
 
+		{{-- ACTIVITY LOG --}}
+		@if (\Request::is('admin/activity-log'))
+		<span class="bg-secondary text-white"><i class="fas fa-book mr-2"></i>Activity Log</span>
+		@elseif (\Request::is('admin/activity-log*'))
+		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.activity-log.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-book mr-2"></i>Activity Log</a>
+		@else
+		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.activity-log.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-book mr-2"></i>Activity Log</a>
+		@endif
+
 		{{-- ADMIN SETTING AREA --}}
 		@php
 		$userAccess = Auth::user()->hasPermission('users_tab_access');
