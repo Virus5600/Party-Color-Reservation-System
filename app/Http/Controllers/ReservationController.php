@@ -175,24 +175,6 @@ class ReservationController extends Controller
 		try {
 			DB::beginTransaction();
 
-			// Menu calculation
-			$menu = [];
-			$hoursToAdd = 0;
-			$minutesToAdd = ($req->extension * 60);
-			foreach ($req->menu as $mi) {
-				$menu["{$mi}"] = Menu::find($mi);
-				
-				$hoursComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("H");
-				$hoursToAdd = max(Carbon::parse($menu["{$mi}"]->duration)->format("H"), $hoursToAdd);
-
-				$minutesComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("i");
-				$minutesToAdd = max($minutesComparisonVal, $minutesToAdd);
-			}
-
-			// Date calculation
-			$start_at = Carbon::parse("{$req->reservation_date} {$req->time_hour}:{$req->time_min}");
-			$end_at = Carbon::parse("{$req->reservation_date} {$req->time_hour}:{$req->time_min}")
-				->addHours($hoursToAdd)->addMinutes($minutesToAdd);
 			$price = 0;
 
 			foreach ($menu as $v)
