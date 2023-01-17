@@ -3,9 +3,13 @@
 @section('title', 'Reservation')
 
 @section('content')
-@php($datetime = now()->timezone('Asia/Tokyo'))
-@php($isEightPM = $datetime->gt('08:00 PM'))
-@php($new_contact_index = Session::get("new_contact_index"))
+
+@php
+$datetime = now()->timezone('Asia/Tokyo');
+$isEightPM = $datetime->gt('08:00 PM');
+$new_contact_index = Session::get("new_contact_index");
+$maxCap = App\Settings::getValue('capacity');
+@endphp
 
 <div class="container-fluid">
 	<div class="row">
@@ -31,6 +35,15 @@
 				<div class="card-body">
 					<form action="{{ route('admin.reservations.store') }}" method="POST" enctype="multipart/form-data" class="form needs-validation" data-continuous-validation="false">
 						{{ csrf_field() }}
+						{{-- GENERAL VALIDATION MESSAGE --}}
+						@error('general')
+							@foreach($errors->get('general') as $e)
+							<div class="alert alert-danger alert-dismissable fade show text-wrap">
+								<button type="buttone" class="close" data-dismiss="alert" aria-label="Close">&times;</button>
+								{!! $e !!}
+							</div>
+							@endforeach
+						@enderror
 
 						{{-- RESERVATION INFORMATION --}}
 						<div class="card my-2">
@@ -47,10 +60,10 @@
 								{{-- PAX --}}
 								<div class="form-group col-12 col-lg-4">
 									<label class="h5" for="pax">Pax</label>
-									<input class="form-control has-spinner" type="number" id="pax" name="pax" min="1" max="{{ App\Settings::getValue('capacity') }}" value="{{ old('pax') ? old('pax') : '1' }}" required />
+									<input class="form-control has-spinner" type="number" id="pax" name="pax" min="1" max="{{ $maxCap }}" value="{{ old('pax') ? old('pax') : '1' }}" required />
 									<div class="d-flex flex-row">
 										<span class="text-danger text-wrap mr-auto">{{ $errors->first('pax') }}</span>
-										<span class="text-muted ml-auto small">Max: {{ App\Settings::getValue('capacity') }}</span>
+										<span class="text-muted ml-auto small">Max: {{ $maxCap }}</span>
 									</div>
 								</div>
 
@@ -173,7 +186,7 @@
 									<div class="form-group">
 										<label for="phone_numbers" class="form-label">Contact Number(s)</label>
 
-										<input name="phone_numbers" id="phone_numbers" class="customLook custom-scrollbar form-control" value="{{ old('phone_numbers') ? implode(",", old('phone_numbers')) : '' }}" required>
+										<input type="text" name="phone_numbers" id="phone_numbers" class="tagify-field customLook custom-scrollbar form-control" value="{{ old('phone_numbers') ? implode(",", old('phone_numbers')) : '' }}" required>
 										<span class="text-danger text-wrap validation">
 											@if ($errors->first("phone_numbers"))
 											{{ $errors->first("phone_numbers") }}
@@ -384,9 +397,13 @@
 			pattern: /^\+*(?=.{7,14})[\d\s-]{7,15}$/
 		});
 
-		$(`form`).on('submit', (e) => {
-			let obj = $(e.currentTarget);
-			let tagified = obj.find(`.tagify`);
+		$(`[type=submit]`).on('click', (e) => {
+			let obj = $(e.currentTarget).closest('form');
+			let validTagify = obj.find(`.tagify-field:valid`);
+			let invalidTagify = obj.find(`.tagify-field:invalid`);
+
+			validTagify.parent().find('tags.tagify').removeClass('is-valid is-invalid').addClass('is-valid');
+			invalidTagify.parent().find('tags.tagify').removeClass('is-valid is-invalid').addClass('is-invalid');
 		});
 	});
 </script>

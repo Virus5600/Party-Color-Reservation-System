@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\MessageBag;
 
 use Carbon\Carbon;
 
@@ -52,36 +51,6 @@ class ReservationController extends Controller
 
 		try {
 			DB::beginTransaction();
-
-			$menu = [];
-			$hoursToAdd = 0;
-			$minutesToAdd = ($req->extension * 60);
-			foreach ($req->menu as $mi) {
-				$menu["{$mi}"] = Menu::find($mi);
-				
-				$hoursComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("H");
-				$hoursToAdd = max(Carbon::parse($menu["{$mi}"]->duration)->format("H"), $hoursToAdd);
-
-				$minutesComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("i");
-				$minutesToAdd = max($minutesComparisonVal, $minutesToAdd);
-			}
-
-			$closing = Carbon::parse("{$req->reservation_date} 22:00:00");
-			$start_at = Carbon::parse("{$req->reservation_date} {$req->time_hour}:{$req->time_min}");
-			$end_at = Carbon::parse("{$req->reservation_date} {$req->time_hour}:{$req->time_min}")
-				->addHours($hoursToAdd)->addMinutes($minutesToAdd);
-
-			if ($end_at->gt($closing)) {
-				$toSubtract = $end_at->diffInMinutes($closing) / 60;
-
-				$customMessage = new MessageBag(["extension" => "Extension made the reservation exceed closing time. Remove {$toSubtract} hours"]);
-				
-				return redirect()
-					->back()
-					->withErrors($validator->messages()->merge($customMessage))
-					->withInput()
-					->with("new_contact_index",  $newContactIndex);
-			}
 
 			$price = 0;
 
