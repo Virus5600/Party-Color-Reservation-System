@@ -46,19 +46,11 @@
 		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.announcements.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-bullhorn mr-2"></i>Announcements</a>
 		@endif
 
-		{{-- ACTIVITY LOG --}}
-		@if (\Request::is('admin/activity-log'))
-		<span class="bg-secondary text-white"><i class="fas fa-book mr-2"></i>Activity Log</span>
-		@elseif (\Request::is('admin/activity-log*'))
-		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.activity-log.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-book mr-2"></i>Activity Log</a>
-		@else
-		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.activity-log.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-book mr-2"></i>Activity Log</a>
-		@endif
-
 		{{-- ADMIN SETTING AREA --}}
 		@php
 		$userAccess = Auth::user()->hasPermission('users_tab_access');
 		$permsAccess = Auth::user()->hasPermission('permissions_tab_access');
+		$logsAccess = Auth::user()->hasPermission('activity_logs_tab_access');
 		$settingsAccess = Auth::user()->hasPermission('settings_tab_access');
 		@endphp
 
@@ -84,6 +76,17 @@
 				<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.permissions.index') }}" aria-hidden="false" aria-label="Permissions"><i class="fas fa-lock mr-2"></i>Permissions</a>
 				@else
 				<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.permissions.index') }}" aria-hidden="false" aria-label="Permissions"><i class="fas fa-lock mr-2"></i>Permissions</a>
+				@endif
+			@endif
+
+			{{-- ACTIVITY LOG --}}
+			@if ($logsAccess)
+				@if (\Request::is('admin/activity-log'))
+				<span class="bg-secondary text-white"><i class="fas fa-book mr-2"></i>Activity Log</span>
+				@elseif (\Request::is('admin/activity-log*'))
+				<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.activity-log.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-book mr-2"></i>Activity Log</a>
+				@else
+				<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.activity-log.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-book mr-2"></i>Activity Log</a>
 				@endif
 			@endif
 
