@@ -140,6 +140,13 @@ Route::group(['prefix' => 'admin'], function() {
 			Route::get('/', 'MenuController@index')->name('admin.menu.index');
 		});
 
+		// ACTIVITY LOG
+		// Route::group(['prefix' => 'activity-log', 'middleware' => ['permissions:activity_log_access']], function() {
+		Route::group(['prefix' => 'activity-log'], function() {
+			// Index
+			Route::get('/', 'ActivityLogController@index')->name('admin.activity-log.index');
+		});
+
 
 		// ANNOUNCEMENTS
 		Route::group(['prefix' => 'announcements', 'middleware' => ['permissions:announcements_tab_access']], function() {
