@@ -19,8 +19,6 @@
 							{{-- SEARCH --}}
 							@include('components.admin.admin-search', ['type' => 'activity'])
 						</div>
-
-						
 					</div>
 				</div>
 				{{-- Controls End --}}
@@ -41,7 +39,6 @@
 			<tbody id="table-content">
 				@forelse ($activity as $a)
 				<tr class="enlarge-on-hover" id="tr-{{ $a->id }}">
-
 					<td class="text-center align-middle mx-auto">
 						{{ $a->email }}
 					</td>
@@ -52,7 +49,7 @@
 
 					<td class="align-middle">
 						<div class="dropdown ">
-							<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="dropdown{{$a->id}}" aria-haspopup="true" aria-expanded="false">
+							<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="dropdown{{ $a->id }}" aria-haspopup="true" aria-expanded="false">
 								Actions
 							</button>
 
@@ -69,7 +66,6 @@
 			</tbody>
 		</table>
 	</div>
-	
 </div>
 @endsection
 
@@ -80,6 +76,4 @@
 @section('scripts')
 <script type="text/javascript" src="{{ asset('js/util/confirm-leave.js') }}"></script>
 {{-- To someone who will handle this... if you can make this part more secure, I will be glad! QwQ --}}
-<script type="text/javascript" src="{{ asset('js/util/swal-change-password.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/login.js') }}"></script>
 @endsection

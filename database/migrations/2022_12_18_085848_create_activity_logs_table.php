@@ -19,6 +19,7 @@ class CreateActivityLogsTable extends Migration
 			$table->string('email')->nullable();
 			$table->string('address')->nullable();
 			$table->string('action')->nullable();
+			$table->tinyInteger('is_automated')->default(0);
 			$table->tinyInteger('is_marked')->default(0);
 			$table->mediumText('reason')->nullable();
 			$table->timestamps();
