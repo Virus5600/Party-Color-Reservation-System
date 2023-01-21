@@ -87,6 +87,7 @@
 										<div class="col-12 col-md-4 my-2 position-relative" {{ $index == 0 ? 'id=origForm' : ''}}>
 											<div class="card h-100">
 												<div class="card-body">
+													{{-- ITEM NAME --}}
 													<div class="form-group">
 														<label class="form-label" for="menu_item[]">Item Name</label><br>
 
@@ -100,6 +101,7 @@
 														<br><span class="text-danger validation">{{ $errors->first("menu_item.".old("new_index")[$index]) }}</span>
 													</div>
 
+													{{-- AMOUNT --}}
 													<div class="form-group">
 														<label for="amount[]" class="form-label">Amount</label>
 
@@ -115,6 +117,18 @@
 														</div>
 
 														<span class="text-danger validation">{{ $errors->first("amount.".old("new_index")[$index]) }}</span>
+													</div>
+
+													{{-- IS UNLI? --}}
+													<div class="form-check">
+														@if (old("is_unlimited.{$index}") == 1)
+														<input type="checkbox" class="form-check-input unlimited" aria-label="Is unlimited?" name="is_unlimited[]" checked>
+														<input type="hidden" value="0" name="is_unlimited[]" disabled>
+														@else
+														<input type="checkbox" class="form-check-input unlimited" aria-label="Is unlimited?" name="is_unlimited[]">
+														<input type="hidden" value="0" name="is_unlimited[]">
+														@endif
+														<label class="form-check-label">Unlimited?</label>
 													</div>
 												</div>
 											</div>
@@ -133,6 +147,7 @@
 									<div class="col-12 col-md-4 my-2 position-relative" id="origForm">
 										<div class="card h-100">
 											<div class="card-body">
+												{{-- ITEM NAME --}}
 												<div class="form-group">
 													<label class="form-label" for="menu_item[]">Item Name</label><br>
 
@@ -145,6 +160,7 @@
 													<br><span class="text-danger">{{ $errors->first('menu_item.0') }}</span>
 												</div>
 
+												{{-- AMOUNT --}}
 												<div class="form-group">
 													<label for="amount[]" class="form-label">Amount</label>
 
@@ -159,6 +175,13 @@
 														</div>
 													</div>
 													<span class="text-danger">{{ $errors->first('amount.0') }}</span>
+												</div>
+
+												{{-- IS UNLI? --}}
+												<div class="form-check">
+													<input type="checkbox" class="form-check-input unlimited" aria-label="Is unlimited?" name="is_unlimited[]">
+													<input type="hidden" value="0" name="is_unlimited[]">
+													<label class="form-check-label">Unlimited?</label>
 												</div>
 											</div>
 										</div>
@@ -204,9 +227,10 @@
 <script type="text/javascript" src="{{ asset('js/util/disable-on-submit.js') }}"></script>
 <script type="text/javascript">
 	$(document).ready(() => {
+		// Decrement
 		$(document).on('click', '.quantity-decrement:not(.disabled)', (e, elm) => {
 			let obj = $(e.currentTarget);
-			obj.parent().parent().find('[name="amount[]"]').trigger('change', ['-', elm]);
+			obj.parent().parent().find('[name="amount[]"]:not([readonly])').trigger('change', ['-', elm]);
 			
 			if (obj.hasClass('disabled') && parseInt(obj.attr('data-id')) !== NaN) {
 				clearInterval(parseInt(obj.attr('data-id')));
@@ -223,9 +247,10 @@
 			obj.removeAttr('data-id');
 		});
 
+		// Increment
 		$(document).on('click', '.quantity-increment:not(.disabled)', (e, elm) => {
 			let obj = $(e.currentTarget);
-			obj.parent().parent().find('[name="amount[]"]').trigger('change', ['+', elm]);
+			obj.parent().parent().find('[name="amount[]"]:not([readonly])').trigger('change', ['+', elm]);
 
 			if (obj.hasClass('disabled') && parseInt(obj.attr('data-id')) !== NaN) {
 				clearInterval(parseInt(obj.attr('data-id')));
@@ -242,7 +267,8 @@
 			obj.removeAttr('data-id');
 		});
 
-		$(document).on('change', '[name="amount[]"]', (e, operation, elm) => {
+		// Amount Update
+		$(document).on('change', '[name="amount[]"]:not([readonly])', (e, operation, elm) => {
 			let obj = $(e.currentTarget);
 			let val = parseInt(obj.val());
 
@@ -280,6 +306,7 @@
 				$(obj.parent().find('.quantity-decrement')).removeClass('disabled');
 		}).trigger('change');
 
+		// Adding Item
 		$(document).on('click', '#addItem', (e) => {
 			let obj = $(e.currentTarget);
 			let field = $("#itemField");
@@ -288,11 +315,13 @@
 
 			// Clone cleaning
 			clone.removeAttr('id');
-			clone.find(".validation").text("");
-			clone.find('.unit-of-measurement').text("kg");
-			clone.find('textarea, input').val("");
-			clone.find('input[name="amount[]"]').val(0);
-			$(clone.find('option').removeAttr('selected').prop('selected', false)[0]).prop('selected', true);
+			clone.find(".validation").text("").trigger("change");
+			clone.find('.unit-of-measurement').text("kg").trigger("change");
+			clone.find('textarea, input').val("").trigger("change");
+			clone.find('input[name="amount[]"]').val(0).trigger("change");
+			clone.find('input[type=checkbox]').prop('checked', false).trigger("change");
+			clone.find('input[type=hidden][name="is_unlimited[]"]').val("0").trigger("change");
+			$(clone.find('option').removeAttr('selected').prop('selected', false)[0]).prop('selected', true).trigger("change");
 			clone.find('.bootstrap-select').replaceWith(function() { return $('select', this); });
 			clone.find(".select-picker").selectpicker({
 				liveSearch: true,
@@ -304,8 +333,10 @@
 			clone.append(removeBtn);
 
 			field.append(clone);
+			clone.find('input[type=checkbox]').trigger('change');
 		});
 
+		// Selectpicker
 		$('.select-picker').selectpicker({
 			liveSearch: true,
 			style: "btn-white border-secondary-light"
@@ -319,6 +350,7 @@
 				unitOfMeasurement.text($(obj.find('option')[parseInt(obj.val())]).attr('data-subtext'));
 		});
 
+		// Duration update
 		$(document).on('keyup keydown keypress change click', '#duration_min, #duration_hour', (e) => {
 			let hourE = $('#duration_hour');
 			let minE = $('#duration_min');
@@ -328,6 +360,24 @@
 			let date = new Date(time);
 			durationE.val(`${`0${date.getUTCHours()}`.slice(-2)}:${`0${date.getUTCMinutes()}`.slice(-2)}`);
 		});
+
+		// Unlimited toggle
+		$(document).on('change', '.unlimited', (e) => {
+			let obj = $(e.currentTarget);
+			let parent = obj.closest('.card-body');
+
+			if (obj.prop('checked')) {
+				obj.attr("value", "1");
+				parent.find('[name="amount[]"]').prop("readonly", true);
+				parent.find('[name="is_unlimited[]"][type=hidden]').prop("disabled", true);
+			}
+			else {
+				obj.removeAttr("value");
+				parent.find('[name="amount[]"]').prop("readonly", false);
+				parent.find('[name="is_unlimited[]"][type=hidden]').prop("disabled", false);
+			}
+		})
+		$('.unlimited').trigger('change');
 	});
 </script>
 @endsection

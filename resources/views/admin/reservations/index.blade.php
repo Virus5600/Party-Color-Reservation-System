@@ -21,15 +21,24 @@
 						<div class="col-12 col-md-6 text-center text-md-right mx-auto mr-lg-0 ml-lg-auto my-auto">
 							<a href="{{ route('admin.reservations.create') }}" class="btn btn-success m-auto"><i class="fa fa-plus-circle mr-2"></i>Add Reservation</a>
 						</div>
-
-						{{-- SEARCH --}}
-						{{-- @include('components.admin.admin-search', ['type' => 'reservations']) --}}
 					</div>
 				</div>
 				{{-- Controls End --}}
 			</div>
 		</div>
 	</div>
+
+	{{-- STATUS --}}
+	<h5>Status Legend:</h5>
+	<div class="row">
+		<label class="text-center col col-md-2 col-xl-2"><i class="fas fa-square mr-2 text-warning"></i>Pending</label>		
+		<label class="text-center col col-md-2 col-xl-2"><i class="fas fa-square mr-2 text-danger"></i>Rejected/Cancelled</label>		
+		<label class="text-center col col-md-4 col-xl-2"><i class="fas fa-square mr-2 text-info"></i>Coming</label>
+		<label class="text-center col col-md-2 col-xl-2"><i class="fas fa-square mr-2 text-primary"></i>Happening</label>		
+		<label class="text-center col col-md-2 col-xl-2"><i class="fas fa-square mr-2 text-secondary"></i>Done</label>
+		<label class="text-center col col-md-2 col-xl-2"><i class="fas fa-square mr-2" style="color: #1e2b37;"></i>Others</label>
+	</div>
+	{{-- STATUS END --}}
 
 	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3" id="reservation_details">
 		<span id="fullscreen_trigger" class="position-relative show-expand d-lg-none" data-target="#reservation_details" data-affected="#calendar_container">
@@ -73,6 +82,10 @@
 		</div>
 	</div>
 </div>
+@endsection
+
+@section('meta')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
 @section('css')
@@ -127,8 +140,11 @@
 @endsection
 
 @section('scripts')
+<script type="text/javascript" src="{{ asset('js/util/swal-change-field.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/util/confirm-leave.js') }}"></script>
+{{-- Calendar Actions --}}
 <script type="text/javascript">
-	var calendar, calendarWrapper, events;
+	var calendar, calendarWrapper;
 
 	$(document).ready(() => {
 		$("#fullscreen_trigger").on('click', (e) => {
@@ -158,188 +174,52 @@
 	});
 </script>
 <script type="text/javascript" src="{{ asset('js/lib/fullcalendar/fullcalendar.js') }}"></script>
-<script type="text/javascript" id="calendarScript">
-	events = [
+{{-- Calendar Pre-Initialization --}}
+<script type="text/javascript" data-for-removal>
+	const events = [
+		@foreach($reservations as $r)
+			@php ($menuName = "")
+			@foreach($r->menus as $m)
+				@php ($menuName .= " {$m->name},")
+				@php ($menuName = trim($menuName))
+			@endforeach
+		{
+			id: {{ $r->id }},
+			title: "{{ substr($menuName, 0, strlen($menuName)-1) }} - Reservation for {{ $r->contactInformation()->first()->contact_name }}",
+			start: "{{ \Carbon\Carbon::parse("$r->reserved_at $r->start_at")->format("Y-m-d\TH:i:s") }}",
+			end: "{{ \Carbon\Carbon::parse("$r->reserved_at $r->end_at")->format("Y-m-d\TH:i:s") }}",
+			data_id: "{{ $r->id }}",
+			color: "{{ $r->getStatusColorCode($r->getOverallStatus()) }}"
+		},
+		@endforeach
 	];
 
-	$(document).ready(() => {
-		calendarWrapper = $("#calendar");
-		calendar = new FullCalendar.Calendar(calendarWrapper.get()[0], {
-			// CALENDAR OPTIONS
-			// locale: 'ja',
-			initialView: 'timeGridWeek',
-			aspectRatio: 1,
-			allDaySlot: false,
-			listDaySideFormat: false,
-			expandRows: true,
-			nowIndicator: true,
-			dayHeaderFormat: {
-				weekday: `${$("#calendar").width() < 992 ? 'short' : 'long'}`,
-				month: `numeric`,
-				day: `numeric`,
-			},
-			headerToolbar: {
-				left: '',
-				center: 'dayGridMonth,timeGridWeek,timeGridDay listWeek,listDay prev,today,next',
-				right: ''
-			},
-			titleFormat: {
-				year: "numeric",
-				month: "long",
-				day: "numeric"
-			},
-			buttonText: {
-				today: 'Today',
-			},
-			// BUSINESS HOURS
-			businessHours: {
-				daysOfWeek: [0, 3, 4, 5, 6],
-				startTime: '17:00',
-				endTime: '22:00',
-			},
-			// SLOT OPTIONS
-			slotMinTime: '09:00:00',
-			slotMaxTime: '24:00:00',
-			slotLabelFormat: {
-				hour: 'numeric',
-				minute: '2-digit',
-				hour12: false
-			},
-			slotLabelInterval: {
-				minute: 30
-			},
-			// VIEW OPTIONS
-			views: {
-				dayGridMonth: { buttonText: 'Month' },
-				timeGridWeek: { buttonText: 'Week' },
-				timeGridDay: { buttonText: 'Day' },
-				listWeek: { buttonText: 'List (Week)' },
-				listDay: { buttonText: 'List (Day)' }
-			},
-			// RESIZING
-			windowResizeDelay: 500,
-			windowResize: (args, manual=false) => {
-				// Set the format for day header
-				if ($("#calendar").width() < 992)
-					calendar.setOption('dayHeaderFormat', {weekday: 'short'});
-				else
-					calendar.setOption('dayHeaderFormat', {weekday: 'long'});
+	const daysOfWeek = [
+		@foreach(explode(",", App\Settings::getValue('day-schedule')) as $day)
+		{{$day}},
+		@endforeach
+	];
 
-				// Disables full screen
-				let viewType = "";
-				if (manual) {
-					viewType = args.currentData.viewApi.type;
-				}
-				else {
-					viewType = args.view.type;
-					if (!$("#fullscreen_trigger").hasClass("show-expand"))
-						setTimeout(() => {$("#fullscreen_trigger").trigger('click')}, 100);
-				}
+	const startTime = '{{ \App\Settings::getValue('opening') }}';
+	const endTime = '{{ \App\Settings::getValue('closing') }}';
 
-				let = toolbar = $(`
-					<div class="fc-header-toolbar fc-toolbar fc-toolbar-ltr">
-						<div class="fc-toolbar-chunk">
-						</div>
+	const showReservation = '{{ route('admin.reservations.show', ["$1"]) }}';
+	const editReservation = '{{ route('admin.reservations.edit', ["$1"]) }}';
+	const deleteReservation = '{{ route('admin.reservations.delete', ["$1"]) }}';
+	
+	const approveReservation = '{{ route('admin.reservations.status.accept', ['$1']) }}';
+	const rejectReservation = '{{ route('admin.reservations.status.reject', ['$1']) }}';
+	const pendingReservation = '{{ route('admin.reservations.status.pending', ['$1']) }}';
+	
+	const archiveReservation = '{{ route('admin.reservations.archive', ['$1']) }}';
+	const restoreReservation = '{{ route('admin.reservations.restore', ['$1']) }}';
 
-						<div class="fc-toolbar-chunk">
-							<div class="fc-button-group">
-								<button type="button" title="Previous week" aria-pressed="false" class="fc-prev-button fc-button fc-button-primary">
-									<span class="fc-icon fc-icon-chevron-left"></span>
-								</button>
-								<button type="button" title="This week" ${$(calendar).find('.fc-day-today').length > 0 ? 'disabled=""' : ''} aria-pressed="false" class="fc-today-button fc-button fc-button-primary">Today</button>
-								<button type="button" title="Next week" aria-pressed="false" class="fc-next-button fc-button fc-button-primary">
-									<span class="fc-icon fc-icon-chevron-right"></span>
-								</button>
-							</div>
-							<div class="dropdown fc-button">
-								<button type="button" aria-pressed="false" title="View" class="fc-button fc-button-primary dropdown-toggle" id="viewDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Views</button>
+	const reservationFetchOne = '{{ route('reservations.fetch-event', ['$1']) }}';
 
-								<div class="dropdown-menu" aria-labelledby="viewDropdown">
-									<button type="button" title="Month view" aria-pressed="false" class="dropdown-item fc-dayGridMonth-button ${viewType == 'dayGridMonth' ? 'fc-button-primary' : ''}" id="dayGridMonth">Month</button>
-									<button type="button" title="Week view" aria-pressed="true" class="dropdown-item fc-timeGridWeek-button ${viewType == 'timeGridWeek' ? 'fc-button-primary' : ''}" id="timeGridWeek">Week</button>
-									<button type="button" title="Day view" aria-pressed="false" class="dropdown-item fc-timeGridDay-button ${viewType == 'timeGridDay' ? 'fc-button-primary' : ''}" id="timeGridDay">Day</button>
-									<div class="dropdown-divider"></div>
-									<button type="button" title="List (Week) view" aria-pressed="false" class="dropdown-item fc-listWeek-button ${viewType == 'listWeek' ? 'fc-button-primary' : ''}" id="listWeek">List (Week)</button>
-									<button type="button" title="List (Day) view" aria-pressed="false" class="dropdown-item fc-listDay-button ${viewType == 'listDay' ? 'fc-button-primary' : ''}" id="listDay">List (Day)</button>
-								</div>
-							</div>
-						</div>
-
-						<div class="fc-toolbar-chunk">
-						</div>
-					</div>
-				`);
-
-				$("#calendar > .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr").remove();
-				$("#calendar").prepend(toolbar);
-
-				$(".fc-prev-button").on('click', (e) => { calendar.prev(); $(".fc-today-button").prop('disabled', $('.fc-day-today').length > 0); });
-				$(".fc-today-button").on('click', (e) => { calendar.today(); });
-				$(".fc-next-button").on('click', (e) => { calendar.next(); $(".fc-today-button").prop('disabled', $('.fc-day-today').length > 0); });
-
-				$("#dayGridMonth").on('click', (e) => { calendar.changeView("dayGridMonth"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
-				$("#timeGridWeek").on('click', (e) => { calendar.changeView("timeGridWeek"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
-				$("#timeGridDay").on('click', (e) => { calendar.changeView("timeGridDay"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
-
-				$("#listWeek").on('click', (e) => { calendar.changeView("listWeek"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
-				$("#listDay").on('click', (e) => { calendar.changeView("listDay"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
-			},
-			// INITIALIZATION
-			datesSet: (args) => {
-				let toolbar = $(`
-					<div class="fc-header-toolbar fc-toolbar fc-toolbar-ltr">
-						<div class="fc-toolbar-chunk">
-							<h2 class="fc-toolbar-title" id="fc-dom-1"></h2>
-						</div>
-
-						<div class="fc-toolbar-chunk">
-							<div class="fc-button-group">
-								<button type="button" title="Previous week" aria-pressed="false" class="fc-prev-button fc-button fc-button-primary">
-									<span class="fc-icon fc-icon-chevron-left"></span>
-								</button>
-								<button type="button" title="This week" disabled="" aria-pressed="false" class="fc-today-button fc-button fc-button-primary">Today</button>
-								<button type="button" title="Next week" aria-pressed="false" class="fc-next-button fc-button fc-button-primary">
-									<span class="fc-icon fc-icon-chevron-right"></span>
-								</button>
-							</div>
-							<div class="dropdown fc-button">
-								<button type="button" aria-pressed="false" title="View" class="fc-button fc-button-primary dropdown-toggle" id="viewDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Views</button>
-
-								<div class="dropdown-menu" aria-labelledby="viewDropdown">
-									<button type="button" title="Month view" aria-pressed="false" class="dropdown-item fc-dayGridMonth-button ${args.view.type == 'dayGridMonth' ? 'fc-button-primary' : ''}" id="dayGridMonth">Month</button>
-									<button type="button" title="Week view" aria-pressed="true" class="dropdown-item fc-timeGridWeek-button ${args.view.type == 'timeGridWeek' ? 'fc-button-primary' : ''}" id="timeGridWeek">Week</button>
-									<button type="button" title="Day view" aria-pressed="false" class="dropdown-item fc-timeGridDay-button ${args.view.type == 'timeGridDay' ? 'fc-button-primary' : ''}" id="timeGridDay">Day</button>
-									<div class="dropdown-divider"></div>
-									<button type="button" title="List (Week) view" aria-pressed="false" class="dropdown-item fc-listWeek-button ${args.view.type == 'listWeek' ? 'fc-button-primary' : ''}" id="listWeek">List (Week)</button>
-									<button type="button" title="List (Day) view" aria-pressed="false" class="dropdown-item fc-listDay-button ${args.view.type == 'listDay' ? 'fc-button-primary' : ''}" id="listDay">List (Day)</button>
-								</div>
-							</div>
-						</div>
-
-						<div class="fc-toolbar-chunk">
-						</div>
-					</div>
-				`);
-
-				$("#calendar > .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr").remove();
-				$("#calendar").prepend(toolbar);
-
-				$(".fc-prev-button").on('click', (e) => { calendar.prev(); $(".fc-today-button").prop('disabled', $('.fc-day-today').length > 0); });
-				$(".fc-today-button").on('click', (e) => { calendar.today(); });
-				$(".fc-next-button").on('click', (e) => { calendar.next(); $(".fc-today-button").prop('disabled', $('.fc-day-today').length > 0); });
-
-				$("#dayGridMonth").on('click', (e) => { calendar.changeView("dayGridMonth"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
-				$("#timeGridWeek").on('click', (e) => { calendar.changeView("timeGridWeek"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
-				$("#timeGridDay").on('click', (e) => { calendar.changeView("timeGridDay"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
-
-				$("#listWeek").on('click', (e) => { calendar.changeView("listWeek"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
-				$("#listDay").on('click', (e) => { calendar.changeView("listDay"); $(e.currentTarget).parent().find("button.dropdown-item").removeClass("fc-button-primary"); $(e.currentTarget).addClass('fc-button-primary'); });
-			},
-			// EVENTS
-			events: events,
-		});
-
-		calendar.render();
-	});
+	const currencySymbol = '{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) }}';
 </script>
+
+{{-- Calendar Initialization --}}
+<script type="text/javascript" src="{{ asset('js/views/admin/reservations/index.js') }}"></script>
+<script type="text/javascript" data-for-removal> $(document).ready(() => { $('[data-for-removal]').remove(); }); </script>
 @endsection

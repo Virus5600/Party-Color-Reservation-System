@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 
 use Carbon\Carbon;
 
+use DB;
+use Exception;
+use Log;
 use NumberFormatter;
 
 class Menu extends Model
@@ -44,5 +47,75 @@ class Menu extends Model
 
 	public function getFromDuration($format = "H:i") {
 		return Carbon::parse($this->duration)->format($format);
+	}
+
+	public function reduceInventory() {
+		$notReduced = [];
+		$response = json_decode(json_encode([
+			"success" => true,
+			"message" => "Successfully reduced {$this->name}'s menu items",
+			"notReduced" => []
+		]));
+
+		try {
+			DB::beginTransaction();
+
+			foreach($this->items as $i) {
+				if ($i->trashed()) {
+					array_push($notReduced, $i->item_name);
+					continue;
+				}
+
+				$i->quantity = $i->quantity - $this->menuItems()->where('inventory_id', '=', $i->id)->first()->amount;
+				$i->save();
+			}
+			
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			$response->success = false;
+			$response->message = $e;
+			return $response;
+		}
+
+		$response->notReduced = $notReduced;
+		return $response;
+	}
+
+	public function returnInventory() {
+		$notReturned = [];
+		$response = json_decode(json_encode([
+			"success" => true,
+			"message" => "Successfully returned {$this->name}'s menu items",
+			"notReturned" => []
+		]));
+
+		try {
+			DB::beginTransaction();
+
+			foreach($this->items as $i) {
+				if ($i->trashed()) {
+					array_push($notReturned, $i->item_name);
+					continue;
+				}
+
+				$i->quantity = $i->quantity + $this->menuItems()->where('inventory_id', '=', $i->id)->first()->amount;
+				$i->save();
+			}
+			
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			$response->success = false;
+			$response->message = $e;
+			return $response;
+		}
+
+		$response->notReturned = $notReturned;
+		return $response;
 	}
 }

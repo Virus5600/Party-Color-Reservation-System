@@ -16,7 +16,8 @@ class CreateMenuItemsTable extends Migration
         Schema::create('menu_items', function (Blueprint $table) {
             $table->bigInteger('menu_id')->unsigned();
             $table->bigInteger('inventory_id')->unsigned();
-            $table->float('amount')->unsigned();
+            $table->float('amount')->unsigned()->default(1);
+            $table->tinyInteger('is_unlimited')->default(0);
 
             $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
             $table->foreign('inventory_id')->references('id')->on('inventories')->onDelete('cascade');

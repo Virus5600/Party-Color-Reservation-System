@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Announcement;
+use App\Reservation;
 use App\User;
 
 use DB;
@@ -283,5 +284,26 @@ class ApiController extends Controller
 		return response()->json([
 			'announcements' => $announcements
 		]);
+	}
+
+	protected function fetchReservationEvent(Request $req, $id) {
+		$reservation = Reservation::with("menus")->find($id);
+
+		if ($reservation == null) {
+			return response()
+				->json([
+					'success' => false,
+					'message' => 'The reservation either does not exists or is already deleted'
+				]);
+		}
+
+		return response()
+			->json([
+				'success' => true,
+				'message' => $reservation,
+				'props' => [
+					'statusColorCode' => $reservation->getStatusColorCode($reservation->getOverallStatus())
+				]
+			]);
 	}
 }

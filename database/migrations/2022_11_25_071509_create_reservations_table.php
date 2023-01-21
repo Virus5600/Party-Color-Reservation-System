@@ -4,6 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+use App\Enum\ApprovalStatus;
+
 class CreateReservationsTable extends Migration
 {
 	/**
@@ -18,10 +20,15 @@ class CreateReservationsTable extends Migration
 			$table->time('start_at');
 			$table->time('end_at');
 			$table->date('reserved_at');
-			$table->double('extension')->unsigned()->default(0);
-			$table->double('price')->unsigned();
+			$table->decimal('extension', 4, 2)->unsigned()->default(0);
+			$table->decimal('price', 17, 2)->unsigned();
 			$table->integer('pax');
 			$table->string('phone_numbers');
+			$table->tinyInteger('archived')->default(0);
+			$table->string('status')->default(ApprovalStatus::Pending);
+			$table->tinyInteger('items_returned')->default(1);
+			$table->string('reason')->nullable();
+			$table->softDeletes();
 			$table->timestamps();
 		});
 	}

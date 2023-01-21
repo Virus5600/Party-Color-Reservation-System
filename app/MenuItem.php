@@ -14,7 +14,8 @@ class MenuItem extends Model
 	protected $fillable = [
 		'menu_id',
 		'inventory_id',
-		'amount'
+		'amount',
+		'is_unlimited',
 	];
 
 	protected $with = [

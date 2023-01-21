@@ -30,6 +30,4 @@ const Navigation = () =>
 		</Navbar>
 	</div>
 
-
-
 export default Navigation;

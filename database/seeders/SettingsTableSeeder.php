@@ -50,5 +50,20 @@ class SettingsTableSeeder extends Seeder
 			'name' => 'capacity',
 			'value' => '50'
 		]);
+
+		Settings::create([
+			'name' => 'opening',
+			'value' => '17:00'
+		]);
+
+		Settings::create([
+			'name' => 'closing',
+			'value' => '22:00'
+		]);
+
+		Settings::create([
+			'name' => 'day-schedule',
+			'value' => '0,3,4,5,6'
+		]);
 	}
 }

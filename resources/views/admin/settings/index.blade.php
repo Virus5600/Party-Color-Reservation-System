@@ -29,10 +29,10 @@
 				{{-- WEB LOGO --}}
 				<div class="col-12 col-lg-6">
 					{{-- IMAGE INPUT --}}
-					<div class="image-input-scope" id="web-logo-scope" data-settings="#image-input-settings" data-fallback-img="{{ asset('uploads/settings/default.png') }}">
+					<div class="image-input-scope h-100" id="web-logo-scope" data-settings="#image-input-settings" data-fallback-img="{{ asset('uploads/settings/default.png') }}">
 						{{-- FILE IMAGE --}}
-						<div class="form-group text-center image-input collapse show avatar_holder" id="web-logo-image-input-wrapper">
-							<div class="row border rounded border-secondary-light py-2 mx-1">
+						<div class="h-100 pb-3 text-center image-input collapse show avatar_holder" id="web-logo-image-input-wrapper">
+							<div class="h-100 row border rounded border-secondary-light py-2 mx-1">
 								<div class="col-12 col-md-6 text-md-right">
 									<div class="hover-cam mx-auto avatar rounded overflow-hidden">
 										<img src="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}" class="hover-zoom img-fluid avatar" id="web-logo-container" alt="Website Logo" data-default-src="{{ asset('uploads/settings/default.png') }}">
@@ -62,27 +62,69 @@
 					</div>
 				</div>
 
-				{{-- APP NAME --}}
 				<div class="col-12 col-lg-6">
+					{{-- APP NAME --}}
 					<div class="form-group">
 						<label class="form-label">Website Name</label>
-						<input type="text" name="web-name" class="form-control" value="{{ App\Settings::getValue('web-name') == null ? 'Party Color' : App\Settings::getValue('web-name') }}" />
+						<input type="text" name="web-name" class="form-control" value="{{ App\Settings::getValue('web-name') == null ? 'Party Color' : App\Settings::getValue('web-name') }}" required />
 						<span class="text-danger small">{{$errors->first('web-name')}}</span>
 					</div>
 
+					{{-- APP DESCRIPTION --}}
 					<div class="form-group text-counter-parent">
 						<label for="web-desc" class="form-label">Website Description</label>
-						<textarea name="web-desc" id="web-desc" class="form-control not-resizable text-counter-input" rows="3" data-max="255">{{ App\Settings::getValue('web-desc') == null ? 'The official website of Taytay Municipal' : App\Settings::getValue('web-desc') }}</textarea>
+						<textarea name="web-desc" id="web-desc" class="form-control not-resizable text-counter-input" rows="3" data-max="255" required>{{ App\Settings::getValue('web-desc') == null ? 'The official website of Taytay Municipal' : App\Settings::getValue('web-desc') }}</textarea>
 						<span class="text-counter small">255</span>
 						<span class="text-danger small">{{$errors->first('web-desc')}}</span>
 					</div>
 				</div>
 
+				{{-- STORE CAPACITY --}}
 				<div class="col-6 col-lg-3 mx-auto">
 					<div class="form-group">
 						<label for="capacity" class="form-label">Store Capacity</label>
-						<input type="number" class="form-control w-100" min="1" max="2147483647" name="capacity" id="capacity" value="{{ App\Settings::getValue('capacity') == null ? '50' : App\Settings::getValue('capacity') }}">
-						<span class="text-danger-small">{{$errors->first('capacity')}}</span>
+						<input type="number" class="form-control w-100" min="1" max="2147483647" name="capacity" id="capacity" value="{{ App\Settings::getValue('capacity') == null ? '50' : App\Settings::getValue('capacity') }}" required>
+						<span class="text-danger small">{{$errors->first('capacity')}}</span>
+					</div>
+				</div>
+
+				{{-- DAY SCHEDULE --}}
+				<div class="col-6 col-lg-3 mx-auto">
+					<div class="form-group">
+						<label for="day-schedule" class="form-label">Day Schedule</label><br>
+
+						<select class="show-tick select-picker form-control w-100" multiple name="day-schedule[]" id="day-schedule" required>
+							@php ($day = now()->startOfWeek(\Carbon\Carbon::SUNDAY))
+							@for ($i = 0; $i < 7; $i++)
+							<option
+								value="{{ $i }}"
+								data-tokens="{{ $day->format("l") }}"
+								{{ in_array($i, explode(",", App\Settings::getValue("day-schedule"))) ? 'selected' : '' }}
+								>
+								{{ $day->format("l") }}
+								@php($day = $day->copy()->addDay())
+							</option>
+							@endfor
+						</select>
+						<br><span class="text-danger small">{{$errors->first('day-schedule')}}</span>
+					</div>
+				</div>
+
+				{{-- OPENING TIME --}}
+				<div class="col-6 col-lg-3 mx-auto">
+					<div class="form-group">
+						<label for="opening" class="form-label">Opening Time</label>
+						<input type="time" class="form-control w-100" name="opening" id="opening" value="{{ App\Settings::getValue('opening') == null ? '17:00' : App\Settings::getValue('opening') }}" required>
+						<span class="text-danger small">{{$errors->first('opening')}}</span>
+					</div>
+				</div>
+				
+				{{-- CLOSING TIME --}}
+				<div class="col-6 col-lg-3 mx-auto">
+					<div class="form-group">
+						<label for="closing" class="form-label">Closing Time</label>
+						<input type="time" class="form-control w-100" name="closing" id="closing" value="{{ App\Settings::getValue('closing') == null ? '17:00' : App\Settings::getValue('closing') }}" min="{{ App\Settings::getValue('opening') == null ? '17:00' : App\Settings::getValue('opening') }}" required>
+						<span class="text-danger small">{{$errors->first('closing')}}</span>
 					</div>
 				</div>
 			</div>
@@ -93,16 +135,36 @@
 			<div class="row">
 				{{-- PUBLIC CONTACT --}}
 				<div class="col-12 col-lg-6 form-group">
-					<label class="form-label">Telephone Number(s)</label>
-					<div data-tags-input-name="contacts" class="tag-input form-control">{{ App\Settings::getValue('contacts') == null ? '080-3980-4560' : App\Settings::getValue('contacts') }}</div>
+					<label class="form-label" for="contacts">Telephone Number(s)</label>
+					<input name="contacts" id="contacts" class="customLook custom-scrollbar form-control" value="{{ App\Settings::getValue('contacts') == null ? '080-3980-4560' : App\Settings::getValue('contacts') }}">
+					<span class="text-danger small">
+						@if ($errors->has('contact-single'))
+						{{ $errors->first('contact-single') }}
+						@elseif ($errors->has('contacts'))
+						{{ $errors->first('contacts') }}
+						@else
+							@foreach($errors->get('contacts.*') as $error)
+								{{ $error[0] }}
+							@endforeach
+						@endif
+					</span>
 				</div>
 
 				{{-- PUBLIC EMAIL --}}
 				<div class="col-12 col-lg-6 form-group">
 					<label class="form-label">Email Address</label>
-					<div data-tags-input-name="emails" class="tag-input form-control tags-remove-prefix" data-forbidden-chars='["," , "_", "?"]'>
-						{{ App\Settings::getValue('emails') == null ? 'partycolor3f@gmail.com' : App\Settings::getValue('emails') }}
-					</div>
+					<input name="emails" id="emails" class="customLook custom-scrollbar form-control" value="{{ App\Settings::valueToJson('emails') == null ? 'partycolor3f@gmail.com' : App\Settings::valueToJson('emails') }}">
+					<span class="text-danger small">
+						@if ($errors->has('email-single'))
+						{{ $errors->first('email-single') }}
+						@elseif ($errors->has('emails'))
+						{{ $errors->first('emails') }}
+						@else
+							@foreach($errors->get('emails.*') as $error)
+								{{ $error[0] }}
+							@endforeach
+						@endif
+					</span>
 				</div>
 
 				{{-- ADDRESS --}}
@@ -124,41 +186,7 @@
 @section('css')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/util/image-input.css') }}" />
 <link rel="stylesheet" type="text/css" href="{{ asset('css/util/text-counter.css') }}" />
-<style type="text/css">
-	.tag-input.form-control {
-		padding: 0.375rem 0.75rem;
-		height: auto;
-		display: flex;
-		flex-wrap: wrap;
-	}
-
-	div.tag {
-		padding: 0;
-		padding-right: 1.75rem;
-	}
-
-	div.tag:first-child { margin-left: 0.125rem; }
-	div.tag:last-child { margin-right: 0.125rem; }
-
-	div.tag, div.tag > * {
-		background-color: var(--primary);
-		margin: 0.25rem 0.5rem;
-	}
-
-	div.tag .tag-i {
-		top: 25%;
-		right: 0.25rem;
-		color: #fff;
-		transition: 0.25s;
-	}
-
-	div.tag .tag-i:hover {
-		color: rgb(255 255 255 / 75%);
-		text-decoration: none;
-	}
-
-	div.tag span { padding: 0; }
-</style>
+<link rel="stylesheet" type="text/css" href="{{ asset('css/custom-tagify.css') }}" />
 @endsection
 
 @section('scripts')
@@ -167,20 +195,25 @@
 <script type="text/javascript" src="{{ asset('js/util/text-counter.js') }}"></script>
 <script type="text/javascript">
 	$(document).ready(() => {
-		$('.tag-input').tagging({
-			'edit-on-delete': true
-		});
+		// Tagify
+		{
+			$('#contacts').tagify({
+				keepInvalidTags: true,
+				originalInputValueFormat: v => v.map(item => item.value).join(","),
+				pattern: /^\+*(?=.{7,14})[\d\s-]{7,15}$/
+			});
 
-		$('.tags-remove-prefix span').text('').addClass('mx-1');
+			$('#emails').tagify({
+				keepInvalidTags: true,
+				originalInputValueFormat: v => v.map(item => item.value).join(","),
+				pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
+			});
+		}
 
 		@if (Auth::user()->hasPermission('settings_tab_edit'))
 		$('#revert').on('click', (e) => {
 			location.reload();
 		});
-
-		// $('#revert-favicon').on('click', (e) => {
-		// 	Swal.fire();
-		// });
 		@else
 		$.each($('form').find('input, textarea'), (k, v) => {
 			$(v).prop('readonly', true);
@@ -188,6 +221,22 @@
 
 		$('div.tag .tag-i').remove();
 		@endif
+
+		// Select Picker
+		$('.select-picker').selectpicker({
+			liveSearch: true,
+			liveSearchStyle: "contains",
+			style: "btn-white border-secondary-light",
+		}).trigger('change').trigger('change.bs.select');
+		$('.select-picker').find("input[type=search]").addClass("dont-validate");
+
+		// Adjusting Closing Time
+		$("#opening").on('change', (e) => {
+			let obj = $(e.currentTarget);
+			let closing = $("#closing");
+
+			closing.attr('min', obj.val());
+		});
 	});
 </script>
 @endsection

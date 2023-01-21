@@ -15,8 +15,36 @@ class MenuItemTableSeeder extends Seeder
 	 */
 	public function run()
 	{
-		MenuItem::factory()
-			->count(random_int(1, 3))
-			->create();
+		MenuItem::create([
+			'menu_id' => 1,
+			'inventory_id' => 1,
+			'amount' => 5
+		]);
+
+		MenuItem::create([
+			'menu_id' => 1,
+			'inventory_id' => 2,
+			'amount' => 5
+		]);
+
+		MenuItem::create([
+			'menu_id' => 1,
+			'inventory_id' => 3,
+			'amount' => 5
+		]);
+
+		MenuItem::create([
+			'menu_id' => 2,
+			'inventory_id' => 4,
+			'amount' => 0,
+			'is_unlimited' => 1
+		]);
+
+		MenuItem::create([
+			'menu_id' => 2,
+			'inventory_id' => 5,
+			'amount' => 0,
+			'is_unlimited' => 1
+		]);
 	}
 }

@@ -2,6 +2,12 @@
 
 @section('title', 'Inventory')
 
+@php
+$user = Auth::user();
+$editAllow = $user->hasPermission('inventory_tab_edit');
+$deleteAllow = $user->hasPermission('inventory_tab_delete');
+@endphp
+
 @section('content')
 <div class="container-fluid d-flex flex-column h-100">
 	<div class="row">
@@ -47,33 +53,26 @@
 				<tr class="enlarge-on-hover">
 					<td class="text-center align-middle mx-auto font-weight-bold">{{ $i->item_name }}</td>
 					<td class="text-center align-middle mx-auto">{{ $i->getInStock() }}</td>
-					<td class="text-center align-middle mx-auto"><i class="fas fa-circle {{ $i->trashed() ? 'text-info' : 'text-success' }} mr-2"></i>{{ $i->trashed() ? 'Inactive' : 'Active'}}</td>
+					<td class="text-center align-middle mx-auto"><i class="fas fa-circle {{ $i->trashed() ? 'text-danger' : ($i->quantity > 10 ? 'text-success' : 'text-warning') }} mr-2"></i>{{ $i->trashed() ? 'Inactive' : ($i->quantity > 10 ? 'Active' : 'Critical') }}</td>
 					<td class="align-middle">
-						<div class="dropdown ">
+						<div class="dropdown">
 							<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="dropdown{{$i->id}}" aria-haspopup="true" aria-expanded="false">
 								Action
 							</button>
 
 							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown{{$i->id}}">
-
 								{{-- EDIT --}}
-								@if (Auth::user()->hasPermission('inventory_tab_edit'))
+								@if ($editAllow)
 								<a href="{{ route('admin.inventory.edit', [$i->id]) }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>
-								{{-- <a href="javascript:void(0);" class="dropdown-item" data-scf="Quantity" data-scf-name="quantity" data-scf-target-uri="{{ route('admin.inventory.increase', [$i->id]) }}"><i class="fas fa-plus-circle mr-2"></i>Increase Stock</a> --}}
 								@endif
 								
 								{{-- DELETE --}}
-								@if (Auth::user()->hasPermission('inventory_tab_delete'))
+								@if ($deleteAllow)
 									@if ($i->trashed())
 									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.inventory.restore', [$i->id]) }}', undefined, 'Are you sure you want to activate this?');" class="dropdown-item"><i class="fas fa-toggle-on mr-2"></i>Set Active</a>
 									@else
 									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.inventory.delete', [$i->id]) }}', undefined, 'Are you sure you want to deactivate this?');" class="dropdown-item"><i class="fas fa-toggle-off mr-2"></i>Set Inactive</a>
 									@endif
-								@endif
-
-								{{-- PERMANENT DELETE --}}
-								@if (Auth::user()->hasPermission('inventory_tab_perma_delete'))
-								<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.inventory.permaDelete', [$i->id]) }}', undefined, 'Are you sure you want to delete this?')" class="dropdown-item"><i class="fas fa-trash mr-2"></i>Delete</a>
 								@endif
 							</div>
 						</div>

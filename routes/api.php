@@ -22,3 +22,6 @@ Route::post('/remove-image', 'ApiController@removeImage')->name('removeImage');
 
 // Fetching Announcements
 Route::get('/user/fetch-announcements', 'ApiController@fetchAnnouncements')->name('user.fetch-announcements');
+
+// Fetch Reservation Event
+Route::get('/reservation/{id}', 'ApiController@fetchReservationEvent')->name('reservations.fetch-event');
