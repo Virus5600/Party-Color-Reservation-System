@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Settings;
+use App\ActivityLog;
 
 use DB;
 use Exception;
@@ -135,6 +136,12 @@ class SettingsController extends Controller
 				->withInput()
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Settings updated.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('admin.settings.index')
