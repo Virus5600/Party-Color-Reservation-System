@@ -89,12 +89,13 @@ const TimeList = ({ data }) => {
 };
 
 const Time = ({ time }) => {
-  
+
   return (
     <div className='Time'>
       <button>7:00PM</button>
     </div>
   );
+  
 };
 
 const Dates = ({ onClickTime }) => {
