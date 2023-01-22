@@ -139,6 +139,12 @@ class AnnouncementController extends Controller
 				->route('admin.announcements.index', ['d' => $req->show_drafts, 'sd' => $req->show_softdeletes])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+		
+		ActivityLog::log(
+			"Announcement '{$announcement->title}' uploaded.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('admin.announcements.index', ['d' => $req->show_drafts, 'sd' => $req->show_softdeletes])
@@ -313,6 +319,12 @@ class AnnouncementController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
+		ActivityLog::log(
+			"Announcement '{$announcement->title}' updated.",
+			null,
+			true
+		);
+
 		return redirect()
 			->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
 			->with('flash_success', 'Successfully uploaded announcement');
@@ -342,6 +354,12 @@ class AnnouncementController extends Controller
 				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Announcement '{$announcement->title}' published.",
+			null,
+			true
+		);
 
 		return redirect()
 			->back()
@@ -373,6 +391,12 @@ class AnnouncementController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
+		ActivityLog::log(
+			"Announcement '{$announcement->title}' unpublished.",
+			null,
+			true
+		);
+
 		return redirect()
 			->back()
 			->with('flash_success', 'Successfully unpublished announcement');
@@ -399,6 +423,12 @@ class AnnouncementController extends Controller
 				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Announcement '{$announcement->title}' moved to trash.",
+			null,
+			true
+		);
 
 		return redirect()
 			->back()
@@ -431,6 +461,12 @@ class AnnouncementController extends Controller
 				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Announcement '{$announcement->title}' restored.",
+			null,
+			true
+		);
 
 		return redirect()
 			->back()
@@ -465,6 +501,12 @@ class AnnouncementController extends Controller
 				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Announcement '{$announcement->title}' permanently deleted.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
