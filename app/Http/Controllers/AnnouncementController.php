@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Announcement;
 use App\AnnouncementContentImage;
+use App\ActivityLog;
 
 use Auth;
 use DB;
