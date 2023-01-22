@@ -264,13 +264,21 @@ class ApiController extends Controller
 			}
 		}
 
-		if (!$emptyResponse)
+		if (!$emptyResponse) {
+
+			ActivityLog::log(
+				"Removed image of '{$req->type}'.",
+				null,
+				true
+			);
+
 			return response()
 				->json([
 					'type' => 'success',
 					'message' => 'Successfully removed image of ' . $req->type,
 					'fallback' => $fallback
 				]);
+		}
 
 		return response()->json([
 			'type' => 'empty',
