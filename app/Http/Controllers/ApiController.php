@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Announcement;
 use App\Reservation;
 use App\User;
+use App\ActivityLog;
 
 use DB;
 use Exception;
