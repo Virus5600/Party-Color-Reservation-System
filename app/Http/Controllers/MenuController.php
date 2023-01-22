@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Inventory;
 use App\Menu;
 use App\MenuItem;
+use App\ActivityLog;
 
 use DB;
 use Log;
@@ -133,6 +134,12 @@ class MenuController extends Controller
 				->route('admin.menu.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Menu '{$req->menu_name}' created.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('admin.menu.index')
@@ -278,6 +285,12 @@ class MenuController extends Controller
 				->route('admin.menu.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Menu '{$menu->menu_name}' updated.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('admin.menu.index')
