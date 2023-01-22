@@ -1,38 +1,209 @@
 .App {
-  /* text-align: center; */
+  background-image: url('./img/main_background.png');
+  background-repeat: repeat;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.Nav a {
+  color: #A52A2A;
+  text-decoration: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+
+.main-image img {
+  width: 100%;
+  height: 25vw;
+  object-fit: cover;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.Reservation {
+  /* resize */
+  text-align: center;
+  width: 30%;
+}
+
+.Reservation .title {
+  color: #F24141;
+  font-size: 100px;
+  font-weight: 900;
+  font-style: italic;
+
+  /* stroke */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #FFFFFF;
+
+  /* spacing */
+  margin-bottom: 0px;
+}
+
+.Reservation .caption {
+  color: #FFED4A;
+  font-size: 20px;
+  font-weight: 900;
+  font-style: italic;
+
+  /* stroke */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #845C5C;
+}
+
+.Reservation .time {
+  color: #593A3A;
+  font-size: 40px;
+  font-weight: 900;
+  font-style: italic;
+
+  /* stroke */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: white;
+}
+
+.Reservation .reserve-button {
+  background-color: #873131;
+  color: #FFE500;
+  font-size: 40px;
+  font-weight: 900;
+  font-style: italic;
+
+  /* stroke */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: white;
+
+  /* border */
+  border-color: #A8AA32;
+  border-radius: 10px;
+
+  /* spacing */
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.Prices {
+  text-align: center;
+  /* border */
+  border: 1px solid #941717;
+
+  /* size */
+  width: 30%;
+  
+  /* spacing */
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.Prices .price-description {
   color: white;
+  font-size: 40px;
+  font-weight: 700;
+  background-color: #a36565;
+  /* border */
+  border: 1px solid #941717;
+
+
 }
 
-.App-link {
-  color: #61dafb;
+.Prices .diff-style {
+  background-color: #a77878;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+
+.Prices .person-type {
+  font-size: 20px;
+}
+
+.Prices .price {
+  letter-spacing: 2px;
+  /* stroke */
+  /* -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black; */
+}
+
+.quick-reservation {
+  display: flex;
+  justify-content: space-around;
+
+  margin: 50px;
+}
+
+.Announcement {
+  background-color: white;
+  padding: 10px;
+}
+
+.Announcement h1 {
+  text-align: center;
+  font-weight: 900;
+  
+  /* spacing */
+  margin-bottom: 30px;
+}
+
+.Announcement hr {
+  /* width: 80%; */
+  color: black;
+  
+}
+
+.Announcement-item {
+  display: flex; 
+  justify-content: space-evenly;
+}
+
+.Announcement-image img {
+  width: 320px;
+  height: 140px;
+  object-fit: center;
+}
+
+.AboutUs {
+  padding: 10px;
+}
+
+.AboutUs h1 {
+  text-align: center;
+  /* font-size: 30px; */
+  font-weight: 900;
+}
+
+.time-location {
+  width: 50%;
+}
+
+.time-location img {
+  width: 800px;
+  height: 300px;
+  object-fit: cover;
+}
+
+.time-location .icon {
+  color: white;
+  margin-left: 50px;
+  margin-right: 50px;
+}
+
+.time-location .adjustment {
+  margin-left: 8px;
+}
+
+.time-location hr {
+  margin: 0;
+}
+
+.time-location .closing {
+  margin-left: 50px;
+}
+
+.Appearance {
+  width: 40%;
+}
+
+.Appearance h2 {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.Appearance img {
+  width: 500px;
+  height: 420px;
+  object-fit: fill;
 }
