@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 // for bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -15,42 +17,51 @@ import announcementImage from './img/announcement_image.png';
 import locationImage from './img/location.png';
 import appearanceImage from './img/appearance.png';
 
+// page
+import Reservation from './Reservation';
+
+
 const App = () => {
-  const listStyle = { 
-	color: '#A52A2A', 
-	fontWeight: 800, 
-	fontSize: '25px', 
-	listStyle: 'none', 
-	display: 'inline', 
-	marginRight: '20px' 
+  
+  const [isReserveClicked, setReserveClicked] = useState(false);
+
+  const handleClickReserve = () => {
+	setReserveClicked(true);
   };
 
   return (
 	<div className='App'>
-		<div className='Nav'>
-			<div className='container-mb d-flex justify-content-between align-items-end'>
-				<img src={logo} alt='logo' height='90' />
-				<ul>
-				<li style={listStyle}><a href='#Home'>Home</a></li>
-				<li style={listStyle}><a href='#Reservation'>Reservation</a></li>
-				<li style={listStyle}><a href='#Announcement'>Announcement</a></li>
-				<li style={listStyle}><a href='#AboutUs'>About Us</a></li>
-				</ul>
-			</div>
-		</div>
+		{ isReserveClicked ? <Reservation /> : <Home onClickReserve={handleClickReserve} />}
+	</div>
+  );
+};
 
+const Home = ({ onClickReserve }) => {
+  return (
+	<div className='Home'>
+		<Nav />
 		<div className='main-image container-mb'>
 		    <img src={mainImage} className='img-fluid'/>
 		</div>
 
-		<div className='quick-reservation'>
+		<QuickReservation onClickReserve={onClickReserve} />
+
+		<Announcement />
+		<AboutUs />
+	</div>
+  );
+};
+
+const QuickReservation = ({ onClickReserve }) => {
+  return (
+	<div className='quick-reservation'>
 
 
-			<div className='Reservation'>
+			<div className='Reservation-temp'>
 				<span className='title'>BBQ</span><br/>
 				<span className='caption'>(including drink all you can)</span><br/>
 				<span className='time'>2hrs</span><br/>
-				<button className='reserve-button'>RESERVE</button>
+				<button className='reserve-button' onClick={onClickReserve}>RESERVE</button>
 			</div>
 
 
@@ -71,12 +82,31 @@ const App = () => {
 
 
 		</div>
+  );
+};
 
-		<Announcement />
-		<AboutUs />
-		
+const Nav = () => {
 
-	</div>
+const listStyle = { 
+	color: '#A52A2A', 
+	fontWeight: 800, 
+	fontSize: '25px', 
+	listStyle: 'none', 
+	display: 'inline', 
+	marginRight: '20px' 
+  };
+  return (
+	<div className='Nav'>
+			<div className='container-mb d-flex justify-content-between align-items-end'>
+				<img src={logo} alt='logo' height='90' />
+				<ul>
+				<li style={listStyle}><a href='#Home'>Home</a></li>
+				<li style={listStyle}><a href='#Reservation'>Reservation</a></li>
+				<li style={listStyle}><a href='#Announcement'>Announcement</a></li>
+				<li style={listStyle}><a href='#AboutUs'>About Us</a></li>
+				</ul>
+			</div>
+		</div>
   );
 };
 
@@ -97,7 +127,10 @@ const Appearance = () => {
   return (
 	<div className='Appearance'>
 		<h2>APPEARANCE</h2>
-		<img src={appearanceImage} alt='appearance' />
+		<div className='Appearance-image'>
+		    <img className='img-fluid' src={appearanceImage} alt='appearance' />
+		</div>
+		
 	</div>
   );	
 };

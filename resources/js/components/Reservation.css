@@ -1,0 +1,123 @@
+.Reservation {
+  /* background-image: url('./img/main_background.png'); */
+
+  /* spacing */
+  /* margin: 100px; */
+}
+
+.Reservation .logo {
+  text-align: center;
+}
+
+.Reservation img {
+  width: 400px;
+  height: 100px;
+}
+
+.Reservation hr {
+  margin: 0px;
+}
+
+.Reservation-form {
+  width: 60%;
+  margin-top: 50px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.Reservation-form h2 {
+  font-size: 30px;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.Reservation .return-button {
+  font-size: 30px;
+  font-weight: 900;
+  color: white;
+  background-color: black;
+  border-radius: 10px;
+
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-top: 20px;
+}
+
+.Reservation-details {
+  background-color: white;
+  padding: 50px;
+  padding-top: 20px;
+  text-align: center;
+
+  /* border */
+  border-radius: 5px;
+
+  /* padding-top: 10px; */
+}
+
+.Reservation-details ol {
+  margin: 0px;
+  margin-bottom: 10px;
+}
+
+.Reservation-details li {
+  font-size: 20px;
+  font-weight: 700;
+  margin-right: 50px;
+  
+}
+
+.Reservation-details .Dates {
+  margin: 10px;
+  margin-top: 50px;
+  margin-bottom: 20px;
+}
+
+
+
+.Dates input[type='number'] {
+  padding: 20px;
+  border-width: 0.5px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.Dates input[type='date'] {
+  padding: 20px;
+  border-width: 0.5px;
+
+}
+
+.Dates .find-table-button {
+  color: white;
+  font-size: 20px;
+  background-color: #E45454;
+  padding: 17px;
+
+  border-color: #808080;
+  border-width: 0.5px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.TimeList {
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  justify-content: space-around;
+}
+
+.Time button {
+  color: white;
+  font-size: 20px;
+  background-color: #E45454;
+
+  padding: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+
+  border-radius: 10px;
+  border: none;
+
+}

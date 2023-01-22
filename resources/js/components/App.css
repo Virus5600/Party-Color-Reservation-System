@@ -1,6 +1,5 @@
 .App {
-  background-image: url('./img/main_background.png');
-  background-repeat: repeat;
+  
 }
 
 .Nav a {
@@ -15,13 +14,13 @@
   object-fit: cover;
 }
 
-.Reservation {
+.Reservation-temp {
   /* resize */
   text-align: center;
   width: 30%;
 }
 
-.Reservation .title {
+.Reservation-temp .title {
   color: #F24141;
   font-size: 100px;
   font-weight: 900;
@@ -35,7 +34,7 @@
   margin-bottom: 0px;
 }
 
-.Reservation .caption {
+.Reservation-temp .caption {
   color: #FFED4A;
   font-size: 20px;
   font-weight: 900;
@@ -46,7 +45,7 @@
   -webkit-text-stroke-color: #845C5C;
 }
 
-.Reservation .time {
+.Reservation-temp .time {
   color: #593A3A;
   font-size: 40px;
   font-weight: 900;
@@ -57,7 +56,7 @@
   -webkit-text-stroke-color: white;
 }
 
-.Reservation .reserve-button {
+.Reservation-temp .reserve-button {
   background-color: #873131;
   color: #FFE500;
   font-size: 40px;
@@ -200,6 +199,10 @@
   text-align: center;
   font-size: 20px;
   font-weight: 700;
+}
+
+.Appearance-image {
+  text-align: center;
 }
 
 .Appearance img {
