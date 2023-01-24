@@ -104,6 +104,7 @@
   width: 70%;
   margin-left: auto;
   margin-right: auto;
+  margin-top: 20px;
   display: flex;
   justify-content: space-around;
 }
@@ -120,4 +121,76 @@
   border-radius: 10px;
   border: none;
 
+}
+
+.Details {
+  padding: 40px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.Details-left {
+  width: 50%;
+}
+
+.Details .Details-left-input {
+  margin: 30px;
+  display: flex;
+
+  justify-content: left;
+  margin-top: 0px;
+}
+
+.Details .Details-left-input .Details-left-icon {
+  font-size: 50px;
+  margin-right: 20px;
+}
+
+.Details .Details-left-input input {
+  font-size: 24px;
+}
+
+.Details-left-icon .adjustment {
+  margin-left: 10px;
+}
+
+.Details-left-input input[type='checkbox'] {
+  height: 25px;
+  width: 25px;
+  margin-right: 25px;
+}
+
+.Detail-right h2 {
+  text-align: left;
+}
+
+.Details-right-icon {
+  font-size: 25px;
+  margin-right: 20px;
+}
+
+.Details-right-item {
+  margin: 30px;
+  display: flex;
+
+  justify-content: flex-start;
+}
+
+.Details-right input[type='text'] {
+  width: 280px;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 10px;
+}
+
+.Details-reserve-button {
+  font-size: 32px;
+  font-weight: 700;
+  padding: 5px;
+  padding-left: 30px;
+  padding-right: 30px;
+
+  background-color: #DF7676;
+  border-radius: 10px;
+  border-color: #854646;
 }

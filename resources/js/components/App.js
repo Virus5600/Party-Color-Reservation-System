@@ -38,8 +38,8 @@ const App = () => {
 
 const Home = ({ onClickReserve }) => {
   return (
-	<div className='Home'>
-		<Nav />
+	<div className='Home' id='Home'>
+		<Nav onClickReserve={onClickReserve}/>
 		<div className='main-image container-mb'>
 		    <img src={mainImage} className='img-fluid'/>
 		</div>
@@ -54,7 +54,7 @@ const Home = ({ onClickReserve }) => {
 
 const QuickReservation = ({ onClickReserve }) => {
   return (
-	<div className='quick-reservation'>
+	<div className='quick-reservation' id='Reservation'>
 
 
 			<div className='Reservation-temp'>
@@ -85,7 +85,7 @@ const QuickReservation = ({ onClickReserve }) => {
   );
 };
 
-const Nav = () => {
+const Nav = ({ onClickReserve }) => {
 
 const listStyle = { 
 	color: '#A52A2A', 
@@ -101,7 +101,7 @@ const listStyle = {
 				<img src={logo} alt='logo' height='90' />
 				<ul>
 				<li style={listStyle}><a href='#Home'>Home</a></li>
-				<li style={listStyle}><a href='#Reservation'>Reservation</a></li>
+				<li style={listStyle} onClick={onClickReserve}><a href='#'>Reservation</a></li>
 				<li style={listStyle}><a href='#Announcement'>Announcement</a></li>
 				<li style={listStyle}><a href='#AboutUs'>About Us</a></li>
 				</ul>
@@ -112,7 +112,7 @@ const listStyle = {
 
 const AboutUs = () => {
   return (
-	<div className='AboutUs'>
+	<div className='AboutUs' id='AboutUs'>
 			<h1>ABOUT US</h1>
 			<div className='d-flex justify-content-evenly'>
 				<TimeLocation />
@@ -168,7 +168,7 @@ const TimeLocation = () => {
 
 const Announcement = () => {
   return (
-	<div className='Announcement'>
+	<div className='Announcement' id='Announcement'>
 			<h1>Announcement</h1>
 			<div className='Announcement-list'>
 				<AnnouncementItem /><hr />
