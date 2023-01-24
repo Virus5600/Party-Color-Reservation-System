@@ -28,21 +28,21 @@ class Inventory extends Model
 		'deleted_at' => 'datetime',
 	];
 
-	// Constructor
-	public function __construct() {
-		parent::__construct();
+	// Booted
+	protected static function booted() {
+		static::retrieved(function($inventory) {
+			try {
+				DB::beginTransaction();
 
-		try {
-			DB::beginTransaction();
+				if ($this->quantity <= 0)
+					$this->delete();
 
-			if ($this->quantity <= 0)
-				$this->delete();
-
-			DB::commit();
-		} catch (Exception $e) {
-			DB::rollback();
-			Log::error($e);
-		}
+				DB::commit();
+			} catch (Exception $e) {
+				DB::rollback();
+				Log::error($e);
+			}
+		});
 	}
 
 	// Relationships

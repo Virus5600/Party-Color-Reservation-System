@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
-	bootstrap="vendor/autoload.php"
-	colors="true">
-	
+		 xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
+		 bootstrap="vendor/autoload.php"
+		 colors="true"
+>
 	<testsuites>
 		<testsuite name="Unit">
 			<directory suffix="Test.php">./tests/Unit</directory>
@@ -13,11 +13,11 @@
 		</testsuite>
 	</testsuites>
 
-	<coverage processUncoveredFiles="true">
-		<include>
+	<filter>
+		<whitelist processUncoveredFilesFromWhitelist="true">
 			<directory suffix=".php">./app</directory>
-		</include>
-	</coverage>
+		</whitelist>
+	</filter>
 	
 	<php>
 		<server name="APP_ENV" value="testing"/>
@@ -27,7 +27,7 @@
 		<server name="QUEUE_CONNECTION" value="sync"/>
 		<server name="SESSION_DRIVER" value="array"/>
 		<server name="TELESCOPE_ENABLED" value="false"/>
-
+		
 		<server name="DB_CONNECTION" value="sqlite"/>
 		<server name="DB_DATABASE" value=":memory:"/>
 	</php>
