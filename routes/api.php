@@ -28,6 +28,11 @@ Route::get('/reservation/fetch/{monthYear?}', 'ApiController@fetchReservationFro
 Route::group(['prefix' => 'react'], function() {
 	// Announcements
 	Route::group(['prefix' => 'announcements'], function() {
-		Route::get('/fetch', 'ReactApiController@fetchAnnouncements')->name('react.fetch-announcements');
+		Route::get('/fetch', 'ReactApiController@fetchAnnouncements')->name('api.react.announcements.fetch');
+	});
+
+	// Reservation
+	Route::group(['prefix' => 'reservations'], function() {
+		Route::post('/create', 'ReactApiController@reservationsCreate')->name('api.react.reservations.create');
 	});
 });

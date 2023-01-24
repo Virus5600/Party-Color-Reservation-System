@@ -27,14 +27,13 @@ const Reservation = () => {
 		return <App />
 	} else {
 		return (
-				<div className='Reservation'>
-						<div className='logo'>
-								<img src={logo} alt='logo' />
-						</div>
-
-						<ReservationForm onClickReturn={handleClickReturn} />
-				
+			<div className='Reservation'>
+				<div className='logo'>
+					<img src={logo} alt='logo' />
 				</div>
+
+				<ReservationForm onClickReturn={handleClickReturn} />
+			</div>
 		);
 	}
 };
@@ -99,6 +98,7 @@ const Details = ({ number, date, time }) => {
 	const [phoneNumber, setPhoneNumber] = useState('');
 	const [isCheckedUpdate, setCheckedUpdate] = useState(false);
 	const [specialRequest, setSpecialRequest] = useState('');
+	const token = document.querySelector('meta[name=csrf-token]').content;
 
 	// console.log('full name:', fullName);
 	// console.log('email:', email);
@@ -108,19 +108,64 @@ const Details = ({ number, date, time }) => {
 
 
 	// eto ung url na para sa api (sending to backend the reservation details)
-	const API_TO_SEND_RESERVATION = '';
-
+	const API_TO_SEND_RESERVATION = 'api/react/reservations/create';
 
 	const handleClickServeButton = async () => {
+		/**
+		 * Still has missing required parameters:
+		 * reservation_date [string date] - The day that they set for their reservation
+		 * pax [integer] - Amount of people that will attend
+		 * price [double] - Sum of the pricesfor the menu they've picked
+		 * time_hour [integer] - Start hour time (24 hour format)
+		 * time_min [integer] - Start minute time
+		 * reservation_time [string time] - Combined time_hour and time_min to create the H:i (i.e.: 17:30) time format
+		 * extension [double] - Time extension they would like to avail (in hours. So 1 hour and 30 minutes will be 1.5 hours). This is optional.
+		 * menu [integer array] - 
+		 */
 		const result = await axios.post(API_TO_SEND_RESERVATION, {
-			// eto ung json na ipapasa ko satch!!!!!!!!!
-			fullname: fullName, // string
-			email: email, //string
-			phoneNumber: phoneNumber, // string
-			specialRequest: specialRequest, // string
-			isCheckedUpdate: isCheckedUpdate, //boolean
+			_token: token,						// _token [string] - For CSRF prevention
+			contact_name: [fullName],			// contact_name [string array] - Primary contact person (Can be many)
+			email: [email],						// email [string array] - Primary contact email (Can be many)
+			phone_numbers: [phoneNumber],		// phone_numbers [string array] - A list of phone numbers that can be contacted
+			specialRequest: specialRequest,		// special_request [string] - Not yet implemented
+			subscribed: isCheckedUpdate,		// subscribed [boolean] = Not yet implemented
 		}).then(response => {
-			console.log('success to send data');
+			if (response.success) {
+				Swal.fire({
+					title: response.flash_success,
+					position: `top`,
+					showConfirmButton: false,
+					toast: true,
+					timer: 10000,
+					background: `#28a745`,
+					customClass: {
+						title: `text-white`,
+						content: `text-white`,
+						popup: `px-3`
+					},
+				});
+			}
+			else {
+				if (response.type == 'error') {
+					Swal.fire({
+						title: response.flash_error,
+						position: `top`,
+						showConfirmButton: false,
+						toast: true,
+						timer: 10000,
+						background: `#28a745`,
+						customClass: {
+							title: `text-white`,
+							content: `text-white`,
+							popup: `px-3`
+						},
+					})
+				}
+				else if (response.type == 'validation') {
+					// IF VALIDATION FAILED
+					console.log(response.errors);
+				}
+			}
 		});
 	};
 
@@ -135,7 +180,7 @@ const Details = ({ number, date, time }) => {
 				/>
 				<DetailsRight number={number} date={date} time={time} onChangeSpecialRequest={setSpecialRequest}/>
 			</div>
-			<button className='Details-reserve-button'>RESERVE</button>
+			<button className='Details-reserve-button' onClick={handleClickServeButton}>RESERVE</button>
 		</>
 	);
 };
@@ -250,7 +295,7 @@ const Dates = ({ onFindTableClick, onTimeClicked }) => {
 	return (
 		<div className='Dates'>
 				<input type='number' min='1' value={number} onChange={handleClickNumber}/>
-				<input type='date' value={date} onChange={handleClickDate}/>
+				<input type='date' min={date} value={date} onChange={handleClickDate}/>
 				<button className='find-table-button' onClick={handleClickFindTable}>Find a table</button>
 
 				{ isTimeAvailable ? <TimeList times={times} onTimeClicked={onTimeClicked}/> : null }
