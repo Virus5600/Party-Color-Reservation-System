@@ -291,14 +291,6 @@ class ApiController extends Controller
 		]);
 	}
 
-	protected function fetchAnnouncements(Request $req) {
-		$announcements = Announcement::get();
-
-		return response()->json([
-			'announcements' => $announcements
-		]);
-	}
-
 	protected function fetchReservationEvent(Request $req, $id) {
 		$reservation = Reservation::with("menus")->find($id);
 
@@ -342,4 +334,7 @@ class ApiController extends Controller
 				'reservations' => $reservations
 			]);
 	}
+
+	// REACT API ENDPOINTS
+
 }
