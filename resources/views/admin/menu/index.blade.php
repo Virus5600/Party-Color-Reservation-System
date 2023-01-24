@@ -45,7 +45,7 @@
 				@forelse ($menus as $m)
 				<tr class="enlarge-on-hover">
 					<td class="text-center align-middle mx-auto font-weight-bold">{{ $m->name }}</td>
-					<td class="text-center align-middle mx-auto"><i class="fas fa-circle {{ $m->trashed() ? 'text-info' : 'text-success' }} mr-2"></i>{{ $m->trashed() ? 'Inactive' : 'Active'}}</td>
+					<td class="text-center align-middle mx-auto"><i class="fas fa-circle {{ $m->trashed() ? 'text-danger' : 'text-success' }} mr-2"></i>{{ $m->trashed() ? 'Inactive' : 'Active'}}</td>
 					<td class="align-middle">
 						<div class="dropdown ">
 							<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="dropdown{{$m->id}}" aria-haspopup="true" aria-expanded="false">
@@ -64,9 +64,9 @@
 								{{-- DELETE --}}
 								@if (Auth::user()->hasPermission('menu_tab_delete'))
 									@if ($m->trashed())
-									<a href="javascript:void(0);" onclick="confirmLeave('@{{ route('admin.menu.restore', [$m->id]) }}', undefined, 'Are you sure you want to activate this?');" class="dropdown-item"><i class="fas fa-toggle-on mr-2"></i>Set Active</a>
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.menu.restore', [$m->id]) }}', undefined, 'Are you sure you want to activate this?');" class="dropdown-item"><i class="fas fa-toggle-on mr-2"></i>Set Active</a>
 									@else
-									<a href="javascript:void(0);" onclick="confirmLeave('@{{ route('admin.menu.delete', [$m->id]) }}', undefined, 'Are you sure you want to deactivate this?');" class="dropdown-item"><i class="fas fa-toggle-off mr-2"></i>Set Inactive</a>
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.menu.delete', [$m->id]) }}', undefined, 'Are you sure you want to deactivate this?');" class="dropdown-item"><i class="fas fa-toggle-off mr-2"></i>Set Inactive</a>
 									@endif
 								@endif
 

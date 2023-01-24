@@ -37,7 +37,7 @@ const getAsyncData = () =>
 		, 2000);
 	});
 
-const API_ENDPOINT = `api/user/fetch-announcements`;																																																																																																																																																																																																		       			               							 
+const API_ENDPOINT = `api/react/announcements/announcements`;																																																																																																																																																																																																		       			               							 
 
 const Announcement = () => {
 	// State

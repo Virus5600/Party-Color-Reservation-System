@@ -14,6 +14,7 @@ use App\Enum\ApprovalStatus;
 use App\Enum\Status;
 
 use Log;
+use NumberFormatter;
 use Validator;
 
 class Reservation extends Model
@@ -160,6 +161,14 @@ class Reservation extends Model
 			default:
 				return "Unknown";
 		}
+	}
+
+	public function reservationFor() {
+		return $this->contactInformation()->first()->contact_name;
+	}
+
+	public function fetchPrice() {
+		return (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . " $this->price";
 	}
 
 	// STATIC FUNCTIONS

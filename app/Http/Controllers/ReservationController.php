@@ -14,6 +14,7 @@ use App\Inventory;
 use App\Menu;
 use App\Reservation;
 use App\Settings;
+use App\ActivityLog;
 
 use DB;
 use Exception;
@@ -98,6 +99,12 @@ class ReservationController extends Controller
 				->route('admin.reservations.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Reservation created.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('admin.reservations.index')
@@ -232,6 +239,12 @@ class ReservationController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
+		ActivityLog::log(
+			"Reservation {$id} updated.",
+			null,
+			true
+		);
+
 		return redirect()
 			->route('admin.reservations.index')
 			->with('flash_success', 'Successfully updated reservation');
@@ -269,6 +282,12 @@ class ReservationController extends Controller
 				->route('admin.reservations.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Reservation {$id} deleted.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('admin.reservations.index')
@@ -354,6 +373,12 @@ class ReservationController extends Controller
 				]);
 		}
 
+		ActivityLog::log(
+			"Reservation {$id} accepted.",
+			null,
+			true
+		);
+
 		return response()
 			->json([
 				'success' => true,
@@ -424,6 +449,12 @@ class ReservationController extends Controller
 				]);
 		}
 
+		ActivityLog::log(
+			"Reservation {$id} rejected.",
+			null,
+			true
+		);
+
 		return response()
 			->json([
 				'success' => true,
@@ -477,6 +508,12 @@ class ReservationController extends Controller
 					'message' => ''
 				]);
 		}
+
+		ActivityLog::log(
+			"Reservation {$id} moved to pending.",
+			null,
+			true
+		);
 
 		return response()
 			->json([

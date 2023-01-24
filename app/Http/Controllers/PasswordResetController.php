@@ -10,6 +10,7 @@ use App\Jobs\AccountNotification;
 
 use App\PasswordReset;
 use App\User;
+use App\ActivityLog;
 
 use DB;
 use Exception;
@@ -74,6 +75,12 @@ class PasswordResetController extends Controller
 				->back()
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Password for '{$req->email}' reset requested.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('login')
@@ -161,6 +168,12 @@ class PasswordResetController extends Controller
 				->back()
 				->with('flash_error', 'Something went wrong, please try again later.');
 		}
+
+		ActivityLog::log(
+			"Password for '{$user->email}' updated.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('login')

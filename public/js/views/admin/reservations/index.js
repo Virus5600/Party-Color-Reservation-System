@@ -294,7 +294,7 @@ $(document).ready(() => {
 					else
 						htmlContent += `<a href="${editReservation.replace('%241', data.data_id)}" class="btn btn-primary">Edit</a>`;
 					htmlContent += `
-									<button onclick="confirmLeave('${deleteReservation.replace('%241', data.data_id)}')" class="btn btn-danger">Remove</button>
+									<button onclick="confirmLeave('${deleteReservation.replace('%241', data.data_id)}', undefined, 'This cannot action cannot be undone once you\'ve decided to proceed.')" class="btn btn-danger">Remove</button>
 								</div>
 
 								<div class="btn-group" role="group" aria-label="Status Actions" id="statusActionButtons">`;

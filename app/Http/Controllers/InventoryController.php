@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Inventory;
+use App\ActivityLog;
 
 use DB;
 use Log;
@@ -81,6 +82,12 @@ class InventoryController extends Controller
 				->route('admin.inventory.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Item '{$req->item_name}' created.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('admin.inventory.index')
@@ -164,6 +171,12 @@ class InventoryController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
+		ActivityLog::log(
+			"Item '{$item->item_name}' updated.",
+			null,
+			true
+		);
+
 		return redirect()
 			->route('admin.inventory.index')
 			->with('flash_success', 'Successfully updated item.');
@@ -210,6 +223,12 @@ class InventoryController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
+		ActivityLog::log(
+			"Item '{$item->item_name}' increased.",
+			null,
+			true
+		);
+
 		return response()
 			->json([
 				''
@@ -237,6 +256,12 @@ class InventoryController extends Controller
 				->route('admin.inventory.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Item '{$item->item_name}' deactivated.",
+			null,
+			true
+		);
 
 		return redirect()
 			->back()
@@ -270,6 +295,12 @@ class InventoryController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
+		ActivityLog::log(
+			"Item '{$item->item_name}' activated.",
+			null,
+			true
+		);
+
 		return redirect()
 			->back()
 			->with('flash_success', 'Successfully activated item.');
@@ -298,6 +329,12 @@ class InventoryController extends Controller
 				->route('admin.inventory.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Item '{$item->item_name}' permanently deleted.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('admin.inventory.index')
