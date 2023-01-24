@@ -34,8 +34,8 @@ class Inventory extends Model
 			try {
 				DB::beginTransaction();
 
-				if ($this->quantity <= 0)
-					$this->delete();
+				if ($inventory->quantity <= 0)
+					$inventory->delete();
 
 				DB::commit();
 			} catch (Exception $e) {
