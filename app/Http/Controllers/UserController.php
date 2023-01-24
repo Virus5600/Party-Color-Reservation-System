@@ -266,7 +266,7 @@ class UserController extends Controller
 		}
 
 		ActivityLog::log(
-			"User '{trim($user->getName())}' created.",
+			"User '" . trim($user->getName()) . "' created.",
 			null,
 			true
 		);
