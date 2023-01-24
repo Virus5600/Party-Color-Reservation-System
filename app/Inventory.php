@@ -28,6 +28,23 @@ class Inventory extends Model
 		'deleted_at' => 'datetime',
 	];
 
+	// Constructor
+	public function __construct() {
+		parent::__construct();
+
+		try {
+			DB::beginTransaction();
+
+			if ($this->quantity <= 0)
+				$this->delete();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+		}
+	}
+
 	// Relationships
 	public function menus() { return $this->belongsToMany('App\Menu', 'menu_items', 'inventory_id', 'menu_id'); }
 	public function menuItem() { return $this->belongsTo('App\MenuItem', 'id', 'inventory_id'); }
@@ -58,6 +75,6 @@ class Inventory extends Model
 	}
 
 	public static function getForDeletion() {
-		return Inventory::whereDate('updated_at', '<', now()->subYears(5))->get();
+		return Inventory::withTrashed()->whereDate('updated_at', '<', now()->subYears(5))->get();
 	}
 }

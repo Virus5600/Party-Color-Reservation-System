@@ -25,3 +25,4 @@ Route::get('/user/fetch-announcements', 'ApiController@fetchAnnouncements')->nam
 
 // Fetch Reservation Event
 Route::get('/reservation/{id}', 'ApiController@fetchReservationEvent')->name('reservations.fetch-event');
+Route::get('/reservation/fetch/{monthYear?}', 'ApiController@fetchReservationFromRange')->name('api.admin.reservations.fetch');

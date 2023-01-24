@@ -39,7 +39,7 @@ class MenuController extends Controller
 
 		foreach ($req->menu_item as $k => $v) {
 			$menuItemValidation["menu_item.{$k}"] = "required_unless:amount.{$k},null|numeric|exists:inventories,id";
-			$amountValidation["amount.{$k}"] = "required_unless:menu_item.{$k},null|numeric|min:1|max:4294967295";
+			$amountValidation["amount.{$k}"] = "required_unless:menu_item.{$k},null|numeric|" . ($req->is_unlimited[$k] ? '' : 'min:1|') . "max:4294967295";
 		}
 
 		$validator = Validator::make($req->all(), array_merge([
@@ -295,5 +295,76 @@ class MenuController extends Controller
 		return redirect()
 			->route('admin.menu.index')
 			->with('flash_success', "Successfully updated {$req->menu_name}");
+	}
+
+	protected function delete(Request $req, $id) {
+		$menu = Menu::find($id);
+
+		if ($menu == null) {
+			return redirect()
+				->route('admin.menu.index')
+				->with('flash_error', 'The menu either does not exists or is already deleted.');
+		}
+
+		try {
+			DB::beginTransaction();			
+			$menu->delete();
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.menu.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		ActivityLog::log(
+			"Menu '{$menu->name}' deactivated.",
+			null,
+			true
+		);
+
+		return redirect()
+			->back()
+			->with('flash_success', 'Successfully deactivated menu.');
+	}
+
+	protected function restore(Request $req, $id) {
+		$menu = Menu::withTrashed()->find($id);
+
+		if ($menu == null) {
+			return redirect()
+				->route('admin.menu.index')
+				->with('flash_error', 'Menu either does not exists or is already deleted permanently.');
+		}
+		else if (!$menu->trashed()) {
+			return redirect()
+				->back()
+				->with('flash_error', 'The menu is already activated.');
+		}
+
+		try {
+			DB::beginTransaction();
+			$menu->restore();
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return redirect()
+				->route('admin.menu.index')
+				->with('flash_error', 'Something went wrong, please try again later');
+		}
+
+		ActivityLog::log(
+			"Menu '{$menu->name}' activated.",
+			null,
+			true
+		);
+
+		return redirect()
+			->back()
+			->with('flash_success', 'Successfully activated menu.');
 	}
 }

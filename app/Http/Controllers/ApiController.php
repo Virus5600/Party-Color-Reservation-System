@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Carbon\Carbon;
+
+use App\Enum\ApprovalStatus;
+
 use App\Announcement;
 use App\Reservation;
 use App\User;
@@ -313,6 +317,29 @@ class ApiController extends Controller
 				'props' => [
 					'statusColorCode' => $reservation->getStatusColorCode($reservation->getOverallStatus())
 				]
+			]);
+	}
+
+	protected function fetchReservationFromRange(Request $req, $monthYear = null) {
+		if ($monthYear == null)
+			$monthYear = now()->format("F") . ' ' . now()->format("Y");
+		else
+			$monthYear = Carbon::parse(strtotime($monthYear))->format("F Y");
+
+		$monthYear = explode(" ", $monthYear);
+		$month = $monthYear[0];
+		$year = $monthYear[1];
+
+		$reservations = Reservation::with('contactInformation:id,reservation_id,contact_name', 'menus:id,name')
+			->where('created_at', '>=', Carbon::parse("$month 01, $year"))
+			->where('created_at', '<=', Carbon::parse("$month $year")->endOfMonth())
+			->where('status', '=', ApprovalStatus::Approved)
+			->get();
+
+		return response()
+			->json([
+				'success' => true,
+				'reservations' => $reservations
 			]);
 	}
 }

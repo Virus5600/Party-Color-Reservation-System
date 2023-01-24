@@ -34,4 +34,9 @@ class Announcement extends Model
 	public function getPoster() {
 		return asset('uploads/announcements/'.$this->id.'/'.$this->poster);
 	}
+
+	public function author() {
+		\Log::info($this->user);
+		return $this->user->getName();
+	}
 }

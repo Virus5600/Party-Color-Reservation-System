@@ -5,6 +5,9 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Auth;
+use Request;
+
 class ActivityLog extends Model
 {
 	use HasFactory;

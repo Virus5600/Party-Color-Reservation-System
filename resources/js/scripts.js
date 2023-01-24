@@ -29,6 +29,9 @@ try {
 	require('summernote/dist/summernote-bs4.min.js');
 	require('summernote/dist/lang/summernote-ja-JP.min.js');
 
+	// Chart.js
+	const Chart = window.Chart = require('chart.js/auto');
+
 	// Setting user language
 	window.lang = (window.navigator.userLanguage || window.navigator.language);
 } catch (e) {
