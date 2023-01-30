@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Announcement;
 use App\Reservation;
+use App\ContactInformation; # added
+use App\ActivityLog; # added
 
 use DB;
 use Exception;
