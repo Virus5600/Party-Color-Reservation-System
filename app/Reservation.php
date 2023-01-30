@@ -191,7 +191,7 @@ class Reservation extends Model
 			'extension' => "nullable|numeric|between:0,5",
 			'menu' => "required|array|min:1",
 			'menu.*' => "required|numeric|exists:menus,id",
-			'phone_numbers' => "required|array|min:1",
+			'phone_numbers' => "required|array|min:1", // this is not worked and it works when array format is not used!!
 			'contact_name' => "required_unless:contact_email,null|array|min:1",
 			'contact_email' => "required_unless:contact_name,null|array|min:1",
 			'contact_email.*' => "distinct:ignore_case",
