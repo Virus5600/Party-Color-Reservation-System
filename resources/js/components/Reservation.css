@@ -64,7 +64,7 @@
   font-size: 20px;
   font-weight: 700;
   margin-right: 50px;
-  
+
 }
 
 .Reservation-details .Dates {
@@ -141,7 +141,7 @@
   margin-top: 0px;
 }
 
-.Details .Details-left-input .Details-left-icon {
+.Details-left-icon {
   font-size: 50px;
   margin-right: 20px;
 }
@@ -166,14 +166,15 @@
 
 .Details-right-icon {
   font-size: 25px;
-  margin-right: 20px;
 }
 
 .Details-right-item {
-  margin: 30px;
+  /* margin: 30px; */
   display: flex;
 
   justify-content: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .Details-right input[type='text'] {
@@ -193,4 +194,72 @@
   background-color: #DF7676;
   border-radius: 10px;
   border-color: #854646;
+}
+
+.ReservationConfirmed {
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+
+  border-radius: 10px;
+}
+
+.ReservationConfirmed-success {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+
+  color: white;
+  background-color: #2F864D;
+
+  padding: 50px;
+
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.ReservationConfirmed-success-icon {
+  width: 30px;
+  height: 30px;
+  color: rgb(11, 169, 11);
+}
+
+.ReservationConfirmed-details {
+  background-color: white;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.ReservationConfirmed-success-title {
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.ReservationConfirmed-details-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  gap: 200px;
+
+  margin-bottom: 100px;
+}
+
+.ReservationConfirmed-details-button {
+  display: flex;
+  justify-content: center;
+}
+
+.ReservationConfirmed-details-button button {
+  border-radius: 10px;
+  background-color: black;
+  color: white;
+  font-size: 30px;
+  font-weight: 900;
+  padding-left: 30px;
+  padding-right: 30px;
 }
