@@ -1,6 +1,4 @@
-.App {
-  
-}
+.App {}
 
 .Nav {
   position: fixed;
@@ -100,7 +98,7 @@
 
   /* size */
   width: 30%;
-  
+
   /* spacing */
   padding-top: 0px;
   padding-bottom: 0px;
@@ -148,7 +146,7 @@
 .Announcement h1 {
   text-align: center;
   font-weight: 900;
-  
+
   /* spacing */
   margin-bottom: 30px;
 }
@@ -156,12 +154,13 @@
 .Announcement hr {
   /* width: 80%; */
   color: black;
-  
+
 }
 
 .Announcement-item {
-  display: flex; 
+  display: flex;
   justify-content: space-evenly;
+  cursor: pointer;
 }
 
 .Announcement-image img {

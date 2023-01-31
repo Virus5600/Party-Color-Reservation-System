@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+import axios from 'axios';
 
 // for bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // css styles
 import './App.css';
+
+// to parse string to html
+import parse from 'html-react-parser';
 
 // icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -22,178 +27,226 @@ import Reservation from './Reservation';
 
 
 const App = () => {
-  
-  const [isReserveClicked, setReserveClicked] = useState(false);
 
-  const handleClickReserve = () => {
-	setReserveClicked(true);
-  };
+	const [isReserveClicked, setReserveClicked] = useState(false);
+	const [isAnnouncementClicked, setAnnouncementClicked] = useState(false);
+	const [announcementContent, setAnnouncementContent] = useState('');
 
-  return (
-	<div className='App'>
-		{ isReserveClicked ? <Reservation /> : <Home onClickReserve={handleClickReserve} />}
-	</div>
-  );
+	const handleClickReserve = () => {
+		setReserveClicked(true);
+	};
+
+	const handleClickAnnouncement = (content) => {
+		setAnnouncementContent(content);
+		setAnnouncementClicked(true);
+	};
+
+	if (isAnnouncementClicked) {
+		const htmlString = announcementContent.slice(0, announcementContent.length - 1);
+		const reactElement = parse(htmlString);
+		return <AnnouncementContent>{reactElement}</AnnouncementContent>
+	} else {
+		return (
+			<div className='App'>
+				{isReserveClicked ? <Reservation /> : <Home onClickReserve={handleClickReserve} onClickAnnouncement={handleClickAnnouncement} />}
+			</div>
+		);
+	}
+
+};
+const AnnouncementContent = ({ children }) => {
+	return (
+		<div>
+			{children}
+		</div>
+	);
 };
 
-const Home = ({ onClickReserve }) => {
-  return (
-	<div className='Home' id='Home'>
-		<Nav onClickReserve={onClickReserve}/>
-		<div className='main-image container-mb'>
-		    <img src={mainImage} className='img-fluid'/>
+const Home = ({ onClickReserve, onClickAnnouncement }) => {
+	return (
+		<div className='Home' id='Home'>
+			<Nav onClickReserve={onClickReserve} />
+			<div className='main-image container-mb'>
+				<img src={mainImage} className='img-fluid' />
+			</div>
+
+			<QuickReservation onClickReserve={onClickReserve} />
+
+			<Announcement onClickAnnouncement={onClickAnnouncement} />
+			<AboutUs />
 		</div>
-
-		<QuickReservation onClickReserve={onClickReserve} />
-
-		<Announcement />
-		<AboutUs />
-	</div>
-  );
+	);
 };
 
 const QuickReservation = ({ onClickReserve }) => {
-  return (
-	<div className='quick-reservation' id='Reservation'>
+	return (
+		<div className='quick-reservation' id='Reservation'>
 
 
 			<div className='Reservation-temp'>
-				<span className='title'>BBQ</span><br/>
-				<span className='caption'>(including drink all you can)</span><br/>
-				<span className='time'>2hrs</span><br/>
+				<span className='title'>BBQ</span><br />
+				<span className='caption'>(including drink all you can)</span><br />
+				<span className='time'>2hrs</span><br />
 				<button className='reserve-button' onClick={onClickReserve}>RESERVE</button>
 			</div>
 
 
 			<div className='Prices'>
 				<div className='price-description'>
-					<span className='person-type'>Adult・senior high</span><br/>
+					<span className='person-type'>Adult・senior high</span><br />
 					<span className='price'>¥3,500</span>
 				</div>
 				<div className='price-description diff-style'>
-					<span className='person-type'>junior high</span><br/>
+					<span className='person-type'>junior high</span><br />
 					<span className='price'>¥2,000</span>
 				</div>
 				<div className='price-description'>
-					<span className='person-type'>elementary</span><br/>
+					<span className='person-type'>elementary</span><br />
 					<span className='price'>¥1,000</span>
 				</div>
 			</div>
 
 
 		</div>
-  );
+	);
 };
 
 const Nav = ({ onClickReserve }) => {
 
-const listStyle = { 
-	color: '#A52A2A', 
-	fontWeight: 800, 
-	fontSize: '25px', 
-	listStyle: 'none', 
-	display: 'inline', 
-	marginRight: '20px' 
-  };
-  return (
-	<div className='Nav'>
+	const listStyle = {
+		color: '#A52A2A',
+		fontWeight: 800,
+		fontSize: '25px',
+		listStyle: 'none',
+		display: 'inline',
+		marginRight: '20px'
+	};
+	return (
+		<div className='Nav'>
 			<div className='container-mb d-flex justify-content-between align-items-end'>
 				<img src={logo} alt='logo' height='90' />
 				<ul>
-				<li style={listStyle}><a href='#Home'>Home</a></li>
-				<li style={listStyle} onClick={onClickReserve}><a href='#'>Reservation</a></li>
-				<li style={listStyle}><a href='#Announcement'>Announcement</a></li>
-				<li style={listStyle}><a href='#AboutUs'>About Us</a></li>
+					<li style={listStyle}><a href='#Home'>Home</a></li>
+					<li style={listStyle} onClick={onClickReserve}><a href='#'>Reservation</a></li>
+					<li style={listStyle}><a href='#Announcement'>Announcement</a></li>
+					<li style={listStyle}><a href='#AboutUs'>About Us</a></li>
 				</ul>
 			</div>
 		</div>
-  );
+	);
 };
 
 const AboutUs = () => {
-  return (
-	<div className='AboutUs' id='AboutUs'>
+	return (
+		<div className='AboutUs' id='AboutUs'>
 			<h1>ABOUT US</h1>
 			<div className='d-flex justify-content-evenly'>
 				<TimeLocation />
 				<Appearance />
 			</div>
-			
+
 		</div>
-  );
+	);
 };
 
 const Appearance = () => {
-  return (
-	<div className='Appearance'>
-		<h2>APPEARANCE</h2>
-		<div className='Appearance-image'>
-		    <img className='img-fluid' src={appearanceImage} alt='appearance' />
+	return (
+		<div className='Appearance'>
+			<h2>APPEARANCE</h2>
+			<div className='Appearance-image'>
+				<img className='img-fluid' src={appearanceImage} alt='appearance' />
+			</div>
+
 		</div>
-		
-	</div>
-  );	
+	);
 };
 
 const TimeLocation = () => {
-  return (
-	<div className='time-location'>
-				<div className='AboutUs-description d-flex adjustment'>
-					<div className='d-flex '>
-						<FontAwesomeIcon icon={faClock} className='icon' />
-						<p>17:00 - 22:00</p>
-					</div>
-					<div>
-						<p className='closing'>CLOSED MONDAY/TUESDAY</p>
-					</div>
+	return (
+		<div className='time-location'>
+			<div className='AboutUs-description d-flex adjustment'>
+				<div className='d-flex '>
+					<FontAwesomeIcon icon={faClock} className='icon' />
+					<p>17:00 - 22:00</p>
 				</div>
-				<hr />
-				<div className='AboutUs-description d-flex m-2'>
-					<FontAwesomeIcon icon={faPhone} className='icon' />
-					<p>080-3980-4560</p>
-				</div>
-				<hr />
-				<div className='AboutUs-description '>
-					<div className='d-flex m-2'>
-						<FontAwesomeIcon icon={faLocationArrow} className='icon' />
-						<p>3F, 1 Chome-2-12 Tsuboya, Naha, Okinawa 902-0065, Japan</p>
-					</div>
-					<div>
-						<img className='img-fluid' src={locationImage} alt='location map of party color' />
-					</div>
+				<div>
+					<p className='closing'>CLOSED MONDAY/TUESDAY</p>
 				</div>
 			</div>
-  );
-};
-
-const Announcement = () => {
-  return (
-	<div className='Announcement' id='Announcement'>
-			<h1>Announcement</h1>
-			<div className='Announcement-list'>
-				<AnnouncementItem /><hr />
-				<AnnouncementItem /><hr />
-				<AnnouncementItem /><hr />
-				<AnnouncementItem />
+			<hr />
+			<div className='AboutUs-description d-flex m-2'>
+				<FontAwesomeIcon icon={faPhone} className='icon' />
+				<p>080-3980-4560</p>
+			</div>
+			<hr />
+			<div className='AboutUs-description '>
+				<div className='d-flex m-2'>
+					<FontAwesomeIcon icon={faLocationArrow} className='icon' />
+					<p>3F, 1 Chome-2-12 Tsuboya, Naha, Okinawa 902-0065, Japan</p>
+				</div>
+				<div>
+					<img className='img-fluid' src={locationImage} alt='location map of party color' />
+				</div>
 			</div>
 		</div>
-  );
+	);
 };
 
-const AnnouncementItem = () => {
-  return (
-	<div className='Announcement-item'>
-					<div className='Announcement-image'>
-						<img className='img-fluid' src={announcementImage} />
-					</div>
-					<div className='Announcement-description'>
-						<span>2021.1.5</span><br />
-						<span>Halloween 15% Discount Promo</span><br />
-						<span>BBQ & Drinks Plan Adult・senior high: ￥3,500 to ￥ 2,975...</span>
-					</div>
-				</div>
-				
-  );
+const Announcement = ({ onClickAnnouncement }) => {
+	const API_ENDPOINT = 'api/react/announcements/fetch';
+	const [announcements, setAnnouncements] = useState([]);
+	useEffect(() => {
+		async function fetchAnnouncements() {
+			try {
+				const result = await axios.get(API_ENDPOINT)
+					.then(response => {
+						console.log(response)
+						setAnnouncements(response.data.announcements);
+					});
+			} catch {
+				console.log('failed fetch announcements');
+			}
+		}
+		fetchAnnouncements();
+
+
+	}, []);
+
+	return (
+		<div className='Announcement' id='Announcement'>
+			<h1>Announcement</h1>
+			<div className='Announcement-list'>
+				{
+					announcements.map(announcement =>
+						<AnnouncementItem
+							key={announcement.id}
+							created_at={announcement.created_at}
+							title={announcement.title}
+							summary={announcement.summary}
+							content={announcement.content}
+							onClickAnnouncement={onClickAnnouncement}
+						/>
+					)
+				}
+			</div>
+		</div>
+	);
+};
+
+const AnnouncementItem = ({ created_at, title, summary, content, onClickAnnouncement }) => {
+	return (
+		<div className='Announcement-item' onClick={() => onClickAnnouncement(content)}>
+			<div className='Announcement-image'>
+				<img className='img-fluid' src={announcementImage} />
+			</div>
+			<div className='Announcement-description'>
+				<span>{created_at}</span><br />
+				<span>{title}</span><br />
+				<span>{summary}</span>
+			</div>
+		</div>
+
+	);
 };
 
 export default App;
