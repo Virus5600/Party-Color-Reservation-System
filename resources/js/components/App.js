@@ -30,21 +30,21 @@ const App = () => {
 
 	const [isReserveClicked, setReserveClicked] = useState(false);
 	const [isAnnouncementClicked, setAnnouncementClicked] = useState(false);
-	const [announcementContent, setAnnouncementContent] = useState('');
+	const [announcementData, setAnnouncementData] = useState([]);
 
 	const handleClickReserve = () => {
 		setReserveClicked(true);
 	};
 
-	const handleClickAnnouncement = (content) => {
-		setAnnouncementContent(content);
+	const handleClickAnnouncement = (title, summary, content) => {
+		setAnnouncementData([title, summary, content]);
 		setAnnouncementClicked(true);
 	};
 
 	if (isAnnouncementClicked) {
-		const htmlString = announcementContent.slice(0, announcementContent.length - 1);
+		const htmlString = announcementData[2].slice(0, announcementData[2].length - 1);
 		const reactElement = parse(htmlString);
-		return <AnnouncementContent>{reactElement}</AnnouncementContent>
+		return <AnnouncementContent title={announcementData[0]} summary={announcementData[1]} onClickReserve={handleClickReserve}> {reactElement}</AnnouncementContent >
 	} else {
 		return (
 			<div className='App'>
@@ -54,11 +54,24 @@ const App = () => {
 	}
 
 };
-const AnnouncementContent = ({ children }) => {
+const AnnouncementContent = ({ title, summary, children, onClickReserve }) => {
 	return (
-		<div>
-			{children}
-		</div>
+		<>
+			<Nav onClickReserve={onClickReserve} />
+			<div className='AnnouncementContent'>
+				<div>
+					<div className='AnnouncementContent-title'>
+						{title}
+					</div>
+					<div className='AnnouncementContent-summary'>
+						{summary}
+					</div><br />
+					{children}
+				</div>
+
+			</div>
+		</>
+
 	);
 };
 
@@ -236,7 +249,7 @@ const Announcement = ({ onClickAnnouncement }) => {
 
 const AnnouncementItem = ({ poster, created_at, title, summary, content, onClickAnnouncement }) => {
 	return (
-		<div className='Announcement-item' onClick={() => onClickAnnouncement(content)}>
+		<div className='Announcement-item' onClick={() => onClickAnnouncement(title, summary, content)}>
 			<div className='Announcement-image'>
 				<img className='img-fluid' src={announcementImage} />
 			</div>
