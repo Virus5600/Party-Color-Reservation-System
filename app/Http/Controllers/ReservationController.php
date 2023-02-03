@@ -210,7 +210,6 @@ class ReservationController extends Controller
 			$reservation->menus()->sync($req->menu);
 			$reservation->contactInformation()->delete();
 
-
 			$iterations = max(count($req->contact_name), count($req->contact_email));
 			for ($i = 0; $i < $iterations; $i++) {
 				$ci = ContactInformation::create([

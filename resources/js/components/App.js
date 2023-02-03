@@ -213,7 +213,8 @@ const Announcement = ({ onClickAnnouncement }) => {
 			try {
 				const result = await axios.get(API_ENDPOINT)
 					.then(response => {
-						console.log(response)
+						console.log(response);
+						console.log(response.data.announcements[0].poster.replace("{id}", response.data.announcements[0].id));
 						setAnnouncements(response.data.announcements);
 					});
 			} catch {

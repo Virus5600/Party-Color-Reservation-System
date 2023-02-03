@@ -17,7 +17,16 @@ class ReactApiController extends Controller
 {
 	// ANNOUNCEMENTS
 	protected function fetchAnnouncements(Request $req) {
-		$announcements = Announcement::where('is_draft', '!=', '1')->get();
+		$announcements = Announcement::select(
+			DB::raw("
+				`id`,
+				CONCAT('" . asset('uploads/announcements/{id}') . "/', `poster`) as `poster`,
+				`slug`,
+				`summary`,
+				`title`
+			"))
+			->where('is_draft', '!=', '1')
+			->get();
 
 		return response()->json([
 			'announcements' => $announcements
