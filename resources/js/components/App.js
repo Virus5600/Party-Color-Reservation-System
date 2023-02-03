@@ -9,7 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 // to parse string to html
-import parse from 'html-react-parser';
+import parse from 'react-html-parser';
 
 // icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -220,6 +220,7 @@ const Announcement = ({ onClickAnnouncement }) => {
 					announcements.map(announcement =>
 						<AnnouncementItem
 							key={announcement.id}
+							poster={announcement.poster}
 							created_at={announcement.created_at}
 							title={announcement.title}
 							summary={announcement.summary}
@@ -233,7 +234,7 @@ const Announcement = ({ onClickAnnouncement }) => {
 	);
 };
 
-const AnnouncementItem = ({ created_at, title, summary, content, onClickAnnouncement }) => {
+const AnnouncementItem = ({ poster, created_at, title, summary, content, onClickAnnouncement }) => {
 	return (
 		<div className='Announcement-item' onClick={() => onClickAnnouncement(content)}>
 			<div className='Announcement-image'>

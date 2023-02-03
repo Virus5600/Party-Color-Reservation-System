@@ -38,6 +38,7 @@
         "react-bootstrap": "^2.6.0",
         "react-calendar": "^4.0.0",
         "react-dom": "^18.2.0",
+        "react-html-parser": "^2.0.2",
         "react-scripts": "5.0.1",
         "resolve-url-loader": "^3.1.0",
         "sass": "^1.15.2",
