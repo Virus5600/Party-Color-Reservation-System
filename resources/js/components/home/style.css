@@ -1,0 +1,10 @@
+.Home {
+    margin-top: 50px;
+}
+
+
+.Home .main-image img {
+    width: 100%;
+    height: 25vw;
+    object-fit: cover;
+}
