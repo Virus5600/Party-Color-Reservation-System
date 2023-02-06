@@ -4,8 +4,8 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faPhone, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
 
-import locationImage from '../img/location.png';
-import appearanceImage from '../img/appearance.png';
+import locationImage from './img/location.png';
+import appearanceImage from './img/appearance.png';
 
 const AboutUs = () => {
     return (
