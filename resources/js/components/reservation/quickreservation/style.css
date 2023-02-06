@@ -1,0 +1,108 @@
+.Reservation-temp {
+    /* resize */
+    text-align: center;
+    width: 30%;
+}
+
+.Reservation-temp .title {
+    color: #F24141;
+    font-size: 100px;
+    font-weight: 900;
+    font-style: italic;
+
+    /* stroke */
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: #FFFFFF;
+
+    /* spacing */
+    margin-bottom: 0px;
+}
+
+.Reservation-temp .caption {
+    color: #FFED4A;
+    font-size: 20px;
+    font-weight: 900;
+    font-style: italic;
+
+    /* stroke */
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: #845C5C;
+}
+
+.Reservation-temp .time {
+    color: #593A3A;
+    font-size: 40px;
+    font-weight: 900;
+    font-style: italic;
+
+    /* stroke */
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: white;
+}
+
+.Reservation-temp .reserve-button {
+    background-color: #873131;
+    color: #FFE500;
+    font-size: 40px;
+    font-weight: 900;
+    font-style: italic;
+
+    /* stroke */
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: white;
+
+    /* border */
+    border-color: #A8AA32;
+    border-radius: 10px;
+
+    /* spacing */
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+.Prices {
+    text-align: center;
+    /* border */
+    border: 1px solid #941717;
+
+    /* size */
+    width: 30%;
+
+    /* spacing */
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.Prices .price-description {
+    color: white;
+    font-size: 40px;
+    font-weight: 700;
+    background-color: #a36565;
+    /* border */
+    border: 1px solid #941717;
+
+
+}
+
+.Prices .diff-style {
+    background-color: #a77878;
+}
+
+
+.Prices .person-type {
+    font-size: 20px;
+}
+
+.Prices .price {
+    letter-spacing: 2px;
+    /* stroke */
+    /* -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: black; */
+}
+
+.quick-reservation {
+    display: flex;
+    justify-content: space-around;
+
+    margin: 50px;
+}
