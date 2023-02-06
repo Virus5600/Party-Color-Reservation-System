@@ -23,7 +23,9 @@ class ReactApiController extends Controller
 				CONCAT('" . asset('uploads/announcements/{id}') . "/', `poster`) as `poster`,
 				`slug`,
 				`summary`,
-				`title`
+				`title`,
+				`created_at`,
+				`content`
 			"))
 			->where('is_draft', '!=', '1')
 			->get();
