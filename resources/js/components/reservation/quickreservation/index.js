@@ -34,22 +34,6 @@ const QuickReservation = ({ onReservationClick }) => {
                 </div>
 
             </div>
-            
-            <div className=' container'>
-                
-            </div>
-
-
-            <div className=' container'>
-
-
-                
-
-            </div>
-          
-
-            
-
 
         </div>
     );
