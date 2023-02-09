@@ -6,7 +6,7 @@ import './style.css';
 const QuickReservation = ({ onReservationClick }) => {
     return (
         <div className='quick-reservation container' id='Reservation'>
-            <div Name="container">
+            <div className="container">
                 <div className="row">
                     <div className="Reservation-temp col-lg-6">
                         <span className='title'>BBQ</span><br />
