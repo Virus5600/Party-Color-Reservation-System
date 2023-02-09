@@ -12,13 +12,13 @@ import './style.css';
 const AboutUs = () => {
     return (
         <div className='AboutUs' id='AboutUs'>
-            <div class='container'>
+            <div className='container'>
                 <h1>About Us</h1>
                 <div className='row'>
-                    <div class='col'>
+                    <div className='col'>
                         <TimeLocation />
                     </div>
-                    <div class='col-md mt-3'>
+                    <div className='col-md mt-3'>
                         <Appearance />
                     </div>
                 </div>
@@ -43,30 +43,30 @@ const Appearance = () => {
 const TimeLocation = () => {
     return (
         <div className='time-location'>
-            <div class='row'>
-                <div class='col-auto'>
+            <div className='row'>
+                <div className='col-auto'>
                     <FontAwesomeIcon icon={faClock} className='icon' />
                 </div>
-                <div class='col'>
+                <div className='col'>
                     17:00 - 22:00<br />
                     CLOSED MONDAY/TUESDAY
                 </div>
             </div>
             <hr />
-            <div class='row'>
-                <div class='col-auto'>
+            <div className='row'>
+                <div className='col-auto'>
                     <FontAwesomeIcon icon={faPhone} className='icon' />
                 </div>
-                <div class='col'>
+                <div className='col'>
                     080-3980-4560<br />
                 </div>
             </div>
             <hr />
-            <div class='row'>
-                <div class='col-auto'>
+            <div className='row'>
+                <div className='col-auto'>
                     <FontAwesomeIcon icon={faLocationArrow} className='icon' />
                 </div>
-                <div class='col'>
+                <div className='col'>
                     3F, 1 Chome-2-12 Tsuboya, Naha, Okinawa 902-0065, Japan
                 </div>
             </div>

@@ -8,6 +8,7 @@ import AnnouncementContent from '../announcement/AnnouncementContent';
 
 import logo from './img/logo.png';
 
+// css
 import './style.css';
 
 
@@ -60,18 +61,37 @@ const Navigation = ({ children }) => {
 
 	return (
 		<>
+			{/* Navbar start */}
+
 			<div className='Nav'>
-				<div className='container-mb d-flex justify-content-between align-items-end'>
-					<img src={logo} alt='logo' height='90' />
-					<ul>
-						<li style={listStyle} onClick={handleHomeClick}><a href='#'>Home</a></li>
-						<li style={listStyle} onClick={handleReservationClick}><a href='#'>Reservation</a></li>
-						<li style={listStyle}><a href='#Announcement'>Announcement</a></li>
-						<li style={listStyle}><a href='#AboutUs'>About Us</a></li>
-					</ul>
-				</div>
+				<nav className='navbar navbar-expand-lg'>
+					<div className="container">
+						<img src={logo} alt='logo' height='90' />
+						<button className="navbar-toggler collapsed"
+							type="button"
+							data-bs-toggle="collapse"
+							data-bs-target="#navbarSupportedContent"
+							aria-controls="navbarSupportedContent"
+							aria-expanded="false"
+							aria-label="Toggle navigation">
+							<span className="navbar-toggler-icon"></span>
+						</button>
+						<div className="navbar-collapse collapse" id="navbarSupportedContent">
+							<ul className="nav nav-pills ms-auto mb-2 mb-lg-0">
+								<li style={listStyle} onClick={handleHomeClick}><a href='#'>Home</a></li>
+								<li style={listStyle} onClick={handleReservationClick}><a href='#'>Reservation</a></li>
+								<li style={listStyle}><a href='#Announcement'>Announcement</a></li>
+								<li style={listStyle}><a href='#AboutUs'>About Us</a></li>
+							</ul>
+						</div>
+					</div>
+				</nav>
 
 			</div>
+
+
+			{/* Navbar end */}
+
 			{
 				isReservationClicked ?
 					<Reservation />
