@@ -4,7 +4,7 @@ import parse from 'react-html-parser';
 
 // components
 import Reservation from '../reservation';
-import AnnouncementContent from '../announcement/AnnouncementContent';
+import AnnouncementContent from '../announcement/announcementcontent';
 
 import logo from './img/logo.png';
 
