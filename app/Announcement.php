@@ -36,7 +36,6 @@ class Announcement extends Model
 	}
 
 	public function author() {
-		\Log::info($this->user);
 		return $this->user->getName();
 	}
 }
