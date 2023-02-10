@@ -134,10 +134,23 @@ Route::group(['prefix' => 'admin'], function() {
 					Route::get('/edit', 'MenuController@edit')->name('admin.menu.edit');
 					Route::post('/update', 'MenuController@update')->name('admin.menu.update');
 				});
+
+				// Delete
+				Route::group(['middleware' => ['permissions:menu_tab_delete']], function() {
+					Route::get('/delete', 'MenuController@delete')->name('admin.menu.delete');
+					Route::get('/restore', 'MenuController@restore')->name('admin.menu.restore');
+				});
 			});
 
 			// Index
 			Route::get('/', 'MenuController@index')->name('admin.menu.index');
+		});
+
+		// ACTIVITY LOG
+		// Route::group(['prefix' => 'activity-log', 'middleware' => ['permissions:activity_log_access']], function() {
+		Route::group(['prefix' => 'activity-log'], function() {
+			// Index
+			Route::get('/', 'ActivityLogController@index')->name('admin.activity-log.index');
 		});
 
 

@@ -1,4 +1,7 @@
 try {
+	// Setting user language
+	window.lang = (window.navigator.userLanguage || window.navigator.language);
+	
 	// jQuery
 	window.$ = window.jQuery = window.jquery = require('jquery');
 
@@ -25,12 +28,12 @@ try {
 	require('@fortawesome/fontawesome-free/js/brands.min.js');
 	require('@fortawesome/fontawesome-free/js/fontawesome.min.js');
 
+	// Chart.js
+	const Chart = window.Chart = require('chart.js/auto');
+
 	// Summernote
 	require('summernote/dist/summernote-bs4.min.js');
 	require('summernote/dist/lang/summernote-ja-JP.min.js');
-
-	// Setting user language
-	window.lang = (window.navigator.userLanguage || window.navigator.language);
 } catch (e) {
 	console.error(e);
 }

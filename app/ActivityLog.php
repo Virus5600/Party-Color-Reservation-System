@@ -5,6 +5,9 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Auth;
+use Request;
+
 class ActivityLog extends Model
 {
 	use HasFactory;
@@ -14,6 +17,7 @@ class ActivityLog extends Model
 		'email',
 		'address',
 		'action',
+		'is_automated',
 		'is_marked',
 		'reason',
 	];
@@ -29,13 +33,13 @@ class ActivityLog extends Model
 			return $this->email;
 	}
 
-	public static function log($action, $user_id = null) {
+	public static function log($action, $user_id = null, $is_automated = false) {
 		if ($user_id == null && Auth::check()) {
 			$user_id = Auth::user()->id;
 			$email = Auth::user()->email;
 		}
 		else if ($user_id == null && !Auth::check()) {
-			$user_id = 0
+			$user_id = 0;
 			$email = null;
 		}
 
@@ -43,7 +47,8 @@ class ActivityLog extends Model
 			'user_id' => $user_id,
 			'address' => Request::ip(),
 			'action' => $action,
-			'email' => $email
+			'email' => $email,
+			'is_automated' => $is_automated ? 1 : 0
 		]);
 	}
 

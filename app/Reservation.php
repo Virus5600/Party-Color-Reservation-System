@@ -5,12 +5,16 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Str;
+
 use Carbon\Carbon;
 
 use App\Enum\ApprovalStatus;
 use App\Enum\Status;
 
 use Log;
+use NumberFormatter;
 use Validator;
 
 class Reservation extends Model
@@ -159,6 +163,15 @@ class Reservation extends Model
 		}
 	}
 
+	public function reservationFor() {
+		return $this->contactInformation()->first()->contact_name;
+	}
+
+	public function fetchPrice() {
+		return (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . " $this->price";
+	}
+
+	// STATIC FUNCTIONS
 	// Validation
 	public static function validate($req) {
 		$datetime = Carbon::now()->timezone('Asia/Tokyo');
@@ -178,7 +191,7 @@ class Reservation extends Model
 			'extension' => "nullable|numeric|between:0,5",
 			'menu' => "required|array|min:1",
 			'menu.*' => "required|numeric|exists:menus,id",
-			'phone_numbers' => "required|array|min:1",
+			'phone_numbers' => "required|array|min:1", // this is not worked and it works when array format is not used!!
 			'contact_name' => "required_unless:contact_email,null|array|min:1",
 			'contact_email' => "required_unless:contact_name,null|array|min:1",
 			'contact_email.*' => "distinct:ignore_case",
@@ -259,9 +272,72 @@ class Reservation extends Model
 
 		$validator = Validator::make($req->all(), $validationRules, $validationMsg);
 
+		// Calculates how many minutes will be added to the reservation (will be used using the addMinutes)
+		$menu = [];
+		$hoursToAdd = 0;
+		$minutesToAdd = 0;
+		foreach ($req->menu as $mi) {
+			$menu["{$mi}"] = Menu::find($mi);
+			
+			// Compares what hour has the highest among the menus selected
+			$hoursComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("H");
+			$hoursToAdd = max(Carbon::parse($menu["{$mi}"]->duration)->format("H"), $hoursToAdd);
+
+			// Compares what minute has the highest among the menus selected
+			$minutesComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("i");
+			$minutesToAdd = max($minutesComparisonVal, $minutesToAdd);
+		}
+		// Adds the extension as minutes
+		$minutesToAdd += ($req->extension * 60);
+
+		// Calculates the duration of the reservation
+		$closing = Carbon::parse("{$req->reservation_date} 22:00:00");
+		$start_at = Carbon::parse("{$req->reservation_date} {$req->time_hour}:{$req->time_min}");
+		$end_at = Carbon::parse("{$req->reservation_date} {$req->time_hour}:{$req->time_min}")
+			->addHours($hoursToAdd)->addMinutes($minutesToAdd);
+
+		$validator->after(function ($validator) use ($req, $storeCap, $start_at, $end_at, $closing) {
+			// Checks whether the reservation exceeded the closing time
+			if ($end_at->gt($closing)) {
+				$toSubtract = $end_at->diffInMinutes($closing) / 60;
+
+				$validator->errors()->add(
+					"extension",
+					"Extension made the reservation exceed closing time. Remove {$toSubtract} " . Str::plural('hour', $toSubtract)
+				);
+			}
+
+			// Checks if the reservation can still be accomodated (store capacity related)
+			{
+				$paxAccomodated = Reservation::whereDate('reserved_at', '=', $req->reservation_date)
+					->whereTime('start_at', '<', $end_at)
+					->whereTime('end_at', '>', $start_at)
+					->sum('pax');
+
+				if ($paxAccomodated >= $storeCap) {
+					$end = $end_at->gt($closing) ? $closing : $end_at;
+					$validator->errors()->add(
+						"general",
+						"Sorry but reservation cannot be accomodated. The restaurant is at full capacity for this time range <b>({$start_at->format('H:i')} - {$end->format('H:i')})</b>."
+					);
+				}
+
+				$totalPax = $paxAccomodated + $req->pax;
+				if ($totalPax > $storeCap) {
+					$validator->errors()->add(
+						"general",
+						"Sorry but reservation cannot be accomodated. Current reservations is already at restaurant's capacity which is at <b>{$storeCap}</b> people. Adding the current reservaton will result to a total of <b>{$totalPax}</b> people reserved at the same time..."
+					);
+				}
+			}
+		});
+
 		return [
 			'validator' => $validator,
-			'newContactIndex' => $newContactIndex
+			'newContactIndex' => $newContactIndex,
+			'menu' => $menu,
+			'start_at' => $start_at,
+			'end_at' => $end_at
 		];
 	}
 }

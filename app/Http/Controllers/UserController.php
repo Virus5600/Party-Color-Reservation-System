@@ -14,6 +14,7 @@ use App\Type;
 use App\TypePermission;
 use App\User;
 use App\UserPermission;
+use App\ActivityLog;
 
 use Auth;
 use DB;
@@ -36,8 +37,16 @@ class UserController extends Controller
 	protected function login() {
 		if (!Auth::check())
 			return view('admin.login');
-		else
+		else {
+
+			ActivityLog::log(
+				"User login.",
+				null,
+				true
+			);
+
 			return redirect()->route('admin.dashboard');
+		}
 	}
 
 	protected function authenticate(Request $req) {
@@ -136,6 +145,13 @@ class UserController extends Controller
 		if (Auth::check()) {
 			auth()->logout();
 			Session::flush();
+
+			ActivityLog::log(
+				"User logout.",
+				null,
+				true
+			);
+
 			return redirect(route('home'))->with('flash_success', 'Logged out!');
 		}
 		return redirect()->route('admin.dashboard')->with('flash_error', 'Something went wrong, please try again.');
@@ -249,6 +265,12 @@ class UserController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
+		ActivityLog::log(
+			"User '" . trim($user->getName()) . "' created.",
+			null,
+			true
+		);
+
 		return redirect()
 			->route('admin.users.index')
 			->with('flash_success', 'Successfully added "' . trim($user->getName()) . '"');
@@ -352,6 +374,12 @@ class UserController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
+		ActivityLog::log(
+			"User '{trim($user->getName())}' updated.",
+			null,
+			true
+		);
+
 		return redirect()
 			->route('admin.users.index')
 			->with('flash_success', 'Successfully updated "' . trim($user->getName()) . '"');
@@ -416,6 +444,13 @@ class UserController extends Controller
 					'message' => 'Something went wrong, please try again later.',
 				]);
 		}
+
+		ActivityLog::log(
+			"User '{$user->getName()}' changed password.",
+			null,
+			true
+		);
+
 		return response()
 			->json([
 				'type' => 'success',
@@ -468,6 +503,12 @@ class UserController extends Controller
 				->route('admin.users.manage-permissions', [$user->id, 'from' => $from ? $from : null])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"User '{$user->getName()}' reverted back to type permissions.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('admin.users.manage-permissions', [$user->id, 'from' => $from ? $from : null])
@@ -572,6 +613,12 @@ class UserController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
+		ActivityLog::log(
+			"User '{$user->getName()}' updated permissions.",
+			null,
+			true
+		);
+
 		return redirect()
 			->to($from)
 			->with('flash_success', 'Successfully updated ' . trim($user->getName()) . '\'s permissions');
@@ -598,6 +645,12 @@ class UserController extends Controller
 				->route('admin.user.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"User '{$user->getName()}' deactivated account.",
+			null,
+			true
+		);
 
 		return redirect()
 			->back()
@@ -631,6 +684,12 @@ class UserController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
+		ActivityLog::log(
+			"User '{$user->getName()}' reactivated account.",
+			null,
+			true
+		);
+
 		return redirect()
 			->back()
 			->with('flash_success', 'Successfully re-activated account.');
@@ -661,6 +720,12 @@ class UserController extends Controller
 				->route('admin.users.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"User '{$user->getName()}' permanently deleted.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('admin.users.index')

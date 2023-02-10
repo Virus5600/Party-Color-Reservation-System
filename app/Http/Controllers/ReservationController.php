@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\MessageBag;
 
 use Carbon\Carbon;
 
@@ -15,6 +14,7 @@ use App\Inventory;
 use App\Menu;
 use App\Reservation;
 use App\Settings;
+use App\ActivityLog;
 
 use DB;
 use Exception;
@@ -52,36 +52,6 @@ class ReservationController extends Controller
 
 		try {
 			DB::beginTransaction();
-
-			$menu = [];
-			$hoursToAdd = 0;
-			$minutesToAdd = ($req->extension * 60);
-			foreach ($req->menu as $mi) {
-				$menu["{$mi}"] = Menu::find($mi);
-				
-				$hoursComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("H");
-				$hoursToAdd = max(Carbon::parse($menu["{$mi}"]->duration)->format("H"), $hoursToAdd);
-
-				$minutesComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("i");
-				$minutesToAdd = max($minutesComparisonVal, $minutesToAdd);
-			}
-
-			$closing = Carbon::parse("{$req->reservation_date} 22:00:00");
-			$start_at = Carbon::parse("{$req->reservation_date} {$req->time_hour}:{$req->time_min}");
-			$end_at = Carbon::parse("{$req->reservation_date} {$req->time_hour}:{$req->time_min}")
-				->addHours($hoursToAdd)->addMinutes($minutesToAdd);
-
-			if ($end_at->gt($closing)) {
-				$toSubtract = $end_at->diffInMinutes($closing) / 60;
-
-				$customMessage = new MessageBag(["extension" => "Extension made the reservation exceed closing time. Remove {$toSubtract} hours"]);
-				
-				return redirect()
-					->back()
-					->withErrors($validator->messages()->merge($customMessage))
-					->withInput()
-					->with("new_contact_index",  $newContactIndex);
-			}
 
 			$price = 0;
 
@@ -129,6 +99,12 @@ class ReservationController extends Controller
 				->route('admin.reservations.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Reservation created.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('admin.reservations.index')
@@ -206,24 +182,6 @@ class ReservationController extends Controller
 		try {
 			DB::beginTransaction();
 
-			// Menu calculation
-			$menu = [];
-			$hoursToAdd = 0;
-			$minutesToAdd = ($req->extension * 60);
-			foreach ($req->menu as $mi) {
-				$menu["{$mi}"] = Menu::find($mi);
-				
-				$hoursComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("H");
-				$hoursToAdd = max(Carbon::parse($menu["{$mi}"]->duration)->format("H"), $hoursToAdd);
-
-				$minutesComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("i");
-				$minutesToAdd = max($minutesComparisonVal, $minutesToAdd);
-			}
-
-			// Date calculation
-			$start_at = Carbon::parse("{$req->reservation_date} {$req->time_hour}:{$req->time_min}");
-			$end_at = Carbon::parse("{$req->reservation_date} {$req->time_hour}:{$req->time_min}")
-				->addHours($hoursToAdd)->addMinutes($minutesToAdd);
 			$price = 0;
 
 			foreach ($menu as $v)
@@ -252,7 +210,6 @@ class ReservationController extends Controller
 			$reservation->menus()->sync($req->menu);
 			$reservation->contactInformation()->delete();
 
-
 			$iterations = max(count($req->contact_name), count($req->contact_email));
 			for ($i = 0; $i < $iterations; $i++) {
 				$ci = ContactInformation::create([
@@ -280,6 +237,12 @@ class ReservationController extends Controller
 				->route('admin.reservations.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Reservation {$id} updated.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('admin.reservations.index')
@@ -318,6 +281,12 @@ class ReservationController extends Controller
 				->route('admin.reservations.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Reservation {$id} deleted.",
+			null,
+			true
+		);
 
 		return redirect()
 			->route('admin.reservations.index')
@@ -403,6 +372,12 @@ class ReservationController extends Controller
 				]);
 		}
 
+		ActivityLog::log(
+			"Reservation {$id} accepted.",
+			null,
+			true
+		);
+
 		return response()
 			->json([
 				'success' => true,
@@ -473,6 +448,12 @@ class ReservationController extends Controller
 				]);
 		}
 
+		ActivityLog::log(
+			"Reservation {$id} rejected.",
+			null,
+			true
+		);
+
 		return response()
 			->json([
 				'success' => true,
@@ -526,6 +507,12 @@ class ReservationController extends Controller
 					'message' => ''
 				]);
 		}
+
+		ActivityLog::log(
+			"Reservation {$id} moved to pending.",
+			null,
+			true
+		);
 
 		return response()
 			->json([

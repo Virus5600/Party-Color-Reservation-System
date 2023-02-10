@@ -1,0 +1,21 @@
+.Nav {
+  position: sticky;
+  top: 0;
+
+
+  width: 100%;
+
+  background-image: url('./img/main_background.png');
+  background-repeat: repeat;
+}
+
+.Nav a {
+  color: #A52A2A;
+
+
+  text-decoration: none;
+}
+
+.Nav a:hover {
+  color: #945555;
+}

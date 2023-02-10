@@ -1,0 +1,84 @@
+.Announcement {
+    background-color: white;
+    padding: 2vw;
+}
+
+
+
+.Announcement h1 {
+    text-align: center;
+    font-weight: 900;
+    font-size: 3vw;
+
+    /* spacing */
+    /* margin-top: 1.2vw; */
+    margin-bottom: 3vw;
+}
+
+.Announcement hr {
+    /* width: 80%; */
+    color: black;
+
+}
+
+.Announcement-more {
+    text-align: center;
+    text-decoration: 1px underline black;
+    cursor: pointer;
+    font-size: 1.5vw;
+}
+
+.Announcement-more:hover {
+    opacity: 0.5;
+}
+
+.AnnouncementItem {
+    display: flex;
+    justify-content: left;
+    gap: 15px;
+    cursor: pointer;
+
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+
+    background-color: rgb(243, 240, 240);
+    padding: 5px;
+    border-radius: 10px;
+
+    margin-bottom: 1.5vw;
+}
+
+.AnnouncementItem:hover {
+    opacity: 0.5;
+}
+
+.AnnouncementItem-image {
+    width: 25vw;
+    height: 15vw;
+    text-align: center;
+    background-color: rgb(227, 222, 222);
+}
+
+.AnnouncementItem-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: center;
+}
+
+.AnnouncementItem-description {
+    font-size: 2vw;
+}
+
+.AnnouncementItem-description .date {
+    font-size: 1.2vw;
+}
+
+.AnnouncementItem-description .title {
+    font-weight: 900;
+}
+
+.AnnouncementItem-description .summary {
+    font-size: 1.75vw;
+    /* (description / title) * title */
+}

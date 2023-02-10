@@ -1,20 +1,24 @@
-import './App.css';
-
 // for bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.min.js';
 
-import Navigation from './navbar/Navigation';
+import Navigation from './navigation';
+import Home from './home';
 
-import Home from './Home';
+import './App.css';
 
-// testing for calendar app
-// import MyCalendar from './calendar/MyCalendar';
 
-const App = () =>	
-	<div className="App">
-		<Navigation />
-		<Home />
-		{/* <MyCalendar /> */}
-	</div>
+const App = () => {
+
+	return (
+		<div className='App'>
+			<Navigation>
+				<Home />
+			</Navigation>
+		</div>
+	);
+
+};
+
 
 export default App;

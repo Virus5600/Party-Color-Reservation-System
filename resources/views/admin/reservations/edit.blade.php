@@ -30,6 +30,15 @@
 				<div class="card-body">
 					<form action="{{ route('admin.reservations.update', [$reservation->id]) }}" method="POST" enctype="multipart/form-data" class="form needs-validation" data-continuous-validation="false">
 						{{ csrf_field() }}
+						{{-- GENERAL VALIDATION MESSAGE --}}
+						@error('general')
+							@foreach($errors->get('general') as $e)
+							<div class="alert alert-danger alert-dismissable fade show text-wrap">
+								<button type="buttone" class="close" data-dismiss="alert" aria-label="Close">&times;</button>
+								{!! $e !!}
+							</div>
+							@endforeach
+						@enderror
 
 						{{-- RESERVATION INFORMATION --}}
 						<div class="card my-2">

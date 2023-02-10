@@ -218,6 +218,7 @@
 
 	const currencySymbol = '{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) }}';
 </script>
+
 {{-- Calendar Initialization --}}
 <script type="text/javascript" src="{{ asset('js/views/admin/reservations/index.js') }}"></script>
 <script type="text/javascript" data-for-removal> $(document).ready(() => { $('[data-for-removal]').remove(); }); </script>
