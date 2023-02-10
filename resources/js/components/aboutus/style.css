@@ -8,8 +8,36 @@
     font-weight: 900;
 }
 
+.time-location {
+    width: 50%;
+}
+
+.time-location img {
+    width: 800px;
+    height: 300px;
+    object-fit: cover;
+}
+
 .time-location .icon {
     color: white;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.time-location .adjustment {
+    margin-left: 8px;
+}
+
+.time-location hr {
+    margin: 0;
+}
+
+.time-location .closing {
+    margin-left: 50px;
+}
+
+.Appearance {
+    width: 40%;
 }
 
 .Appearance h2 {
@@ -20,4 +48,10 @@
 
 .Appearance-image {
     text-align: center;
+}
+
+.Appearance img {
+    width: 500px;
+    height: 420px;
+    object-fit: fill;
 }

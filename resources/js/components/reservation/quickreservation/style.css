@@ -1,14 +1,11 @@
-
-
 .Reservation-temp {
+    /* resize */
     text-align: center;
-    margin-bottom: 30px;
-    align-items: center;
-    
+    width: 30%;
 }
 
 .Reservation-temp .title {
-    color: #824747;
+    color: #F24141;
     font-size: 100px;
     font-weight: 900;
     font-style: italic;
@@ -41,11 +38,9 @@
     /* stroke */
     -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: white;
-    
 }
 
 .Reservation-temp .reserve-button {
-    margin-top: 15px;
     background-color: #873131;
     color: #FFE500;
     font-size: 40px;
@@ -67,8 +62,11 @@
 
 .Prices {
     text-align: center;
-    align-items: center;
-  
+    /* border */
+    border: 1px solid #941717;
+
+    /* size */
+    width: 30%;
 
     /* spacing */
     padding-top: 0px;
@@ -82,7 +80,6 @@
     background-color: #a36565;
     /* border */
     border: 1px solid #941717;
-    padding-bottom: 10px;
 
 
 }
@@ -104,30 +101,8 @@
 }
 
 .quick-reservation {
-    padding-top: 60px;
-    padding-bottom: 60px;
-    padding-left: 30px;
-    padding-right: 40px;
-}
+    display: flex;
+    justify-content: space-around;
 
-@media (max-width: 750px) {
-    .Reservation-temp .title {
-        font-size: 80px;
-    }
-    .Reservation-temp .time {
-        font-size: 30px;
-    }
-    .Reservation-temp .reserve-button {
-        font-size: 25px;
-    }
-
-}
-
-@media (max-width: 989px) {
-    .quick-reservation {
-        padding-top: 10px;
-        padding-bottom: 60px;
-        padding-left: 30px;
-        padding-right: 40px;
-    }
+    margin: 50px;
 }

@@ -24,6 +24,8 @@ const Announcement = ({ onAnnouncementClick }) => {
             }
         }
         fetchAnnouncements();
+
+
     }, []);
 
 
@@ -46,34 +48,20 @@ const Announcement = ({ onAnnouncementClick }) => {
                     )
                 }
             </div>
-            <p className='Announcement-more'>more details</p>
         </div>
     );
 };
 
-
 const AnnouncementItem = ({ id, poster, created_at, title, summary, content, onAnnouncementClick }) => {
-
-    function changeDateFormat(string_date) {
-        const current_date = new Date(string_date);
-        let year = current_date.getFullYear();
-        let month = current_date.getMonth() + 1;
-        if (month < 10) month = '0' + month.toString();
-        let date = current_date.getDate();
-        if (Number(date) < 10) date = '0' + date;
-        let compatibleDateFormat = year + '.' + month + '.' + date;
-        return compatibleDateFormat;
-    };
-
     return (
-        <div className='AnnouncementItem' onClick={() => onAnnouncementClick(title, summary, content)}>
-            <div className='AnnouncementItem-image'>
-                <img src={poster.replace("{id}", id)} />
+        <div className='Announcement-item' onClick={() => onAnnouncementClick(title, summary, content)}>
+            <div className='Announcement-image'>
+                <img className='img-fluid' src={poster.replace("{id}", id)} />
             </div>
-            <div className='AnnouncementItem-description'>
-                <span className='date'>{changeDateFormat(created_at)}</span><br />
-                <span className='title'>{title}</span><br />
-                <span className='summary'>{summary}</span>
+            <div className='Announcement-description'>
+                <span>{created_at}</span><br />
+                <span>{title}</span><br />
+                <span>{summary}</span>
             </div>
         </div>
 

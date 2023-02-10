@@ -1,7 +1,5 @@
 import React from 'react';
 
-import './style.css';
-
 const AnnouncementContent = ({ title, summary, children }) => {
     return (
 

@@ -7,21 +7,13 @@ import { faClock, faPhone, faLocationArrow } from '@fortawesome/free-solid-svg-i
 import locationImage from './img/location.png';
 import appearanceImage from './img/appearance.png';
 
-import './style.css';
-
 const AboutUs = () => {
     return (
         <div className='AboutUs' id='AboutUs'>
-            <div className='container'>
-                <h1>About Us</h1>
-                <div className='row'>
-                    <div className='col'>
-                        <TimeLocation />
-                    </div>
-                    <div className='col-md mt-3'>
-                        <Appearance />
-                    </div>
-                </div>
+            <h1>ABOUT US</h1>
+            <div className='d-flex justify-content-evenly'>
+                <TimeLocation />
+                <Appearance />
             </div>
 
         </div>
@@ -43,36 +35,29 @@ const Appearance = () => {
 const TimeLocation = () => {
     return (
         <div className='time-location'>
-            <div className='row'>
-                <div className='col-auto'>
+            <div className='AboutUs-description d-flex adjustment'>
+                <div className='d-flex '>
                     <FontAwesomeIcon icon={faClock} className='icon' />
+                    <p>17:00 - 22:00</p>
                 </div>
-                <div className='col'>
-                    17:00 - 22:00<br />
-                    CLOSED MONDAY/TUESDAY
-                </div>
-            </div>
-            <hr />
-            <div className='row'>
-                <div className='col-auto'>
-                    <FontAwesomeIcon icon={faPhone} className='icon' />
-                </div>
-                <div className='col'>
-                    080-3980-4560<br />
+                <div>
+                    <p className='closing'>CLOSED MONDAY/TUESDAY</p>
                 </div>
             </div>
             <hr />
-            <div className='row'>
-                <div className='col-auto'>
+            <div className='AboutUs-description d-flex m-2'>
+                <FontAwesomeIcon icon={faPhone} className='icon' />
+                <p>080-3980-4560</p>
+            </div>
+            <hr />
+            <div className='AboutUs-description '>
+                <div className='d-flex m-2'>
                     <FontAwesomeIcon icon={faLocationArrow} className='icon' />
+                    <p>3F, 1 Chome-2-12 Tsuboya, Naha, Okinawa 902-0065, Japan</p>
                 </div>
-                <div className='col'>
-                    3F, 1 Chome-2-12 Tsuboya, Naha, Okinawa 902-0065, Japan
+                <div>
+                    <img className='img-fluid' src={locationImage} alt='location map of party color' />
                 </div>
-            </div>
-            <hr />
-            <div>
-                <img className='img-fluid' src={locationImage} alt='location map of party color' />
             </div>
         </div>
     );
