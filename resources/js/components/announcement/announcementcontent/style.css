@@ -1,0 +1,20 @@
+.AnnouncementContent {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: white;
+    padding: 20px;
+
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+.AnnouncementContent-title {
+    font-weight: 900;
+}
+
+.AnnouncementContent-summary {
+    opacity: 0.7;
+}
