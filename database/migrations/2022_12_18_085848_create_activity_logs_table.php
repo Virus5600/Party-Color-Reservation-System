@@ -22,6 +22,8 @@ class CreateActivityLogsTable extends Migration
 			$table->tinyInteger('is_automated')->default(0);
 			$table->tinyInteger('is_marked')->default(0);
 			$table->mediumText('reason')->nullable();
+			$table->bigInteger('model_id')->unsigned()->nullable();
+			$table->string('model_type')->nullable();
 			$table->timestamps();
 		});
 	}

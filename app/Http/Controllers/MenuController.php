@@ -137,8 +137,9 @@ class MenuController extends Controller
 
 		ActivityLog::log(
 			"Menu '{$req->menu_name}' created.",
-			null,
-			true
+			$menu->id,
+			"Menu",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -288,8 +289,9 @@ class MenuController extends Controller
 
 		ActivityLog::log(
 			"Menu '{$menu->menu_name}' updated.",
-			null,
-			true
+			$menu->id,
+			"Menu",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -321,8 +323,9 @@ class MenuController extends Controller
 
 		ActivityLog::log(
 			"Menu '{$menu->name}' deactivated.",
-			null,
-			true
+			$menu->id,
+			"Menu",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -359,8 +362,9 @@ class MenuController extends Controller
 
 		ActivityLog::log(
 			"Menu '{$menu->name}' activated.",
-			null,
-			true
+			$menu->id,
+			"Menu",
+			Auth::user()->id
 		);
 
 		return redirect()

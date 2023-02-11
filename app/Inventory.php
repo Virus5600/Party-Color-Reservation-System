@@ -60,6 +60,8 @@ class Inventory extends Model
 
 			ActivityLog::log(
 				"Item '{$this->item_name}' permanently deleted.",
+				null
+				"Inventory",
 				null,
 				true
 			);

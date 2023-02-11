@@ -270,11 +270,11 @@ class ApiController extends Controller
 		}
 
 		if (!$emptyResponse) {
-
 			ActivityLog::log(
-				"Removed image of '{$req->type}'.",
-				null,
-				true
+				"{$user->getName()} removed avatar image ('{$req->type}').",
+				$user->id,
+				"User",
+				$Auth::user()->id
 			);
 
 			return response()

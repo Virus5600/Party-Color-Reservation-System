@@ -84,9 +84,10 @@ class InventoryController extends Controller
 		}
 
 		ActivityLog::log(
-			"Item '{$req->item_name}' created.",
-			null,
-			true
+			"Item '{$req->item_name}' created.",,
+			$item->id,
+			"Inventory",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -173,8 +174,9 @@ class InventoryController extends Controller
 
 		ActivityLog::log(
 			"Item '{$item->item_name}' updated.",
-			null,
-			true
+			$item->id,
+			"Inventory",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -207,10 +209,12 @@ class InventoryController extends Controller
 				]);
 		}
 
+		$prevCount = 0;
 		try {
 			DB::beginTransaction();
+			$prevCount = $item->quantity;
 
-			$item->quantity = $item->quantity + $req->quantity;
+			$item->quantity = $prevCount + $req->quantity;
 			$item->save();
 
 			DB::commit();
@@ -224,9 +228,10 @@ class InventoryController extends Controller
 		}
 
 		ActivityLog::log(
-			"Item '{$item->item_name}' increased.",
-			null,
-			true
+			"Item '{$item->item_name}' increased by '{$req->quantity}' from '{$prevCount}' to '{$item->quantity}'.",
+			$item->id,
+			"Inventory",
+			Auth::user()->id
 		);
 
 		return response()
@@ -259,8 +264,9 @@ class InventoryController extends Controller
 
 		ActivityLog::log(
 			"Item '{$item->item_name}' deactivated.",
-			null,
-			true
+			$item->id,
+			"Inventory",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -297,8 +303,9 @@ class InventoryController extends Controller
 
 		ActivityLog::log(
 			"Item '{$item->item_name}' activated.",
-			null,
-			true
+			$item->id,
+			"Inventory",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -333,8 +340,11 @@ class InventoryController extends Controller
 		ActivityLog::log(
 			"Item '{$item->item_name}' permanently deleted.",
 			null,
-			true
+			"Inventory",
+			Auth::user()->id
 		);
+
+		ActivityLog::itemDeleted($id);
 
 		return redirect()
 			->route('admin.inventory.index')

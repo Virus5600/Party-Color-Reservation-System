@@ -101,9 +101,10 @@ class ReservationController extends Controller
 		}
 
 		ActivityLog::log(
-			"Reservation created.",
-			null,
-			true
+			"Reservation #{$reservation->control_no} created.",
+			$reservation->id,
+			"Reservation"
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -239,9 +240,10 @@ class ReservationController extends Controller
 		}
 
 		ActivityLog::log(
-			"Reservation {$id} updated.",
-			null,
-			true
+			"Reservation #{$reservation->control_no} updated.",
+			$reservation->id,
+			"Reservation"
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -271,6 +273,7 @@ class ReservationController extends Controller
 				}
 			}
 
+			$control_no = $reservation->control_no;
 			$reservation->forceDelete();
 
 			DB::commit();
@@ -283,10 +286,13 @@ class ReservationController extends Controller
 		}
 
 		ActivityLog::log(
-			"Reservation {$id} deleted.",
-			null,
-			true
+			"Reservation #{$control_no} deleted.",
+			$reservation->id,
+			"Reservation"
+			Auth::user()->id
 		);
+
+		ActivityLog::itemDeleted($id);
 
 		return redirect()
 			->route('admin.reservations.index')
@@ -373,9 +379,10 @@ class ReservationController extends Controller
 		}
 
 		ActivityLog::log(
-			"Reservation {$id} accepted.",
-			null,
-			true
+			"Reservation #{$reservation->control_no} accepted.",
+			$reservation->id,
+			"Reservation"
+			Auth::user()->id
 		);
 
 		return response()
@@ -450,8 +457,9 @@ class ReservationController extends Controller
 
 		ActivityLog::log(
 			"Reservation {$id} rejected.",
-			null,
-			true
+			$reservation->id,
+			"Reservation"
+			Auth::user()->id
 		);
 
 		return response()
@@ -509,9 +517,10 @@ class ReservationController extends Controller
 		}
 
 		ActivityLog::log(
-			"Reservation {$id} moved to pending.",
-			null,
-			true
+			"Reservation {$reservation->control_no} moved to pending.",
+			$reservation->id,
+			"Reservation"
+			Auth::user()->id
 		);
 
 		return response()

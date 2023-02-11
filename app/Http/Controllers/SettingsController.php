@@ -140,7 +140,8 @@ class SettingsController extends Controller
 		ActivityLog::log(
 			"Settings updated.",
 			null,
-			true
+			"Settings",
+			Auth::user()->id
 		);
 
 		return redirect()

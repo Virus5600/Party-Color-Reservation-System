@@ -17,6 +17,7 @@ class CreateReservationsTable extends Migration
 	{
 		Schema::create('reservations', function (Blueprint $table) {
 			$table->id();
+			$table->string('control_no');
 			$table->time('start_at');
 			$table->time('end_at');
 			$table->date('reserved_at');
