@@ -11,6 +11,9 @@ import logo from './img/logo.png';
 // css
 import './style.css';
 
+// under development
+import TempReservation from '../tempreservation';
+
 
 const Navigation = ({ children }) => {
 
@@ -94,7 +97,7 @@ const Navigation = ({ children }) => {
 
 			{
 				isReservationClicked ?
-					<Reservation />
+					<TempReservation />
 					:
 					/*
 						reference
