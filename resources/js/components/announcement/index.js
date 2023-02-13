@@ -15,12 +15,12 @@ const Announcement = ({ onAnnouncementClick }) => {
             try {
                 const result = await axios.get(API_ENDPOINT)
                     .then(response => {
-                        console.log(response.data.announcements);
-                        console.log(response.data.announcements[0].poster.replace("{id}", response.data.announcements[0].id));
+                        // console.log(response.data.announcements);
+                        // console.log(response.data.announcements[0].poster.replace("{id}", response.data.announcements[0].id));
                         setAnnouncements(response.data.announcements);
                     });
             } catch {
-                console.log('failed fetch announcements');
+                // console.log('failed fetch announcements');
             }
         }
         fetchAnnouncements();
