@@ -43,28 +43,28 @@ const Appearance = () => {
 const TimeLocation = () => {
     return (
         <div className='time-location'>
-            <div className='row'>
+            <div className='row align-items-center'>
                 <div className='col-auto'>
-                    <FontAwesomeIcon icon={faClock} className='icon' />
+                    <FontAwesomeIcon icon={faClock} className='h5 my-0' />
                 </div>
                 <div className='col'>
                     17:00 - 22:00<br />
-                    CLOSED MONDAY/TUESDAY
+                    <i>CLOSED Monday/Tuesday</i>
                 </div>
             </div>
             <hr />
-            <div className='row'>
+            <div className='row align-items-center'>
                 <div className='col-auto'>
-                    <FontAwesomeIcon icon={faPhone} className='icon' />
+                    <FontAwesomeIcon icon={faPhone} className='h5 my-0' />
                 </div>
                 <div className='col'>
-                    080-3980-4560<br />
+                    080-3980-4560
                 </div>
             </div>
             <hr />
-            <div className='row'>
+            <div className='row align-items-center'>
                 <div className='col-auto'>
-                    <FontAwesomeIcon icon={faLocationArrow} className='icon' />
+                    <FontAwesomeIcon icon={faLocationArrow} className='h5 my-0' />
                 </div>
                 <div className='col'>
                     3F, 1 Chome-2-12 Tsuboya, Naha, Okinawa 902-0065, Japan
