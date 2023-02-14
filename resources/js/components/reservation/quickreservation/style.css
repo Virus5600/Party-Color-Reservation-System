@@ -1,10 +1,8 @@
-
-
 .Reservation-temp {
     text-align: center;
     margin-bottom: 30px;
     align-items: center;
-    
+
 }
 
 .Reservation-temp .title {
@@ -41,7 +39,7 @@
     /* stroke */
     -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: white;
-    
+
 }
 
 .Reservation-temp .reserve-button {
@@ -63,12 +61,14 @@
     /* spacing */
     padding-left: 40px;
     padding-right: 40px;
+
+    text-decoration: none;
 }
 
 .Prices {
     text-align: center;
     align-items: center;
-  
+
 
     /* spacing */
     padding-top: 0px;
@@ -114,9 +114,11 @@
     .Reservation-temp .title {
         font-size: 80px;
     }
+
     .Reservation-temp .time {
         font-size: 30px;
     }
+
     .Reservation-temp .reserve-button {
         font-size: 25px;
     }

@@ -7,6 +7,9 @@ import './style.css';
 
 import axios from 'axios';
 
+// react router
+import { redirect } from 'react-router-dom';
+
 
 const TempReservation = () => {
     const [isReviewReserveClick, setReviewReserveClick] = useState(false);
@@ -42,8 +45,8 @@ const TempReservation = () => {
 
         const API_TO_SEND_RESERVATION = 'api/react/reservations/create';
 
-
-        await axios.post(API_TO_SEND_RESERVATION, {
+        let flag = 0;
+        const result = await axios.post(API_TO_SEND_RESERVATION, {
             _token: token,
             reservation_date: JSON.parse(sessionStorage.getItem('date'))['value'],
             pax: Number(JSON.parse(sessionStorage.getItem('#ofGuests'))['value']),
@@ -61,10 +64,34 @@ const TempReservation = () => {
         }).then(response => {
             // do something after send the data to backend
             console.log(response);
-            sessionStorage.clear();
-            alert('success');
-            setReviewReserveClick(false);
-        }).catch(response => console.log(response));
+            const data = response.data
+            if (data.success) {
+                sessionStorage.clear();
+                alert('success');
+                flag = 1;
+            } else {
+                var index = 0;
+                for (const key in data.errors) {
+                    if (data.errors.hasOwnProperty(key)) {
+                        // console.log(`Index: ${index}, ${key}: ${data.errors[key]}`);
+                        // index++;
+                        alert(`${data.errors[key]}`);
+                    }
+                }
+                setReviewReserveClick(false);
+            }
+
+
+        }).catch(response => {
+            console.log(response)
+            alert('internal error');
+
+        });
+        console.log('result:', result);
+
+        if (flag) {
+            redirect('/home');
+        }
 
     };
 
