@@ -19,3 +19,7 @@
 .Nav a:hover {
   color: #945555;
 }
+
+a.nav-active {
+  text-decoration: underline;
+}

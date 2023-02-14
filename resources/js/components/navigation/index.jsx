@@ -4,10 +4,9 @@ import React, { useEffect, useState } from 'react';
 import logo from './img/logo.png';
 import './style.css';
 
-import Home from '../home';
 
 // react route
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 
 
 export default function Navigation() {
@@ -45,10 +44,23 @@ export default function Navigation() {
 						</button>
 						<div className="navbar-collapse collapse" id="navbarSupportedContent">
 							<ul className="nav nav-pills ms-auto mb-2 mb-lg-0">
-								<li style={listStyle} ><Link to='home'>Home</Link></li>
-								<li style={listStyle} ><Link to='reservation'>Reservation</Link></li>
-								<li style={listStyle}><Link to='announcement'>Announcement</Link></li>
-								<li style={listStyle}><Link to='aboutus'>About Us</Link></li>
+								<li style={listStyle} >
+									<NavLink
+										to='home'
+										className={({ isActive, isPending }) =>
+											isActive ? 'nav-active' : ''
+										}
+									>Home</NavLink>
+								</li>
+								<li style={listStyle} ><NavLink to='reservation' className={({ isActive, isPending }) =>
+									isActive ? 'nav-active' : ''
+								}>Reservation</NavLink></li>
+								<li style={listStyle}><NavLink to='announcement' className={({ isActive, isPending }) =>
+									isActive ? 'nav-active' : ''
+								}>Announcement</NavLink></li>
+								<li style={listStyle}><NavLink to='aboutus' className={({ isActive, isPending }) =>
+									isActive ? 'nav-active' : ''
+								}>About Us</NavLink></li>
 							</ul>
 						</div>
 					</div>
