@@ -7,23 +7,25 @@ import './style.css';
 // components
 import QuickReservation from '../reservation/quickreservation';
 import Announcement from '../announcement';
-import AboutUs from '../aboutus';
+
+// react router
+import { Link } from 'react-router-dom';
 
 
-const Home = ({ onReservationClick, onAnnouncementClick }) => {
+export default function Home({ onReservationClick, onAnnouncementClick }) {
     return (
-        <div className='Home' id='Home'>
+        <div className='Home'>
             <div className='main-image container-mb'>
                 <img src={mainImage} className='img-fluid' />
             </div>
             <QuickReservation onReservationClick={onReservationClick} />
+
             <Announcement onAnnouncementClick={onAnnouncementClick} />
-            <AboutUs />
+            <p className='Announcement-more'><Link to='/announcement'>more details</Link></p>
         </div>
     );
-};
+}
 
 
 
 
-export default Home;
