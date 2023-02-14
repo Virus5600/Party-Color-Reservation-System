@@ -21,16 +21,6 @@
 
 }
 
-.Announcement-more {
-    text-align: center;
-    text-decoration: 1px underline black;
-    cursor: pointer;
-    font-size: 1.5vw;
-}
-
-.Announcement-more:hover {
-    opacity: 0.5;
-}
 
 .AnnouncementItem {
     display: flex;
@@ -81,4 +71,8 @@
 .AnnouncementItem-description .summary {
     font-size: 1.75vw;
     /* (description / title) * title */
+}
+
+a {
+    text-decoration: none;
 }
