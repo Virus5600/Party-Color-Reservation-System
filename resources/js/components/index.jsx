@@ -1,7 +1,10 @@
 import React from 'react';
 import './index.css';
-import App from './App';
 import ReactDOM from 'react-dom';
+
+// for bootstrap
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.min.js';
 
 // components (pages)
 import Home from './home';

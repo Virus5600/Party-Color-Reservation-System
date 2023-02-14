@@ -4,7 +4,7 @@ import './style.css';
 
 import ReactHtmlParser from 'react-html-parser';
 
-import { useLoaderData } from 'react-router-dom';
+import { useLoaderData, Link } from 'react-router-dom';
 
 export function loader({ params }) {
 
@@ -26,19 +26,28 @@ export default function AnnouncementContent() {
 
     return (
 
+        <>
+            <div className='AnnouncementContent'>
+                <div>
+                    <div className='AnnouncementContent-title'>
+                        "{announcement.title}""
+                    </div>
+                    <div className='AnnouncementContent-summary'>
+                        {announcement.summary}
+                    </div><hr /><br />
+                    <div className='AnnouncementContent-content'>
+                        {ReactHtmlParser(announcement.content)}
+                    </div>
 
-        <div className='AnnouncementContent'>
-            <div>
-                <div className='AnnouncementContent-title'>
-                    {announcement.title}
                 </div>
-                <div className='AnnouncementContent-summary'>
-                    {announcement.summary}
-                </div><br />
-                {ReactHtmlParser(announcement.content)}
-            </div>
 
-        </div>
+            </div>
+            <div className=' d-flex justify-content-center mt-2'>
+                <button className='btn btn-primary'><Link to='/announcement'>back</Link></button>
+
+            </div>
+        </>
+
 
 
     );

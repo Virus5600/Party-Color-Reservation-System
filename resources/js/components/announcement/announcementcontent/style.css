@@ -1,20 +1,36 @@
 .AnnouncementContent {
-    width: 50%;
+    font-size: 30px;
+    width: 80%;
     margin-left: auto;
     margin-right: auto;
     background-color: white;
     padding: 20px;
 
     border-radius: 10px;
-    display: flex;
-    justify-content: center;
+    /* display: flex;
+    justify-content: center; */
     margin-top: 50px;
 }
 
 .AnnouncementContent-title {
+    text-align: center;
     font-weight: 900;
 }
 
 .AnnouncementContent-summary {
+    text-align: center;
+    font-size: 20px;
     opacity: 0.7;
+}
+
+hr {
+    color: black;
+}
+
+.AnnouncementContent-content {
+    font-size: 15px;
+}
+
+a {
+    color: white;
 }

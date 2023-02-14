@@ -23,6 +23,7 @@
 
 
 .AnnouncementItem {
+    color: black;
     display: flex;
     justify-content: left;
     gap: 15px;
