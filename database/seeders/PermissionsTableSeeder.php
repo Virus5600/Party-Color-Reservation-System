@@ -15,40 +15,40 @@ class PermissionsTableSeeder extends Seeder
 	 */
 	public function run()
 	{
-		// RESERVATIONS
-		$reservationPerm = Permission::create([
-			'name' => 'Reservations Tab Access',
-			'slug' => 'reservations_tab_access'
+		// BOOKINGS
+		$bookingPerm = Permission::create([
+			'name' => 'Bookings Tab Access',
+			'slug' => 'bookings_tab_access'
 		]);
 
 		Permission::create([
-			'parent_permission' => $reservationPerm->id,
-			'name' => 'Reservations Tab Create',
-			'slug' => 'reservations_tab_create'
+			'parent_permission' => $bookingPerm->id,
+			'name' => 'Bookings Tab Create',
+			'slug' => 'bookings_tab_create'
 		]);
 
 		Permission::create([
-			'parent_permission' => $reservationPerm->id,
-			'name' => 'Reservations Tab Edit',
-			'slug' => 'reservations_tab_edit'
+			'parent_permission' => $bookingPerm->id,
+			'name' => 'Bookings Tab Edit',
+			'slug' => 'bookings_tab_edit'
 		]);
 
 		Permission::create([
-			'parent_permission' => $reservationPerm->id,
-			'name' => 'Reservations Tab Respond',
-			'slug' => 'reservations_tab_respond'
+			'parent_permission' => $bookingPerm->id,
+			'name' => 'Bookings Tab Respond',
+			'slug' => 'bookings_tab_respond'
 		]);
 
 		Permission::create([
-			'parent_permission' => $reservationPerm->id,
-			'name' => 'Reservations Tab Delete',
-			'slug' => 'reservations_tab_delete'
+			'parent_permission' => $bookingPerm->id,
+			'name' => 'Bookings Tab Delete',
+			'slug' => 'bookings_tab_delete'
 		]);
 
 		Permission::create([
-			'parent_permission' => $reservationPerm->id,
-			'name' => 'Reservations Tab Perma Delete',
-			'slug' => 'reservations_tab_perma_delete'
+			'parent_permission' => $bookingPerm->id,
+			'name' => 'Bookings Tab Perma Delete',
+			'slug' => 'bookings_tab_perma_delete'
 		]);
 
 		// INVENTORY

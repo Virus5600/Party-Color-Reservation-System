@@ -11,12 +11,12 @@
 		@endif
 
 		{{-- RESERVATION --}}
-		@if (\Request::is('admin/reservation'))
-		<span class="bg-secondary text-white"><i class="fas fa-calendar-alt mr-2"></i>Reservations</span>
-		@elseif (\Request::is('admin/reservation*'))
-		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.reservations.index') }}" aria-hidden="false" aria-label="Reservation"><i class="fas fa-calendar-alt mr-2"></i>Reservation</a>
+		@if (\Request::is('admin/booking'))
+		<span class="bg-secondary text-white"><i class="fas fa-calendar-alt mr-2"></i>Bookings</span>
+		@elseif (\Request::is('admin/booking*'))
+		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.bookings.index') }}" aria-hidden="false" aria-label="Booking"><i class="fas fa-calendar-alt mr-2"></i>Booking</a>
 		@else
-		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.reservations.index') }}" aria-hidden="false" aria-label="Reservation"><i class="fas fa-calendar-alt mr-2"></i>Reservation</a>
+		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.bookings.index') }}" aria-hidden="false" aria-label="Booking"><i class="fas fa-calendar-alt mr-2"></i>Booking</a>
 		@endif
 
 		{{-- INVENTORY --}}

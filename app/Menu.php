@@ -38,6 +38,8 @@ class Menu extends Model
 	// Relationships
 	public function items() { return $this->belongsToMany('App\Inventory', 'menu_items', 'menu_id', 'inventory_id'); }
 	public function menuItems() { return $this->hasMany('App\MenuItem', 'menu_id', 'id'); }
+	public function bookings() { return $this->morphedByMany('App\Booking', 'boooking_menus'); }
+	public function additionalOrders() { return $this->morphedByMany('App\AdditionalOrder', 'boooking_menus'); }
 
 	// Custom Functions
 	public function getPrice() {

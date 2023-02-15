@@ -9,38 +9,41 @@ use Carbon\Carbon;
 use App\Enum\ApprovalStatus;
 use App\Enum\Status;
 
+use App\ActivityLog;
+use App\Booking;
 use App\ContactInformation;
 use App\Inventory;
 use App\Menu;
-use App\Reservation;
 use App\Settings;
-use App\ActivityLog;
 
+use Auth;
 use DB;
 use Exception;
 use Log;
+use Session;
 use Validator;
 
-class ReservationController extends Controller
+class BookingController extends Controller
 {
 	protected function index(Request $req) {
-		$reservations = Reservation::with("menus")->get();
+		$bookings = Booking::with("menus")->get();
 
-		return view('admin.reservations.index', [
-			'reservations' => $reservations
+		return view('admin.bookings.index', [
+			'bookings' => $bookings
 		]);
 	}
 
-	protected function create() {
+	protected function create(Request $req) {
 		$menus = Menu::get();
 
-		return view('admin.reservations.create', [
-			'menus' => $menus
+		return view('admin.bookings.create', [
+			'menus' => $menus,
+			'booking_type' => $req->t
 		]);
 	}
 
 	protected function store(Request $req) {
-		extract(Reservation::validate($req));
+		extract(Booking::validate($req));
 
 		if ($validator->fails()) {
 			return redirect()
@@ -60,29 +63,37 @@ class ReservationController extends Controller
 			$price *= $req->pax;
 			$price += ($req->extension * 500);
 
-			$reservation = Reservation::create([
+			$booking = Booking::create([
+				'control_no' => Booking::createControlNumber(),
+				'booking_type' => $req->booking_type,
 				'start_at' => $start_at,
 				'end_at' => $end_at,
-				'reserved_at' => $req->reservation_date,
+				'reserved_at' => $req->booking_date,
 				'extension' => $req->extension,
 				'price' => $price,
 				'pax' => $req->pax,
 				'phone_numbers' => implode("|", $req->phone_numbers)
 			]);
 
-			$reservation->menus()->attach($req->menu);
+			foreach ($req->menu as $v)
+				$booking->menus()
+					->attach([
+						$v => [
+							'count' => $req->pax
+						]
+					]);
 
 			$iterations = max(count($req->contact_name), count($req->contact_email));
 			for ($i = 0; $i < $iterations; $i++) {
 				$ci = ContactInformation::create([
 					'contact_name' => $req->contact_name["{$i}"],
 					'email' => $req->contact_email["{$i}"],
-					'reservation_id' => $reservation->id
+					'booking_id' => $booking->id
 				]);
 			}
 
 			// Reduce the inventoy for realtime update
-			foreach ($reservation->menus as $m) {
+			foreach ($booking->menus as $m) {
 				$response = $m->reduceInventory();
 
 				if (!$response->success) {
@@ -96,81 +107,88 @@ class ReservationController extends Controller
 			Log::error($e);
 
 			return redirect()
-				->route('admin.reservations.index')
+				->route('admin.bookings.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
 		ActivityLog::log(
-			"Reservation #{$reservation->control_no} created.",
-			$reservation->id,
-			"Reservation"
+			"Booking #{$booking->control_no} created.",
+			$booking->id,
+			"Booking",
 			Auth::user()->id
 		);
 
 		return redirect()
-			->route('admin.reservations.index')
-			->with('flash_success', 'Successfully added a new reservation');
+			->route('admin.bookings.index')
+			->with('flash_success', 'Successfully added a new booking');
 	}
 
 	protected function show($id) {
-		$reservation = Reservation::with(['menus', 'contactInformation'])->find($id);
+		$booking = Booking::with([
+				'menus',
+				'contactInformation',
+				'additionalOrders' => function($query) {return $query->withTrashed();},
+				'additionalOrders.bookingMenus',
+				'additionalOrders.bookingMenus.menu'
+			])
+			->find($id);
 
-		if ($reservation == null) {
+		if ($booking == null) {
 			return response()
 				->json([
 					'success' => false,
-					'message' => 'The reservation either does not exists or is already deleted'
+					'message' => 'The booking either does not exists or is already deleted'
 				]);
 		}
 
-		$colorCode = $reservation->getStatusColorCode($reservation->getOverallStatus());
-		$status = $reservation->getStatusText($reservation->getOverallStatus());
+		$colorCode = $booking->getStatusColorCode($booking->getOverallStatus());
+		$status = $booking->getStatusText($booking->getOverallStatus());
 
 		return response()
 			->json([
 				'success' => true,
-				'message' => 'Reservation found',
-				'reservation' => $reservation,
+				'message' => 'Booking found',
+				'booking' => $booking,
 				'colorCode' => $colorCode,
 				'status' => $status
 			]);
 	}
 
 	protected function edit($id) {
-		$reservation = Reservation::with(['menus', 'contactInformation'])->find($id);
+		$booking = Booking::with(['menus', 'contactInformation'])->find($id);
 
-		if ($reservation == null) {
-			Log::info("No such reservation.", ["id" => $id, "reservation" => $reservation]);
+		if ($booking == null) {
+			Log::info("No such booking.", ["id" => $id, "booking" => $booking]);
 			return redirect()
-				->route('admin.reservations.index')
-				->with('flash_error', 'The reservations either does not exists or is already deleted.');
+				->route('admin.bookings.index')
+				->with('flash_error', 'The bookings either does not exists or is already deleted.');
 		}
 
 		$menus = Menu::get();
 		$newContactIndex = [];
 
-		for ($i = 0; $i < $reservation->contactInformation->count(); $i++)
+		for ($i = 0; $i < $booking->contactInformation->count(); $i++)
 			array_push($newContactIndex, "{$i}");
 
-		\Session::put("new_contact_index", $newContactIndex);
+		Session::put("new_contact_index", $newContactIndex);
 
-		return view('admin.reservations.edit', [
-			'reservation' => $reservation,
+		return view('admin.bookings.edit', [
+			'booking' => $booking,
 			'menus' => $menus
 		]);
 	}
 
 	protected function update(Request $req, $id) {
-		$reservation = Reservation::find($id);
+		$booking = Booking::find($id);
 
-		if ($reservation == null) {
-			Log::info("No such reservation.", ["id" => $id, "reservation" => $reservation]);
+		if ($booking == null) {
+			Log::info("No such booking.", ["id" => $id, "booking" => $booking]);
 			return redirect()
-				->route('admin.reservations.index')
-				->with('flash_error', 'The reservations either does not exists or is already deleted.');
+				->route('admin.bookings.index')
+				->with('flash_error', 'The bookings either does not exists or is already deleted.');
 		}
 
-		extract(Reservation::validate($req));
+		extract(Booking::validate($req));
 
 		if ($validator->fails()) {
 			return redirect()
@@ -190,17 +208,17 @@ class ReservationController extends Controller
 			$price *= $req->pax;
 			$price += ($req->extension * 500);
 
-			$reservation->start_at = $start_at;
-			$reservation->end_at = $end_at;
-			$reservation->reserved_at = $req->reservation_date;
-			$reservation->extension = $req->extension;
-			$reservation->price = $price;
-			$reservation->pax = $req->pax;
-			$reservation->phone_numbers = implode("|", $req->phone_numbers);
-			$reservation->save();
+			$booking->start_at = $start_at;
+			$booking->end_at = $end_at;
+			$booking->reserved_at = $req->booking_date;
+			$booking->extension = $req->extension;
+			$booking->price = $price;
+			$booking->pax = $req->pax;
+			$booking->phone_numbers = implode("|", $req->phone_numbers);
+			$booking->save();
 
 			// Return the inventory for realtime update
-			foreach ($reservation->menus as $m) {
+			foreach ($booking->menus as $m) {
 				$response = $m->returnInventory();
 
 				if (!$response->success) {
@@ -208,20 +226,20 @@ class ReservationController extends Controller
 				}
 			}
 
-			$reservation->menus()->sync($req->menu);
-			$reservation->contactInformation()->delete();
+			$booking->menus()->sync($req->menu);
+			$booking->contactInformation()->delete();
 
 			$iterations = max(count($req->contact_name), count($req->contact_email));
 			for ($i = 0; $i < $iterations; $i++) {
 				$ci = ContactInformation::create([
 					'contact_name' => $req->contact_name["{$i}"],
 					'email' => $req->contact_email["{$i}"],
-					'reservation_id' => $reservation->id
+					'booking_id' => $booking->id
 				]);
 			}
 
 			// Reduce the inventoy for realtime update
-			foreach ($reservation->menus as $m) {
+			foreach ($booking->menus as $m) {
 				$response = $m->reduceInventory();
 
 				if (!$response->success) {
@@ -235,37 +253,37 @@ class ReservationController extends Controller
 			Log::error($e);
 
 			return redirect()
-				->route('admin.reservations.index')
+				->route('admin.bookings.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
 		ActivityLog::log(
-			"Reservation #{$reservation->control_no} updated.",
-			$reservation->id,
-			"Reservation"
+			"Booking #{$booking->control_no} updated.",
+			$booking->id,
+			"Booking",
 			Auth::user()->id
 		);
 
 		return redirect()
-			->route('admin.reservations.index')
-			->with('flash_success', 'Successfully updated reservation');
+			->route('admin.bookings.index')
+			->with('flash_success', 'Successfully updated booking');
 	}
 
 	protected function delete($id) {
-		$reservation = Reservation::withTrashed()->find($id);
+		$booking = Booking::withTrashed()->find($id);
 
-		if ($reservation == null) {
-			Log::info("No such reservation.", ["id" => $id, "reservation" => $reservation]);
+		if ($booking == null) {
+			Log::info("No such booking.", ["id" => $id, "booking" => $booking]);
 			return redirect()
-				->route('admin.reservations.index')
-				->with('flash_error', 'The reservations either does not exists or is already deleted');
+				->route('admin.bookings.index')
+				->with('flash_error', 'The bookings either does not exists or is already deleted');
 		}
 
 		try {
 			DB::beginTransaction();
 
 			// Return the inventory for realtime update
-			foreach ($reservation->menus as $m) {
+			foreach ($booking->menus as $m) {
 				$response = $m->returnInventory();
 
 				if (!$response->success) {
@@ -273,75 +291,84 @@ class ReservationController extends Controller
 				}
 			}
 
-			$control_no = $reservation->control_no;
-			$reservation->forceDelete();
+			$control_no = $booking->control_no;
+			$booking->forceDelete();
 
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
 
 			return redirect()
-				->route('admin.reservations.index')
+				->route('admin.bookings.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
 		ActivityLog::log(
-			"Reservation #{$control_no} deleted.",
-			$reservation->id,
-			"Reservation"
+			"Booking #{$control_no} deleted.",
+			$booking->id,
+			"Booking",
 			Auth::user()->id
 		);
 
 		ActivityLog::itemDeleted($id);
 
 		return redirect()
-			->route('admin.reservations.index')
-			->with('flash_success', 'Successfully removed reservation request');
+			->route('admin.bookings.index')
+			->with('flash_success', 'Successfully removed booking request');
 	}
 
 	protected function archive($id) {
-		$reservation = Reservation::find($id);
+		$booking = Booking::find($id);
 
-		if ($reservation == null) {
-			Log::info("No such reservation.", ["id" => $id, "reservation" => $reservation]);
+		if ($booking == null) {
+			Log::info("No such booking.", ["id" => $id, "booking" => $booking]);
 			return redirect()
-				->route('admin.reservations.index')
-				->with('flash_error', 'The reservations either does not exists or is already deleted');
+				->route('admin.bookings.index')
+				->with('flash_error', 'The bookings either does not exists or is already deleted');
 		}
 
 		try {
 			DB::beginTransaction();
 
 			// Return the inventory for realtime update
-			foreach ($reservation->menus as $m) {
-				$response = $m->returnInventory();
+			if (!($booking->getOverallStatus() == Status::Happening || $booking->getOverallStatus() == Status::Done)) {
+				foreach ($booking->menus as $m) {
+					$response = $m->returnInventory();
 
-				if (!$response->success) {
-					throw new Exception($response->message);
+					if (!$response->success) {
+						throw new Exception($response->message);
+					}
 				}
 			}
 
-			$reservation->delete();
+			$booking->delete();
 
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
 
 			return redirect()
-				->route('admin.reservations.index')
+				->route('admin.bookings.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
+
+		ActivityLog::log(
+			"Booking #{$booking->control_no} archived.",
+			$booking->id,
+			"Booking",
+			Auth::user()->id
+		);
 	}
 
 	protected function accept($id) {
-		$reservation = Reservation::find($id);
+		$booking = Booking::find($id);
 
-		if ($reservation == null) {
-			Log::info("No such reservation.", ["id" => $id, "reservation" => $reservation]);
+		if ($booking == null) {
+			Log::info("No such booking.", ["id" => $id, "booking" => $booking]);
 			return response()
 				->json([
 					'success' => false,
-					'title' => 'The reservations either does not exists or is already deleted',
+					'title' => 'The bookings either does not exists or is already deleted',
 					'message' => ''
 				]);
 		}
@@ -349,9 +376,9 @@ class ReservationController extends Controller
 		try {
 			DB::beginTransaction();
 
-			if ($reservation->items_returned == 1) {
+			if ($booking->items_returned == 1) {
 				// Reduce the inventoy for realtime update
-				foreach ($reservation->menus as $m) {
+				foreach ($booking->menus as $m) {
 					$response = $m->reduceInventory();
 
 					if (!$response->success) {
@@ -359,12 +386,12 @@ class ReservationController extends Controller
 					}
 				}
 
-				$reservation->items_returned = 0;
+				$booking->items_returned = 0;
 			}
 
-			$reservation->status = ApprovalStatus::Approved;
-			$reservation->reason = null;
-			$reservation->save();
+			$booking->status = ApprovalStatus::Approved;
+			$booking->reason = null;
+			$booking->save();
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -379,29 +406,29 @@ class ReservationController extends Controller
 		}
 
 		ActivityLog::log(
-			"Reservation #{$reservation->control_no} accepted.",
-			$reservation->id,
-			"Reservation"
+			"Booking #{$booking->control_no} accepted.",
+			$booking->id,
+			"Booking",
 			Auth::user()->id
 		);
 
 		return response()
 			->json([
 				'success' => true,
-				'title' => 'Successfully accepted reservation request',
+				'title' => 'Successfully accepted booking request',
 				'message' => ''
 			]);
 	}
 
 	protected function reject(Request $req, $id) {
-		$reservation = Reservation::find($id);
+		$booking = Booking::find($id);
 
-		if ($reservation == null) {
+		if ($booking == null) {
 			return response()
 				->json([
 					'success' => false,
-					'title' => 'Reservation not found',
-					'message' => 'The reservation either does not exists or is already deleted'
+					'title' => 'Booking not found',
+					'message' => 'The booking either does not exists or is already deleted'
 				]);
 		}
 
@@ -425,9 +452,9 @@ class ReservationController extends Controller
 		try {
 			DB::beginTransaction();
 
-			if ($reservation->items_returned == 0) {
+			if ($booking->items_returned == 0) {
 				// Return the inventory for realtime update
-				foreach ($reservation->menus as $m) {
+				foreach ($booking->menus as $m) {
 					$response = $m->returnInventory();
 
 					if (!$response->success) {
@@ -435,12 +462,12 @@ class ReservationController extends Controller
 					}
 				}
 
-				$reservation->items_returned = 1;
+				$booking->items_returned = 1;
 			}
 
-			$reservation->reason = $req->reason;
-			$reservation->status = ApprovalStatus::Rejected;
-			$reservation->save();
+			$booking->reason = $req->reason;
+			$booking->status = ApprovalStatus::Rejected;
+			$booking->save();
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -456,29 +483,29 @@ class ReservationController extends Controller
 		}
 
 		ActivityLog::log(
-			"Reservation {$id} rejected.",
-			$reservation->id,
-			"Reservation"
+			"Booking #{$booking->control_no} rejected.",
+			$booking->id,
+			"Booking",
 			Auth::user()->id
 		);
 
 		return response()
 			->json([
 				'success' => true,
-				'title' => 'Successfully rejected reservation request',
+				'title' => 'Successfully rejected booking request',
 				'message' => ''
 			]);
 	}
 
 	protected function pending($id) {
-		$reservation = Reservation::find($id);
+		$booking = Booking::find($id);
 
-		if ($reservation == null) {
-			Log::info("No such reservation.", ["id" => $id, "reservation" => $reservation]);
+		if ($booking == null) {
+			Log::info("No such booking.", ["id" => $id, "booking" => $booking]);
 			return response()
 				->json([
 					'success' => false,
-					'title' => 'The reservations either does not exists or is already deleted',
+					'title' => 'The bookings either does not exists or is already deleted',
 					'message' => ''
 				]);
 		}
@@ -486,9 +513,9 @@ class ReservationController extends Controller
 		try {
 			DB::beginTransaction();
 
-			if ($reservation->items_returned == 1) {
+			if ($booking->items_returned == 1) {
 				// Reduce the inventoy for realtime update
-				foreach ($reservation->menus as $m) {
+				foreach ($booking->menus as $m) {
 					$response = $m->reduceInventory();
 
 					if (!$response->success) {
@@ -496,12 +523,12 @@ class ReservationController extends Controller
 					}
 				}
 
-				$reservation->items_returned = 0;
+				$booking->items_returned = 0;
 			}
 
-			$reservation->status = ApprovalStatus::Pending;
-			$reservation->reason = null;
-			$reservation->save();
+			$booking->status = ApprovalStatus::Pending;
+			$booking->reason = null;
+			$booking->save();
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -517,16 +544,16 @@ class ReservationController extends Controller
 		}
 
 		ActivityLog::log(
-			"Reservation {$reservation->control_no} moved to pending.",
-			$reservation->id,
-			"Reservation"
+			"Booking {$booking->control_no} moved to pending.",
+			$booking->id,
+			"Booking",
 			Auth::user()->id
 		);
 
 		return response()
 			->json([
 				'success' => true,
-				'title' => 'Successfully moved reservation request to pending',
+				'title' => 'Successfully moved booking request to pending',
 				'message' => ''
 			]);
 	}

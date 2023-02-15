@@ -17,11 +17,13 @@ use Log;
 use NumberFormatter;
 use Validator;
 
-class Reservation extends Model
+class Booking extends Model
 {
 	use SoftDeletes;
 
 	protected $fillable = [
+		'control_no',
+		'booking_type',
 		'start_at',
 		'end_at',
 		'reserved_at',
@@ -36,9 +38,14 @@ class Reservation extends Model
 	];
 
 	protected $casts = [
+		'created_at' => 'datetime',
+		'updated_at' => 'datetime',
 		'reserved_at' => 'datetime',
 		'deleted_at' => 'datetime',
 	];
+
+	// Public static variables
+	public static $bookingTypes = ['reservation', 'walk-ins'];
 
 	// Accessor
 	protected function getStartAtAttribute($value) {
@@ -54,7 +61,8 @@ class Reservation extends Model
 	}
 
 	// Relationships
-	public function menus() { return $this->belongsToMany('App\Menu', 'reservation_menus'); }
+	public function additionalOrders() { return $this->hasMany('App\AdditionalOrder'); }
+	public function menus() { return $this->morphToMany('App\Menu', 'orderable', 'booking_menus')->withPivot('count'); }
 	public function contactInformation() { return $this->hasMany('App\ContactInformation'); }
 
 	// Public Function
@@ -77,7 +85,7 @@ class Reservation extends Model
 		else if ($done)
 			return Status::Done;
 		else {
-			Log::info("Reservation does not match the three status; returning \"NonExistent\" as value.", ["Reservation" => $this]);
+			Log::info("Booking does not match the three status; returning \"NonExistent\" as value.", ["Booking" => $this]);
 			return Status::NonExistent;
 		}
 	}
@@ -87,13 +95,13 @@ class Reservation extends Model
 			return "#1e2b37";
 
 		$approvalStatus = $this->status;
-		$reservationStatus = $this->getStatus();
+		$bookingStatus = $this->getStatus();
 
 		if ($approvalStatus == ApprovalStatus::Approved) {
-			return $reservationStatus;
+			return $bookingStatus;
 		}
 		else {
-			if ($approvalStatus == ApprovalStatus::Pending && ($reservationStatus == Status::Happening || $reservationStatus == Status::Done))
+			if ($approvalStatus == ApprovalStatus::Pending && ($bookingStatus == Status::Happening || $bookingStatus == Status::Done))
 				return Status::Ghosted;
 			return $approvalStatus;
 		}
@@ -163,7 +171,7 @@ class Reservation extends Model
 		}
 	}
 
-	public function reservationFor() {
+	public function bookingFor() {
 		return $this->contactInformation()->first()->contact_name;
 	}
 
@@ -172,35 +180,50 @@ class Reservation extends Model
 	}
 
 	// STATIC FUNCTIONS
+	// Control Number Generator
+	public static function createControlNumber() {
+		$controlNumber = now()->format("ymd") . str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+		$validator = Validator::make(['control_no' => $controlNumber], ['control_no' => 'unique:bookings,control_no']);
+
+		if (count($validator->errors()->get('control_no')) > 0)
+			$controlNumber = createControlNumber();
+
+		return $controlNumber;
+	}
+
 	// Validation
 	public static function validate($req) {
 		$datetime = Carbon::now()->timezone('Asia/Tokyo');
-		$isEightPM = $datetime->gt('08:00 PM');
-		$validDate = $isEightPM ? $datetime->addDay()->format("Y-m-d") : $datetime->format("Y-m-d");
-		$validTime = ($isEightPM ? '17' : ($datetime->format('H') < 17 ? '17' : $datetime->format('H'))) . ":00";
+		$openingTime = Settings::getValue('opening');
+		$closingTime = Settings::getValue('closing');
+		$opening = Carbon::parse("{$req->booking_date} {$openingTime}");
+		$closing = Carbon::parse("{$req->booking_date} {$closingTime}");
+		$isClosing = $datetime->gt($closing);
+		$validDate = $isClosing ? $datetime->addDay()->format("Y-m-d") : $datetime->format("Y-m-d");
+		$validTime = ($isClosing ? $opening->format('H') : ($datetime->format('H') < $opening->format('H') ? $opening->format('H') : $datetime->format('H'))) . ":00";
 		$validDatetime = Carbon::parse("{$validDate} {$validTime}")->subHours(9)->timezone("Asia/Tokyo");
 		$storeCap = Settings::getValue('capacity');
 
 		$validationRules = [
-			'reservation_date' => array("required", "date", "after_or_equal:{$validDatetime->format('M d, Y h:i A')}"),
-			'pax' => "required|numeric|between:0,{$storeCap}",
+			'booking_date' => array("required", "date", "after_or_equal:{$validDatetime->format('M d, Y h:i A')}"),
+			'pax' => "required|numeric|between:1,{$storeCap}",
 			'price' => "required|numeric|min:0",
-			'time_hour' => "required|numeric|between:17,19",
+			'time_hour' => "required|numeric|between:{$opening->format('H')},{$closing->format('H')}",
 			'time_min' => "required|numeric|between:0,59",
-			'reservation_time' => "required",
+			'booking_time' => "required",
 			'extension' => "nullable|numeric|between:0,5",
 			'menu' => "required|array|min:1",
 			'menu.*' => "required|numeric|exists:menus,id",
-			'phone_numbers' => "required|array|min:1", // this is not worked and it works when array format is not used!!
+			'phone_numbers' => "required|array|min:1",
 			'contact_name' => "required_unless:contact_email,null|array|min:1",
 			'contact_email' => "required_unless:contact_name,null|array|min:1",
 			'contact_email.*' => "distinct:ignore_case",
 		];
 
 		$validationMsg = [
-			"reservation_date.required" => "Reservation date is required",
-			"reservation_date.date" => "Reservation date should be a date",
-			"reservation_date.after_or_equal" => "Reservation date should be on or after {$validDatetime->format('M d, Y h:i A')}",
+			"booking_date.required" => "Booking date is required",
+			"booking_date.date" => "Booking date should be a date",
+			"booking_date.after_or_equal" => "Booking date should be on or after {$validDatetime->format('M d, Y h:i A')}",
 			"pax.required" => "Amount of people is required",
 			"pax.numeric" => "Amount of people should be a number",
 			"pax.between" => "Amount of people should be between 1 and {$storeCap}",
@@ -209,16 +232,19 @@ class Reservation extends Model
 			"price.min" => "Price should be at least ¥0.00",
 			"time_hour.required" => "Hour is required",
 			"time_hour.numeric" => "Hour should be a number",
-			"time_hour.between" => "Hour should be between 17 and 19",
+			"time_hour.between" => "Hour should be between {$opening->format('H')} and {$closing->format('H')}",
 			"time_min.required" => "Minute is required",
 			"time_min.numeric" => "Minute should be a number",
 			"time_min.between" => "Minute should be between 0 and 59",
-			"reservation_time.requried" => "Reservation Time is required",
+			"booking_time.requried" => "Booking Time is required",
 			"extension.numeric" => "Extension should be a number",
 			"extension.between" => "Extension should be between 0 and 5",
 			"menu.required" => "A menu is required",
 			"menu.array" => "Malformed menu data, please resubmit",
 			"menu.min" => "At least 1 menu should be selected",
+			"menu.*.required" => "Menu is required",
+			"menu.*.numeric" => "Please refrain from modifying the form",
+			"menu.*.exists" => "Please refrain from modifying the form",
 			"phone_numbers.required" => "A phone number is required",
 			"phone_numbers.array" => "Malformed contact data, please resubmit",
 			"phone_numbers.min" => "At least 1 phone number is required",
@@ -235,14 +261,14 @@ class Reservation extends Model
 			'phone_numbers' => explode(",", $req->phone_numbers)
 		]);
 
-		$iterations = $req->phone_numbers ? count($req->phone_numbers) : 0;
-		for ($i = 0; $i < $iterations; $i++) {
-			$validationRules["phone_numbers.{$i}"] = array("required", "regex:/^\+*(?=.{7,14})[\d\s-]{7,15}$/", "distinct", "max:15"); // Identifies a phone number with atleast 7 digits
+		// Validation for phone number
+		{
+			$validationRules["phone_numbers.*"] = array("required", "regex:/^\+*(?=.{7,14})[\d\s-]{7,15}$/", "distinct", "max:15"); // Identifies a phone number with atleast 7 digits
 
-			$validationMsg["phone_numbers.{$i}.required"] = "The phone number is required";
-			$validationMsg["phone_numbers.{$i}.regex"] = "Please put a proper phone number";
-			$validationMsg["phone_numbers.{$i}.distinct"] = "This number is already delcared";
-			$validationMsg["phone_numbers.{$i}.max"] = "Phone numbers is capped at 15 characters only";
+			$validationMsg["phone_numbers.*.required"] = "The phone number is required";
+			$validationMsg["phone_numbers.*.regex"] = "Please put a proper phone number";
+			$validationMsg["phone_numbers.*.distinct"] = "This number is already delcared";
+			$validationMsg["phone_numbers.*.max"] = "Phone numbers is capped at 15 characters only";
 		}
 
 		$iterations = max(count($req->contact_name), count($req->contact_email));
@@ -272,7 +298,7 @@ class Reservation extends Model
 
 		$validator = Validator::make($req->all(), $validationRules, $validationMsg);
 
-		// Calculates how many minutes will be added to the reservation (will be used using the addMinutes)
+		// Calculates how many minutes will be added to the booking (will be used using the addMinutes)
 		$menu = [];
 		$hoursToAdd = 0;
 		$minutesToAdd = 0;
@@ -290,26 +316,26 @@ class Reservation extends Model
 		// Adds the extension as minutes
 		$minutesToAdd += ($req->extension * 60);
 
-		// Calculates the duration of the reservation
-		$closing = Carbon::parse("{$req->reservation_date} 22:00:00");
-		$start_at = Carbon::parse("{$req->reservation_date} {$req->time_hour}:{$req->time_min}");
-		$end_at = Carbon::parse("{$req->reservation_date} {$req->time_hour}:{$req->time_min}")
+		// Calculates the duration of the booking
+		$closing = Carbon::parse("{$req->booking_date} 22:00:00");
+		$start_at = Carbon::parse("{$req->booking_date} {$req->time_hour}:{$req->time_min}");
+		$end_at = Carbon::parse("{$req->booking_date} {$req->time_hour}:{$req->time_min}")
 			->addHours($hoursToAdd)->addMinutes($minutesToAdd);
 
 		$validator->after(function ($validator) use ($req, $storeCap, $start_at, $end_at, $closing) {
-			// Checks whether the reservation exceeded the closing time
+			// Checks whether the booking exceeded the closing time
 			if ($end_at->gt($closing)) {
 				$toSubtract = $end_at->diffInMinutes($closing) / 60;
 
 				$validator->errors()->add(
 					"extension",
-					"Extension made the reservation exceed closing time. Remove {$toSubtract} " . Str::plural('hour', $toSubtract)
+					"Extension made the booking exceed closing time. Remove {$toSubtract} " . Str::plural('hour', $toSubtract)
 				);
 			}
 
-			// Checks if the reservation can still be accomodated (store capacity related)
+			// Checks if the booking can still be accomodated (store capacity related)
 			{
-				$paxAccomodated = Reservation::whereDate('reserved_at', '=', $req->reservation_date)
+				$paxAccomodated = Booking::whereDate('reserved_at', '=', $req->booking_date)
 					->whereTime('start_at', '<', $end_at)
 					->whereTime('end_at', '>', $start_at)
 					->sum('pax');
@@ -318,7 +344,7 @@ class Reservation extends Model
 					$end = $end_at->gt($closing) ? $closing : $end_at;
 					$validator->errors()->add(
 						"general",
-						"Sorry but reservation cannot be accomodated. The restaurant is at full capacity for this time range <b>({$start_at->format('H:i')} - {$end->format('H:i')})</b>."
+						"Sorry but booking cannot be accomodated. The restaurant is at full capacity for this time range <b>({$start_at->format('H:i')} - {$end->format('H:i')})</b>."
 					);
 				}
 
@@ -326,7 +352,7 @@ class Reservation extends Model
 				if ($totalPax > $storeCap) {
 					$validator->errors()->add(
 						"general",
-						"Sorry but reservation cannot be accomodated. Current reservations is already at restaurant's capacity which is at <b>{$storeCap}</b> people. Adding the current reservaton will result to a total of <b>{$totalPax}</b> people reserved at the same time..."
+						"Sorry but booking cannot be accomodated. Current bookings is already at restaurant's capacity which is at <b>{$storeCap}</b> people. Adding the current reservaton will result to a total of <b>{$totalPax}</b> people reserved at the same time..."
 					);
 				}
 			}

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Reservation')
+@section('title', 'Booking')
 
 @section('content')
 
@@ -18,8 +18,8 @@ $maxCap = App\Settings::getValue('capacity');
 				{{-- Header --}}
 				<div class="col-12">
 					<h1>
-						<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.reservations.index')}}');" class="text-dark text-decoration-none font-weight-normal">
-							<i class="fas fa-chevron-left mr-2"></i>Reservation
+						<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.bookings.index')}}');" class="text-dark text-decoration-none font-weight-normal">
+							<i class="fas fa-chevron-left mr-2"></i>Booking
 						</a>
 					</h1>
 				</div>
@@ -33,7 +33,7 @@ $maxCap = App\Settings::getValue('capacity');
 		<div class="mx-auto col-12 col-lg-10">
 			<div class="card dark-shadow mb-5" id="inner-content">
 				<div class="card-body">
-					<form action="{{ route('admin.reservations.store') }}" method="POST" enctype="multipart/form-data" class="form needs-validation" data-continuous-validation="false">
+					<form action="{{ route('admin.bookings.update', [$booking->id]) }}" method="POST" enctype="multipart/form-data" class="form needs-validation" data-continuous-validation="false">
 						{{ csrf_field() }}
 						{{-- GENERAL VALIDATION MESSAGE --}}
 						@error('general')
@@ -47,23 +47,35 @@ $maxCap = App\Settings::getValue('capacity');
 
 						{{-- RESERVATION INFORMATION --}}
 						<div class="card my-2">
-							<h3 class="card-header">Reservation Information</h3>
+							<div class="card-header d-flex flex-wrap">
+								<h3 class="w-100 w-md-50 mb-3 mx-auto my-md-auto ml-lg-0 mr-lg-auto text-center text-lg-left">Booking Information</h3>
+								<select class="show-tick select-picker form-control w-100 w-sm-75 w-md-50 w-lg-25 my-auto mx-auto ml-lg-auto mr-lg-0" name="booking_type" id="bookingType" required>
+									@foreach (App\Booking::$bookingTypes as $t)
+									<option value="{{ $t }}" {{ $booking->booking_type == $t ? "checked" : "" }}>{{ ucwords($t) }}</option>
+									@endforeach
+								</select>
+							</div>
 
 							<div class="row card-body">
-								{{-- MENU NAME --}}
+								<div class="form-group col-12">
+									<h3>Control No <span class="float-right" style="font-weight: normal;">#{{ $booking->control_no }}</span></h3>
+									<hr class="hr-thick">
+								</div>
+
+								{{-- BOOKING DATE --}}
 								<div class="form-group col-12 col-lg-4">
-									<label class="h5 required" for="reservation_date">Reservation Date</label>
-									<input class="form-control" type="date" name="reservation_date" id="reservation_date" min="{{ $isEightPM ? $datetime->addDay()->format("Y-m-d") : $datetime->format("Y-m-d") }}" value="{{ old('reservation_date') }}" required />
-									<span class="text-danger text-wrap">{{ $errors->first('reservation_date') }}</span>
+									<label class="h5 required" for="booking_date">Booking Date</label>
+									<input class="form-control" type="date" name="booking_date" id="booking_date" min="{{ $isEightPM ? $datetime->addDay()->format("Y-m-d") : $datetime->format("Y-m-d") }}" value="{{ $booking->reserved_at }}" required />
+									<span class="text-danger text-wrap">{{ $errors->first('booking_date') }}</span>
 								</div>
 
 								{{-- PAX --}}
 								<div class="form-group col-12 col-lg-4">
 									<label class="h5" for="pax">Pax</label>
-									<input class="form-control has-spinner" type="number" id="pax" name="pax" min="1" max="{{ $maxCap }}" value="{{ old('pax') ? old('pax') : '1' }}" required />
+									<input class="form-control has-spinner" type="number" id="pax" name="pax" min="1" max="{{ App\Settings::getValue('capacity') }}" value="{{ $booking->pax }}" required />
 									<div class="d-flex flex-row">
 										<span class="text-danger text-wrap mr-auto">{{ $errors->first('pax') }}</span>
-										<span class="text-muted ml-auto small">Max: {{ $maxCap }}</span>
+										<span class="text-muted ml-auto small">Max: {{ App\Settings::getValue('capacity') }}</span>
 									</div>
 								</div>
 
@@ -75,7 +87,7 @@ $maxCap = App\Settings::getValue('capacity');
 										<div class="input-group-prepend">
 											<span class="input-group-text">{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) }}</span>
 										</div>
-										<input type="number" readonly class="form-control" min="0" max="4294967295" step=".25" name="price" id="price" value="{{ old('price') ? number_format(old('price'), 2, ".", "") : number_format(0, 2, ".", "") }}" required />
+										<input type="number" readonly class="form-control" min="0" max="4294967295" step=".25" name="price" id="price" value="{{ number_format($booking->price, 2, ".", "") }}" required />
 									</div>
 									<span class="text-danger text-wrap">{{ $errors->first('price') }}</span>
 								</div>
@@ -84,29 +96,29 @@ $maxCap = App\Settings::getValue('capacity');
 							<div class="row card-body">
 								{{-- RESERVATION TIME --}}
 								<div class="form-group col-12 col-lg-6">
-									<label class="h5" for="reservation_time">Time</label>
+									<label class="h5" for="booking_time">Time</label>
 
 									<div class="input-group">
 										<div class="input-group-prepend">
 											<span class="input-group-text">Hour</span>
 										</div>
 
-										<input class="form-control has-spinner text-right" title="Hour" type="number" name="time_hour" id="time_hour" min="17" max="19" value="{{ (old('time_hour') ? old('time_hour') : ($isEightPM ? '17' : ($datetime->format('H') < 17 ? '17' : $datetime->format('H')))) }}" required />
+										<input class="form-control has-spinner text-right" title="Hour" type="number" name="time_hour" id="time_hour" min="17" max="19" value="{{ \Carbon\Carbon::createFromFormat("H:i", $booking->start_at)->format("H") }}" required />
 										
 										<div class="input-group-prepend input-group-append">
 											<span class="input-group-text">:</span>
 										</div>
 										
-										<input class="form-control has-spinner text-left" title="Minutes" type="number" name="time_min" id="time_min" min="0" max="59" value="{{ old('time_min') ? old('time_min') : '00' }}" required />
+										<input class="form-control has-spinner text-left" title="Minutes" type="number" name="time_min" id="time_min" min="0" max="59" value="{{ \Carbon\Carbon::createFromFormat("H:i", $booking->start_at)->format("i") }}" required />
 
 										<div class="input-group-append">
 											<span class="input-group-text">Minute</span>
 										</div>
 									</div>
-									<input type="hidden" name="reservation_time" id="reservation_time" value="{{ old('reservation_time') ? old('reservation_time') : "17:00" }}" required />
+									<input type="hidden" name="booking_time" id="booking_time" value="{{ old('booking_time') ? old('booking_time') : "17:00" }}" required />
 									<span class="text-danger text-wrap">
 										{{
-											(strlen($errors->first('reservation_time')) > 0 ? $errors->first('reservation_time') : 
+											(strlen($errors->first('booking_time')) > 0 ? $errors->first('booking_time') : 
 												(strlen($errors->first('time_hour')) > 0 ? $errors->first('time_hour') : 
 													(strlen($errors->first('time_min')) > 0 ? $errors->first('time_min') : '')
 												)
@@ -119,7 +131,7 @@ $maxCap = App\Settings::getValue('capacity');
 								<div class="form-group col-12 col-lg-6">
 									<label class="h5" for="extension">Extension</label>
 									<div class="input-group">
-										<input class="form-control has-spinner" type="number" name="extension" id="extension" value="{{ old('extension') ? old('extension') : '0' }}" min="0" max="5" step="0.5" required>
+										<input class="form-control has-spinner" type="number" name="extension" id="extension" value="{{ $booking->extension }}" min="0" max="5" step="0.5" required>
 										<div class="input-group-append">
 											<span class="input-group-text">Hours</span>
 										</div>
@@ -156,6 +168,7 @@ $maxCap = App\Settings::getValue('capacity');
 																data-price="{{ $m->price }}"
 																data-duration="{{ $m->getFromDuration() }}"
 																{{ in_array($m->id, (old('menu') ? old('menu') : [])) ? 'selected' : '' }}
+																{{ in_array($m->id, $booking->menus->pluck('id')->toArray()) ? 'selected' : '' }}
 																>
 																{{ $m->name }}
 															</option>
@@ -184,9 +197,9 @@ $maxCap = App\Settings::getValue('capacity');
 									<p class="h5">Contacts</p>
 									
 									<div class="form-group">
-										<label for="phone_numbers" class="form-label">Contact Number(s)</label>
+										<label for="phone_numbers" class="form-label">Contact Number</label>
 
-										<input type="text" name="phone_numbers" id="phone_numbers" class="tagify-field customLook custom-scrollbar form-control" value="{{ old('phone_numbers') ? implode(",", old('phone_numbers')) : '' }}" required>
+										<input name="phone_numbers" id="phone_numbers" class="customLook custom-scrollbar form-control" value="{{ implode(", ", explode("|", $booking->phone_numbers)) }}" required>
 										<span class="text-danger text-wrap validation">
 											@if ($errors->first("phone_numbers"))
 											{{ $errors->first("phone_numbers") }}
@@ -198,57 +211,42 @@ $maxCap = App\Settings::getValue('capacity');
 
 									{{-- Dynamic form fields --}}
 									<div class="row" id="contactField">
+										{{-- CONTACT FORM --}}
 										@php ($index = 0)
-										{{-- IF CONTACT --}}
-										@if ((old('contact_name') || old('contact_email')) && $new_contact_index != null)
-											@php($new_contact_index = Session::get('new_contact_index'))
-											@foreach (old('contact_name') as $c)
-											<div class="col-12 col-md-4 my-2 position-relative contact-form" {{ $index == 0 ? 'id=origContactForm data-min-1=true' : '' }}>
-												<div class="card h-100">
-													<div class="card-body">
-														<div class="form-group">
-															<label class="form-label">Contact Name</label>
-															<input name="contact_name[]" class="form-control" type="text" title="Contact name" value="{{ old("contact_name.{$index}") }}" {{ $index == 0 ? 'required' : '' }} />
-															<span class="text-danger text-wrap validation">{{ $errors->first("contact_name.{$new_contact_index[$index]}") }}</span>
-														</div>
+										@php($new_contact_index = Session::get('new_contact_index'))
+										@php($newIndexRange = count($new_contact_index))
 
-														<div class="form-group">
-															<label class="form-label">Email</label>
-															<input type="email" class="form-control" name="contact_email[]" title="Contact email" value="{{ old("contact_email.{$index}") }}" {{ $index == 0 ? 'required' : '' }} />
-															<span class="text-danger text-wrap validation">{{ $errors->first("contact_email.{$new_contact_index[$index]}") }}</span>
-														</div>
-													</div>
-												</div>
-
-												@if ($index++ > 0)
-												<div class="position-absolute d-flex flex-row" style="top: calc(0rem); right: calc(1rem - 1px);">
-													<button type="button" class="rounded btn btn-white border-secondary-light" title="Remove contact information" onclick="$(this).parent().parent().remove();">
-														<i class="fas fa-trash fa-sm text-danger"></i>
-													</button>
-												</div>
-												@endif
-											</div>
-											@endforeach
-										{{-- ELSE CONTACT --}}
-										@else
-										<div class="col-12 col-md-4 my-2 position-relative" id="origContactForm" data-min-1="true">
+										@foreach ($booking->contactInformation as $c)
+										<div class="col-12 col-md-4 my-2 position-relative contact-form" {{ $index == 0 ? 'id=origContactForm data-min-1=true' : '' }}>
 											<div class="card h-100">
 												<div class="card-body">
 													<div class="form-group">
 														<label class="form-label">Contact Name</label>
-														<input name="contact_name[]" class="form-control" type="text" title="Contact name" value="{{ old("contact_name.0") }}" required />
-														<span class="text-danger text-wrap validation">{{ $errors->first("contact_name.0") }}</span>
+														<input name="contact_name[]" class="form-control" type="text" title="Contact name" value="{{ $c->contact_name }}" {{ $index == 0 ? 'required' : '' }} />
+														<span class="text-danger text-wrap validation">
+															{{ $errors->first("contact_name.{$new_contact_index[$index]}") }}
+														</span>
 													</div>
 
 													<div class="form-group">
 														<label class="form-label">Email</label>
-														<input type="email" class="form-control" name="contact_email[]" title="Contact email" value="{{ old("contact_email.0") }}" required />
-														<span class="text-danger text-wrap validation">{{ $errors->first("contact_email.0") }}</span>
+														<input type="email" class="form-control" name="contact_email[]" title="Contact email" value="{{ $c->email }}" {{ $index == 0 ? 'required' : '' }} />
+														<span class="text-danger text-wrap validation">
+															{{ $errors->first("contact_email.{$new_contact_index[$index]}") }}
+														</span>
 													</div>
 												</div>
 											</div>
+
+											@if ($index++ > 0)
+											<div class="position-absolute d-flex flex-row" style="top: calc(0rem); right: calc(1rem - 1px);">
+												<button type="button" class="rounded btn btn-white border-secondary-light" title="Remove contact information" onclick="$(this).parent().parent().remove();">
+													<i class="fas fa-trash fa-sm text-danger"></i>
+												</button>
+											</div>
+											@endif
 										</div>
-										@endif
+										@endforeach
 									</div>
 								</div>
 							</div>
@@ -256,7 +254,7 @@ $maxCap = App\Settings::getValue('capacity');
 
 						<div class="d-flex">
 							<button class="btn btn-success ml-auto" type="submit" data-action="submit">Submit</button>
-							<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.reservations.index')}}');" class="btn btn-danger ml-3 mr-auto">Cancel</a>
+							<a href="javascript:void(0);" onclick="confirmLeave('{{route('admin.bookings.index')}}');" class="btn btn-danger ml-3 mr-auto">Cancel</a>
 						</div>
 					</form>
 				</div>
@@ -372,7 +370,7 @@ $maxCap = App\Settings::getValue('capacity');
 		$(document).on('keyup keydown keypress change click', '#time_min, #time_hour', (e) => {
 			let hourE = $('#time_hour');
 			let minE = $('#time_min');
-			let timeE = $('#reservation_time');
+			let timeE = $('#booking_time');
 			let time = `{{ now()->format('Y-m-d') }}T${`0${parseInt(hourE.val())}`.slice(-2)}:${`0${minE.val()}`.slice(-2)}:00Z`;
 
 			let date = new Date(time);
@@ -397,14 +395,6 @@ $maxCap = App\Settings::getValue('capacity');
 			pattern: /^\+*(?=.{7,14})[\d\s-]{7,15}$/
 		});
 
-		$(`[type=submit]`).on('click', (e) => {
-			let obj = $(e.currentTarget).closest('form');
-			let validTagify = obj.find(`.tagify-field:valid`);
-			let invalidTagify = obj.find(`.tagify-field:invalid`);
-
-			validTagify.parent().find('tags.tagify').removeClass('is-valid is-invalid').addClass('is-valid');
-			invalidTagify.parent().find('tags.tagify').removeClass('is-valid is-invalid').addClass('is-invalid');
-		});
 	});
 </script>
 @endsection

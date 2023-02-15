@@ -38,7 +38,7 @@ class ActivityLog extends Model
 			return $this->email;
 	}
 
-	public function item(boolean $asQuery = false) {
+	public function item(bool $asQuery = false) {
 		$modelType = $this->model_type;
 		$modelId = $this->model_id;
 
@@ -49,13 +49,17 @@ class ActivityLog extends Model
 	}
 
 	public static function log($action, $model_id = null, $model_type = null, $user_id = null, $is_automated = false) {
+		$email = null;
 		if ($user_id == null && Auth::check()) {
 			$user_id = Auth::user()->id;
 			$email = Auth::user()->email;
 		}
 		else if ($user_id == null && !Auth::check()) {
 			$user_id = 0;
-			$email = null;
+		}
+		else if ($user_id != null) {
+			$user = User::find($user_id);
+			$email = $user->email;
 		}
 
 		ActivityLog::create([

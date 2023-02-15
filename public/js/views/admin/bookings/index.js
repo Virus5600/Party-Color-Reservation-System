@@ -199,48 +199,65 @@ $(document).ready(() => {
 			var data = e.event.extendedProps
 			let htmlContent = `<div class="spinner-border text-dark" role="status"><span class="sr-only">Loading...</span></div>`;
 
-			$.get(showReservation.replace('%241', data.data_id), (response) => {
+			$.get(showBooking.replace('%241', data.data_id), (response) => {
 				if (response.success) {
-					let reservation = response.reservation;
-					let date = new Date(reservation.reserved_at);
-					let createdAt = new Date(reservation.created_at);
+					let booking = response.booking;
+					let date = new Date(booking.reserved_at);
+					let createdAt = new Date(booking.created_at);
 					let dateOpt = {year: 'numeric', month: 'long', day: 'numeric'};
 					let fulldateOpt = {year: 'numeric', month: 'long', day: 'numeric', hours: '2-digits'};
 
 					let phoneNumbers = ``;
-					for (let pn of reservation.phone_numbers.split("|"))
+					for (let pn of booking.phone_numbers.split("|"))
 						phoneNumbers += `<a href="tel:${pn}">${pn}</a>, `;
 					phoneNumbers = phoneNumbers.trim();
 					phoneNumbers = phoneNumbers.substring(0, phoneNumbers.length-1);
 
 					let callback = `updateCalendar(${data.data_id})`;
 
-					// BUTTONS
-					let pendingButtons = `<button onclick="updateCalendar(${reservation.id}, '${approveReservation.replace('%241', reservation.id)}', undefined, true, 'Are you sure you want to approve this reservation?')" class="btn btn-success"><i class="fas fa-circle-check mr-2"></i>Approve</button>
-						<button class="btn btn-danger" data-scf="Reason" data-scf-name="reason" data-scf-custom-title="Reason for rejection" data-scf-target-uri="${rejectReservation.replace('%241', reservation.id)}" data-scf-use-textarea='true' data-scf-callback='${callback}'><i class="fas fa-circle-xmark mr-2"></i>Reject</a>`;
+					// ACTION BUTTONS
+					let pendingButtons = `<button onclick="updateCalendar(${booking.id}, '${approveBooking.replace('%241', booking.id)}', undefined, true, 'Are you sure you want to approve this booking?')" class="btn btn-success"><i class="fas fa-circle-check mr-2"></i>Approve</button>
+						<button class="btn btn-danger" data-scf="Reason" data-scf-name="reason" data-scf-custom-title="Reason for rejection" data-scf-target-uri="${rejectBooking.replace('%241', booking.id)}" data-scf-use-textarea='true' data-scf-callback='${callback}'><i class="fas fa-circle-xmark mr-2"></i>Reject</a>`;
 					
-					let approvedButtons = `<button onclick="updateCalendar(${reservation.id}, '${pendingReservation.replace('%241', reservation.id)}', undefined, true, 'Are you sure you want to move this to pending?')" class="btn btn-warning"><i class="fas fa-clock mr-2"></i>Pending</a>
-						<button class="btn btn-danger" data-scf="Reason" data-scf-name="reason" data-scf-custom-title="Reason for rejection" data-scf-target-uri="${rejectReservation.replace('%241', reservation.id)}" data-scf-use-textarea='true' data-scf-callback='${callback}'><i class="fas fa-circle-xmark mr-2"></i>Reject</a>`;
+					let approvedButtons = `<button onclick="updateCalendar(${booking.id}, '${pendingBooking.replace('%241', booking.id)}', undefined, true, 'Are you sure you want to move this to pending?')" class="btn btn-warning"><i class="fas fa-clock mr-2"></i>Pending</a>
+						<button class="btn btn-danger" data-scf="Reason" data-scf-name="reason" data-scf-custom-title="Reason for rejection" data-scf-target-uri="${rejectBooking.replace('%241', booking.id)}" data-scf-use-textarea='true' data-scf-callback='${callback}'><i class="fas fa-circle-xmark mr-2"></i>Reject</a>`;
 					
-					let rejectedButtons = `<button onclick="updateCalendar(${reservation.id}, '${approveReservation.replace('%241', reservation.id)}', undefined, true, 'Are you sure you want to approve this reservation?')" class="btn btn-success"><i class="fas fa-circle-check mr-2"></i>Approve</button>
-						<button onclick="updateCalendar(${reservation.id}, '${pendingReservation.replace('%241', reservation.id)}', undefined, true, 'Are you sure you want to move this to pending?')" class="btn btn-warning"><i class="fas fa-clock mr-2"></i>Pending</a>`;
+					let rejectedButtons = `<button onclick="updateCalendar(${booking.id}, '${approveBooking.replace('%241', booking.id)}', undefined, true, 'Are you sure you want to approve this booking?')" class="btn btn-success"><i class="fas fa-circle-check mr-2"></i>Approve</button>
+						<button onclick="updateCalendar(${booking.id}, '${pendingBooking.replace('%241', booking.id)}', undefined, true, 'Are you sure you want to move this to pending?')" class="btn btn-warning"><i class="fas fa-clock mr-2"></i>Pending</a>`;
+
+					// ADDITIONAL ORDER BUTTONS
+					let additionalOrderButtons = `<a href="${additionalOrdersIndex.replace('%241', booking.id)}" class="btn btn-primary">Additional Orders</a>`;
+
+					// Subtotal of all additional orders
+					let additionalOrdersSubtotal = 0;
+					for (let a of booking.additional_orders)
+						if (a.deleted_at == null)
+							additionalOrdersSubtotal += parseFloat(a.price);
 
 					htmlContent = `
 						<div class="card">
 							<h4 class="card-header d-flex">
-								<span class="mr-auto">${date.toLocaleDateString(window.lang, dateOpt)} ${reservation.start_at} - ${reservation.end_at}</span>
-								<span class="ml-auto">${currencySymbol} ${parseFloat(reservation.price).toFixed(2)}</span>
+								<span class="w-100 w-lg-50 mr-lg-auto">${date.toLocaleDateString(window.lang, dateOpt)} ${booking.start_at} - ${booking.end_at}</span>
+								<span class="w-100 w-lg-50 ml-lg-auto">${currencySymbol} ${parseFloat(parseFloat(booking.price) + additionalOrdersSubtotal).toFixed(2)}</span>
 							</h4>
 							
 							<div class="card-body">
 								<div class="row text-left">
-									<div class="col-12 col-lg-6">
-										<p><b>Pax:</b> &times;${reservation.pax} people${reservation.pax > 1 ? 's' : ''}</p>
+									<div class="col-12 col-lg-6 my-3 my-lg-0">
+										<p><b>Control Number:</b> #${booking.control_no}</p>
+									</div>
+
+									<div class="col-12 col-lg-6 my-3 my-lg-0">
+										<p><b>Booking Type:</b> ${booking.booking_type}</p>
+									</div>
+
+									<div class="col-12 col-lg-6 my-3 my-lg-0">
+										<p><b>Pax:</b> &times;${booking.pax} people${booking.pax > 1 ? 's' : ''}</p>
 										<p><b>Created:</b> ${createdAt.toLocaleDateString(window.lang, fulldateOpt)}</p>
 									</div>
 									
-									<div class="col-12 col-lg-6">
-										<p><b>Extension:</b> ${reservation.extension * 60} min (${reservation.extension} hrs)</p>
+									<div class="col-12 col-lg-6 my-3 my-lg-0">
+										<p><b>Extension:</b> ${booking.extension * 60} min (${booking.extension} hrs)</p>
 										<p><b>Phone Numbers:</b> ${phoneNumbers}</p>
 									</div>
 								</div>
@@ -249,12 +266,15 @@ $(document).ready(() => {
 							<div class="card-body text-left">
 								<div class="row">
 									<div class="col-12 col-lg-6">
-										<h3>Menus</h3>
+										<div class="d-flex justify-content-between">
+											<span class="h3">Menus</span>
+											<span class="my-auto">${currencySymbol}${booking.price}</span>
+										</div>
 
 										<ul>`;
-					// Write down reservation menus
-					for (let m of reservation.menus)
-						htmlContent += `<li>${m.name}</li>`;
+					// Write down booking menus
+					for (let m of booking.menus)
+						htmlContent += `<li>${m.name} (&times;${m.pivot.count})</li>`;
 					htmlContent += `
 										</ul>
 									</div>
@@ -263,23 +283,66 @@ $(document).ready(() => {
 										<h3>Contacts</h3>
 										
 										<ul>`;
-					// Write down reservation contacts
-					for (let c of reservation.contact_information)
+					// Write down booking contacts
+					for (let c of booking.contact_information)
 						htmlContent += `<li>${c.contact_name} [<a href="mailto:${c.email}">${c.email}</a>]</li>`;
 					htmlContent += 	`
 										</ul>
 									</div>
 								</div>
 							</div>
+
+							<hr class="hr-thick">
+							
+							<div class="card-body text-left">
+								<div class="row my-3">
+									<div class="col-12 col-lg-6">
+										<h3>Additional Orders</h3>
+									</div>
+
+									<div class="col-12 col-lg-6 d-flex justify-content-evenly">
+										<i class="fas fa-square mr-2 text-danger my-auto"></i>
+										<span class="my-auto">Voided</span>
+									</div>
+								</div>
+
+								<div class="row my-3">`;
+					// List down all additional orders
+					if (booking.additional_orders.length > 0) {
+						for (let a of booking.additional_orders) {
+							htmlContent +=
+										`<div class="col-12 col-lg-6 p-2">
+											<div class="container-fluid p-2 border rounded border-secondary ${a.deleted_at == null ? '' : 'bg-danger text-white'}">
+												<div class="d-flex justify-content-between">
+													<span class="h5">Subtotal: </span>
+													<span class="my-auto">${currencySymbol}${a.price}</span>
+												</div>
+												<hr class="hr-thick">
+
+												<ul>`;
+								for (let m of a.booking_menus)
+									htmlContent += `<li>${m.menu.name} (&times;${m.count})</li>`;
+							htmlContent +=
+												`</ul>
+											</div>
+										</div>`;
+						}
+					}
+					else {
+						htmlContent += `<div class="col-12 p-2 text-center h3">[No Aadditional Orders Yet]</div>`;
+					}
+					htmlContent +=
+								`</div>
+							</div>
 							
 							<div class="card-body text-left m-0 p-0">
 								<div class="card">
-									<h3 class="card-header" style="color: white; background-color: ${response.colorCode}">Reservation Status (${response.status})</h3>`;
+									<h3 class="card-header" style="color: white; background-color: ${response.colorCode}">Booking Status (${response.status})</h3>`;
 					if (response.colorCode == "#dc3545") {
 						htmlContent += `
 									<div class="card-body">
 										<h4>Reason:</h4>
-										<p>${reservation.reason}</p>
+										<p>${booking.reason}</p>
 									</div>`;
 					}
 					htmlContent += `
@@ -287,16 +350,21 @@ $(document).ready(() => {
 							</div>
 
 							<div class="card-footer">
-								<div class="btn-group" role="group" aria-label="Reservation Actions">`;
-					// Displaying Reservation Action Buttons
+								<div class="btn-group" role="group" aria-label="Booking Actions">`;
+					// Displaying Booking Action Buttons
 					if (["Happening", "Done", "Ghosted", "Cancelled", "Rejected", "Unknown"].includes(response.status))
 						htmlContent += `<button class="btn btn-primary" disabled>Edit</button>`;
 					else
-						htmlContent += `<a href="${editReservation.replace('%241', data.data_id)}" class="btn btn-primary">Edit</a>`;
+						htmlContent += `<a href="${editBooking.replace('%241', data.data_id)}" class="btn btn-primary">Edit</a>`;
 					htmlContent += `
-									<button onclick="confirmLeave('${deleteReservation.replace('%241', data.data_id)}', undefined, 'This cannot action cannot be undone once you\'ve decided to proceed.')" class="btn btn-danger">Remove</button>
+									<button onclick="confirmLeave('${deleteBooking.replace('%241', data.data_id)}', undefined, 'This cannot action cannot be undone once you\'ve decided to proceed.')" class="btn btn-danger">Remove</button>
+								</div>`;
+					// Displaying athe additional orders button
+					htmlContent += `
+								<div class="btn-group" role="group" aria-label="Status Actions">
+									${additionalOrderButtons}
 								</div>
-
+								
 								<div class="btn-group" role="group" aria-label="Status Actions" id="statusActionButtons">`;
 					// Displaying Status Action Buttons
 					if (response.status == 'Pending')
@@ -397,7 +465,7 @@ const updateCalendar = async function(id, route, reqType = 'get', shouldConfirm 
 	}
 
 	const updateBG = () => {
-		$.get(reservationFetchOne.replace('%241', id), (response) => {
+		$.get(bookingFetchOne.replace('%241', id), (response) => {
 			eventCal.setProp('color', response.props.statusColorCode);
 		});
 	};

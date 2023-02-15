@@ -52,7 +52,7 @@
 		<link rel="mask-icon" href="{{ $webLogo }}">
 
 		{{-- TITLE --}}
-		<title>Admin Login - Party Color</title>
+		<title>Confirm Password - Party Color</title>
 	</head>
 
 	<body>
@@ -82,18 +82,15 @@
 			<main class="content d-flex flex-column flex-grow-1 my-3 my-lg-5" id="content">
 				<div class="container-fluid d-flex flex-column flex-grow-1">
 					
-					{{-- LOGIN FORM START --}}
+					{{-- CONFIRM PASSWORD FORM START --}}
 					<div class="card w-100 w-sm-75 w-md-50 w-lg-25 m-auto">
-						<h4 class="card-header text-center">LOGIN</h4>
+						<h4 class="card-header text-center">CONFIRM PASSWORD</h4>
 
-						<form action="{{ route('authenticate') }}" method="POST" class="card-body">
+						<form action="{{ route('password.confirm.check') }}" method="POST" class="card-body" id="form">
 							{{ csrf_field() }}
-							
-							<div class="form-group">
-								<label class="form-label" for="email">Email</label>
-								<input class="form-control border-secondary" type="email" name="email" value="{{ old('email') }}" aria-label="E-mail" placeholder="E-mail" />
-							</div>
 
+							<p class="card-text text-center text-muted">{{ $message }}</p>
+							
 							<div class="form-group mb-0">
 								<label class="form-label" for="password">Password</label>
 								<div class="input-group">
@@ -113,6 +110,7 @@
 
 							<div class="form-group text-center">
 								<button type="submit" class="btn btn-primary" data-action="submit">Submit</button>
+								<a href="{{ url()->previous() }}" class="btn btn-secondary">Cancel</a>
 							</div>
 						</form>
 					</div>
@@ -122,6 +120,8 @@
 			</main>
 
 			<!-- SCRIPTS -->
+			<script type="text/javascript" src="{{ asset('js/util/confirm-leave.js') }}"></script>
+			<script type="text/javascript" src="{{ asset('js/util/disable-on-submit.js') }}"></script>
 			<script type="text/javascript" src="{{ asset('js/login.js') }}"></script>
 			<script type="text/javascript">
 				@if (Session::has('flash_error'))

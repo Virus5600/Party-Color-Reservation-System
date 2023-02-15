@@ -5,16 +5,18 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ReservationMenu extends Model
+class BookingMenu extends Model
 {
 	use HasFactory;
 
 	protected $fillable = [
-		'reservation_id',
+		'booking_id',
 		'menu_id',
+		'count'
 	];
 
 	// Relationships
-	public function reservation() { return $this->belongsTo('App\Reservation', 'reservation_id', 'id'); }
 	public function menu() { return $this->belongsTo('App\Menu', 'menu_id', 'id'); }
+	public function booking() { return $this->morphTo(); }
+	public function additionalOrder() { return $this->morphTo(); }
 }

@@ -20,9 +20,9 @@ Route::post('/admin-search/{id}', 'ApiController@adminSearch')->name('adminSearc
 // Removing Image
 Route::post('/remove-image', 'ApiController@removeImage')->name('removeImage');
 
-// Fetch Reservation Event
-Route::get('/reservation/{id}', 'ApiController@fetchReservationEvent')->name('reservations.fetch-event');
-Route::get('/reservation/fetch/{monthYear?}', 'ApiController@fetchReservationFromRange')->name('api.admin.reservations.fetch');
+// Fetch Booking Event
+Route::get('/booking/{id}', 'ApiController@fetchBookingEvent')->name('bookings.fetch-event');
+Route::get('/booking/fetch/{monthYear?}', 'ApiController@fetchBookingFromRange')->name('api.admin.bookings.fetch');
 
 // REACT API ENDPOINTS //
 Route::group(['prefix' => 'react'], function() {
@@ -31,8 +31,8 @@ Route::group(['prefix' => 'react'], function() {
 		Route::get('/fetch', 'ReactApiController@fetchAnnouncements')->name('api.react.announcements.fetch');
 	});
 
-	// Reservation
-	Route::group(['prefix' => 'reservations'], function() {
-		Route::post('/create', 'ReactApiController@reservationsCreate')->name('api.react.reservations.create');
+	// Booking
+	Route::group(['prefix' => 'bookings'], function() {
+		Route::post('/create', 'ReactApiController@bookingsCreate')->name('api.react.bookings.create');
 	});
 });

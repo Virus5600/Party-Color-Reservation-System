@@ -10,10 +10,11 @@ use App\ActivityLog;
 use App\Announcement;
 use App\Inventory;
 use App\Menu;
-use App\Reservation;
+use App\Booking;
 
 use App\Enum\ApprovalStatus;
 
+use DB;
 use Log;
 
 class PageController extends Controller
@@ -37,7 +38,7 @@ class PageController extends Controller
 	// ADMIN PAGES
 	protected function dashboard() {
 		$totals = [
-			'calendar-alt' => Reservation::class,
+			'calendar-alt' => Booking::class,
 			'boxes' => Inventory::class,
 		];
 
@@ -59,19 +60,19 @@ class PageController extends Controller
 			'critical_inventories' => [
 				'clazz' => Inventory::class,
 				'name' => 'Critical Stocks',
-				'conditions' => ['withTrashed', 'quantity <= 10'],
-				'columns' => ['item_name', 'quantity'],
+				'conditions' => ['withTrashed', 'quantity <= critical_level true'],
+				'columns' => ['item_name', 'quantity', 'critical_level'],
 				'hasActions' => false,
 				'paginate' => 5
 			],
-			'pending_reservations' => [
-				'clazz' => Reservation::class,
-				'name' => 'Pending Reservations',
+			'pending_bookings' => [
+				'clazz' => Booking::class,
+				'name' => 'Pending Bookings',
 				'conditions' => ['status = ' . ApprovalStatus::Pending],
 				'hiddenColumns' => ['price'],
 				'columns' => ['pax'],
-				'columnsFn' => ['reservation_for', 'price'],
-				'aliasFn' => ['reservation_for' => 'reservationFor', 'price' => 'fetchPrice'],
+				'columnsFn' => ['booking_for', 'price'],
+				'aliasFn' => ['booking_for' => 'bookingFor', 'price' => 'fetchPrice'],
 				'fnFirst' => true,
 				'hasActions' => false,
 				'paginate' => 5
@@ -104,9 +105,11 @@ class PageController extends Controller
 			array_push($months, Carbon::parse(now()->format('Y') . '-' . $i . '-' . now()->format('d'))->format('M'));
 
 			array_push($monthly_earnings,
-				Reservation::where('created_at', '>=', Carbon::parse(now()->format('Y') . '-' . $i . '-01'))
-					->where('created_at', '<=', Carbon::parse(Carbon::now()->format('Y') . '-' . $i)->endOfMonth())
-					->where('status', '=', ApprovalStatus::Approved)
+				Booking::where('created_at', '>=', Carbon::parse(now()->format('Y') . '-' . $i . '-01'))
+					->where('created_at', '<=', Carbon::parse(now()->format('Y') . '-' . $i)->endOfMonth())
+					->where(function($query) {
+						return $query->where(DB::raw('CONCAT(reserved_at, " ", start_at)'), '<=', now()->format("Y-m-d H:i:s"));
+					})
 					->get()
 					->sum('price')
 			);

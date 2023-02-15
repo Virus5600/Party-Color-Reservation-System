@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 use App\Enum\ApprovalStatus;
 
-class CreateReservationsTable extends Migration
+class CreateBookingsTable extends Migration
 {
 	/**
 	 * Run the migrations.
@@ -15,15 +15,16 @@ class CreateReservationsTable extends Migration
 	 */
 	public function up()
 	{
-		Schema::create('reservations', function (Blueprint $table) {
+		Schema::create('bookings', function (Blueprint $table) {
 			$table->id();
-			$table->string('control_no');
+			$table->string('control_no')->unique();
+			$table->enum('booking_type', ['reservation', 'walk-ins'])->default('reservation');
 			$table->time('start_at');
 			$table->time('end_at');
 			$table->date('reserved_at');
 			$table->decimal('extension', 4, 2)->unsigned()->default(0);
 			$table->decimal('price', 17, 2)->unsigned();
-			$table->integer('pax');
+			$table->integer('pax')->unsigned();
 			$table->string('phone_numbers');
 			$table->tinyInteger('archived')->default(0);
 			$table->string('status')->default(ApprovalStatus::Pending);
@@ -41,6 +42,6 @@ class CreateReservationsTable extends Migration
 	 */
 	public function down()
 	{
-		Schema::dropIfExists('reservations');
+		Schema::dropIfExists('bookings');
 	}
 }

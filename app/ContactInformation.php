@@ -9,10 +9,10 @@ class ContactInformation extends Model
 {
 	protected $fillable = [
 		'contact_name',
-		'reservation_id',
+		'booking_id',
 		'email',
 	];
 
 	// Relationships
-	public function reservation() { return $this->belongsTo('App\Reservation', 'reservation_id', 'id'); }
+	public function booking() { return $this->belongsTo('App\Booking', 'booking_id', 'id'); }
 }

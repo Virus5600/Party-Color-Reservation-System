@@ -285,7 +285,7 @@ class UserController extends Controller
 		ActivityLog::log(
 			"User '" . trim($user->getName()) . "' created under the email of '{$user->email}' as {$user->type->name}.",
 			$user->id,
-			"User"
+			"User",
 			Auth::user()->id,
 			false
 		);
