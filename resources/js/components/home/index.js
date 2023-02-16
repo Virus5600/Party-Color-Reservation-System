@@ -13,8 +13,8 @@ import AboutUs from '../aboutus';
 const Home = ({ onReservationClick, onAnnouncementClick }) => {
     return (
         <div className='Home' id='Home'>
-            <div className='main-image container-mb'>
-                <img src={mainImage} className='img-fluid' />
+            <div className=''>
+                <img src={mainImage} className="img-fluid"/>
             </div>
             <QuickReservation onReservationClick={onReservationClick} />
             <Announcement onAnnouncementClick={onAnnouncementClick} />
