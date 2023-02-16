@@ -1,11 +1,9 @@
-import React from 'react';
-
 import mainImage from './img/mainImage.png';
 
 import './style.css';
 
 // components
-import QuickReservation from '../reservation/quickreservation';
+import QuickReservation from '../archivedreservation/quickreservation';
 import Announcement from '../announcement';
 
 // react router

@@ -9,7 +9,8 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 // components (pages)
 import Home from './home';
 import Nav from './navigation';
-import TempReservation from './tempreservation';
+import Reservation from './reservation';
+import ReservationConfirmation from './reservation/reservationconfirmation';
 import Announcement from './announcement';
 import AnnouncementContent from './announcement/announcementcontent';
 import AboutUs from './aboutus';
@@ -22,6 +23,22 @@ import {
 import {
     loader as loaderAnnouncementContent
 } from './announcement/announcementcontent/index';
+
+import {
+    loader as reservationLoader
+} from './reservation/index';
+
+import {
+    action as confirmAction,
+} from './reservation/index';
+
+import {
+    loader as reservationInfoLoader,
+} from './reservation/reservationconfirmation/index';
+
+import {
+    action as reserveAction,
+} from './reservation/reservationconfirmation/index';
 
 import {
     createBrowserRouter,
@@ -41,7 +58,15 @@ const router = createBrowserRouter([
             },
             {
                 path: 'reservation',
-                element: <TempReservation />,
+                element: <Reservation />,
+                loader: reservationLoader,
+                action: confirmAction,
+            },
+            {
+                path: '/reservation/confirm',
+                element: <ReservationConfirmation />,
+                loader: reservationInfoLoader,
+                action: reserveAction,
             },
             {
                 path: 'announcement',

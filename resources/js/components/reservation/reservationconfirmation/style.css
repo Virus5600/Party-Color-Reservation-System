@@ -1,0 +1,19 @@
+.ReservationDetailsConfirmation {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+    border: 1px solid white;
+    background-color: rgba(66, 32, 32, 0.7);
+}
+
+.ReservationDetailsConfirmationTR td {
+    text-align: left;
+    padding: 20px;
+}
+
+.ReservationDetailsConfirmation-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
