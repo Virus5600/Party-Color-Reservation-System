@@ -13,7 +13,7 @@ export async function action() {
     const raw_session_data = sessionStorage.getItem('reservationInfo');
     const reservationInfo = JSON.parse(raw_session_data);
     await handleReserveClick(reservationInfo);
-    return redirect('/home');
+    return redirect('/reservation/success');
 
 }
 

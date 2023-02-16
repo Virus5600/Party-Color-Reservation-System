@@ -11,6 +11,7 @@ import Home from './home';
 import Nav from './navigation';
 import Reservation from './reservation';
 import ReservationConfirmation from './reservation/reservationconfirmation';
+import ReservationSuccess from './reservation/reservationsuccess';
 import Announcement from './announcement';
 import AnnouncementContent from './announcement/announcementcontent';
 import AboutUs from './aboutus';
@@ -63,10 +64,14 @@ const router = createBrowserRouter([
                 action: confirmAction,
             },
             {
-                path: '/reservation/confirm',
+                path: 'reservation/confirm',
                 element: <ReservationConfirmation />,
                 loader: reservationInfoLoader,
                 action: reserveAction,
+            },
+            {
+                path: 'reservation/success',
+                element: <ReservationSuccess />,
             },
             {
                 path: 'announcement',
