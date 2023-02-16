@@ -32,6 +32,7 @@
 				<tr>
 					<th class="text-center">User</th>
 					<th class="text-center">Action</th>
+					<th class="text-center">Timestamp</th>
 					<th class="text-center"></th>
 				</tr>
 			</thead>
@@ -43,8 +44,12 @@
 						{{ $a->email }}
 					</td>
 
-					<td class="text-center align-middle mx-auto">
+					<td class="text-center align-midde mx-auto">
 						{{ $a->action }}
+					</td>
+
+					<td class="text-center align-midde mx-auto">
+						{{ $a->created_at->format("M d, Y h:i A") }}
 					</td>
 
 					<td class="align-middle">
@@ -54,6 +59,8 @@
 							</button>
 
 							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown{{$a->id}}">
+								<a href="#" class="dropdown-item"><i class="fas fa-eye mr-2"></i>View</a>
+								<a href="#" class="dropdown-item"><i class="fas fa-magnifying-glass-location mr-2"></i>Trace User</a>
 							</div>
 						</div>
 					</td>

@@ -55,6 +55,20 @@
 								<input class="form-control" type="text" name="measurement_unit" value="{{ $item->measurement_unit }}"/>
 							</div>
 
+							{{-- CRITICAL LEVEL --}}
+							<div class="form-group col-12">
+								<label class="h5" for="critical_level">Critical Level</label>
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<button type="button" class="btn btn-secondary quantity-decrement"><i class="fas fa-minus"></i></button>
+									</div>
+									<input class="form-control" type="number" min="0" max="4294967295" name="critical_level" value="{{ $item->critical_level }}"/>
+									<div class="input-group-append">
+										<button type="button" class="btn btn-secondary quantity-increment"><i class="fas fa-plus"></i></button>
+									</div>
+								</div>
+							</div>
+
 							{{-- IS ACTIVE --}}
 							<div class="form-group col-6 my-auto">
 								<div class="custom-control custom-switch custom-switch-md my-auto">
@@ -95,36 +109,36 @@
 <script type="text/javascript" src="{{ asset('js/util/confirm-leave.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/util/disable-on-submit.js') }}"></script>
 <script type="text/javascript">
-    $(document).ready(() => {
-    	$("#is_active").prop("checked", {{ !$item->trashed() }});
+	$(document).ready(() => {
+		$("#is_active").prop("checked", {{ old('is_active') or "true" }});
 
-    	$('.quantity-decrement').on('click', (e) => {
-			$(e.currentTarget).parent().parent().find('[name=quantity]').trigger('change', ['-']);
-		}).on('mousedown', (e) => {
+		$(document).on('click', '.quantity-decrement:not(.disabled)', (e, elm) => {
+			$(e.currentTarget).parent().parent().find('[type=number]').trigger('change', ['-', elm]);
+		}).on('mousedown', '.quantity-decrement', (e) => {
 			let obj = $(e.currentTarget);
 			let id = setInterval(() => {obj.trigger('click')}, 100);
 			obj.attr('data-id', id);
-		}).on('mouseup mouseleave', (e) => {
+		}).on('mouseup mouseleave', '.quantity-decrement', (e) => {
 			let obj = $(e.currentTarget);
 			let id = parseInt(obj.attr('data-id'));
 			clearInterval(id);
 			obj.removeAttr('data-id');
 		});
 
-		$('.quantity-increment:not(.disabled)').on('click', (e) => {
-			$(e.currentTarget).parent().parent().find('[name=quantity]').trigger('change', ['+']);
-		}).on('mousedown', (e) => {
+		$(document).on('click', '.quantity-increment:not(.disabled)', (e, elm) => {
+			$(e.currentTarget).parent().parent().find('[type=number]').trigger('change', ['+', elm]);
+		}).on('mousedown', '.quantity-increment', (e) => {
 			let obj = $(e.currentTarget);
 			let id = setInterval(() => {obj.trigger('click')}, 100);
 			obj.attr('data-id', id);
-		}).on('mouseup mouseleave', (e) => {
+		}).on('mouseup mouseleave', '.quantity-increment', (e) => {
 			let obj = $(e.currentTarget);
 			let id = parseInt(obj.attr('data-id'));
 			clearInterval(id);
 			obj.removeAttr('data-id');
 		});
 
-		$('[name=quantity]').on('change', (e, operation) => {
+		$('[type=number]').on('change', (e, operation, elm) => {
 			let obj = $(e.currentTarget);
 			let val = parseInt(obj.val());
 
@@ -135,16 +149,28 @@
 				obj.val(--val);
 			}
 
+			// Increment
 			if (val >= 4294967295) {
 				$(obj.parent().find('.quantity-increment')).addClass('disabled');
 				obj.val(4294967295);
+
+				if (typeof elm != 'undefined') {
+					let id = parseInt(elm.attr('data-id'));
+					clearInterval(id);
+				}
 			}
 			else
 				$(obj.parent().find('.quantity-increment')).removeClass('disabled');
 
+			// Decrement
 			if (val <= 0) {
 				$(obj.parent().find('.quantity-decrement')).addClass('disabled');
 				obj.val(0);
+
+				if (typeof elm != 'undefined') {
+					let id = parseInt(elm.attr('data-id'));
+					clearInterval(id);
+				}
 			}
 			else
 				$(obj.parent().find('.quantity-decrement')).removeClass('disabled');
@@ -163,6 +189,6 @@
 		}).on('click focus', (e) => {
 			$(e.currentTarget).autocomplete('search', $(e.currentTarget).val());
 		});
-    });
+	});
 </script>
 @endsection

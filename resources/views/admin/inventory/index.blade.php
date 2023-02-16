@@ -53,8 +53,8 @@ $deleteAllow = $user->hasPermission('inventory_tab_delete');
 				<tr class="enlarge-on-hover">
 					<td class="text-center align-middle mx-auto font-weight-bold">{{ $i->item_name }}</td>
 					<td class="text-center align-middle mx-auto">{{ $i->getInStock() }}</td>
-					<td class="text-center align-middle mx-auto"><i class="fas fa-circle {{ $i->trashed() ? 'text-danger' : ($i->quantity > 10 ? 'text-success' : 'text-warning') }} mr-2"></i>{{ $i->trashed() ? 'Inactive' : ($i->quantity > 10 ? 'Active' : 'Critical') }}</td>
-					<td class="align-middle">
+					<td class="text-center align-middle mx-auto"><i class="fas fa-circle {{ $i->trashed() ? 'text-danger' : ($i->quantity > $i->critical_level ? 'text-success' : 'text-warning') }} mr-2"></i>{{ $i->trashed() ? 'Inactive' : ($i->quantity > $i->critical_level ? 'Active' : 'Critical') }}</td>
+					<td class="text-center align-middle">
 						<div class="dropdown">
 							<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="dropdown{{$i->id}}" aria-haspopup="true" aria-expanded="false">
 								Action

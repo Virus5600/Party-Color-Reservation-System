@@ -24,9 +24,9 @@ class TypePermissionsTableSeeder extends Seeder
 			]);
 
 		// Manager
-		$reservationAcc = Permission::where('slug', '=', 'reservations_tab_access')->first();
-		$reservationPerm = Permission::where('parent_permission', '=', $reservationAcc->id)->orWhere('slug', '=', $reservationAcc->slug)->get();
-		foreach ($reservationPerm as $r)
+		$bookingAcc = Permission::where('slug', '=', 'bookings_tab_access')->first();
+		$bookingPerm = Permission::where('parent_permission', '=', $bookingAcc->id)->orWhere('slug', '=', $bookingAcc->slug)->get();
+		foreach ($bookingPerm as $r)
 			TypePermission::insert([
 				'type_id' => 2,
 				'permission_id' => $r->id

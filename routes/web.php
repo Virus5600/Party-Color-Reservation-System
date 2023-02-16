@@ -44,51 +44,77 @@ Route::group(['prefix' => 'admin'], function() {
 
 	// NEEDED AUTH
 	Route::group(['middleware' => ['auth']], function() {
+		// API PASSWORD CONFIRM
+		Route::get('/confirm-password', 'ApiController@confirmPassword')->name('password.confirm');
+		Route::post('/check-password', 'ApiController@checkPassword')->middleware('throttle:6,1')->name('password.confirm.check');
+
 		// DASHBAORD
 		Route::get('/', 'PageController@redirectToDashboard')->name('admin.redirectToDashboard');
 		Route::get('/dashboard', 'PageController@dashboard')->name('admin.dashboard');
 
-		// RESERVATIONS
-		Route::group(['prefix' => 'reservations', 'middleware' => ['permissions:reservations_tab_access']], function() {
+		// BOOKINGS
+		Route::group(['prefix' => 'bookings', 'middleware' => ['permissions:bookings_tab_access']], function() {
 			// Create
-			Route::group(['middleware' => ['permissions:reservations_tab_create']], function() {
-				Route::get('/create', 'ReservationController@create')->name('admin.reservations.create');
-				Route::post('/store', 'ReservationController@store')->name('admin.reservations.store');
+			Route::group(['middleware' => ['permissions:bookings_tab_create']], function() {
+				Route::get('/create', 'BookingController@create')->name('admin.bookings.create');
+				Route::post('/store', 'BookingController@store')->name('admin.bookings.store');
 			});
 
 			Route::group(['prefix' => '{id}'], function() {
 				// Show
-				Route::get('/', 'ReservationController@show')->name('admin.reservations.show');
+				Route::get('/', 'BookingController@show')->name('admin.bookings.show');
 
 				// Edit
-				Route::group(['middleware' => ['permissions:reservations_tab_edit']], function() {
-					Route::get('/edit', 'ReservationController@edit')->name('admin.reservations.edit');
-					Route::post('/update', 'ReservationController@update')->name('admin.reservations.update');
+				Route::group(['middleware' => ['permissions:bookings_tab_edit']], function() {
+					Route::get('/edit', 'BookingController@edit')->name('admin.bookings.edit');
+					Route::post('/update', 'BookingController@update')->name('admin.bookings.update');
 				});
 
 				// Status
-				Route::group(['prefix' => 'status', 'middleware' => 'permissions:reservations_tab_respond'], function() {
+				Route::group(['prefix' => 'status', 'middleware' => 'permissions:bookings_tab_respond'], function() {
 					// Reject
-					Route::post('/reject', 'ReservationController@reject')->name('admin.reservations.status.reject');
+					Route::post('/reject', 'BookingController@reject')->name('admin.bookings.status.reject');
 
 					// Accept
-					Route::get('/accept', 'ReservationController@accept')->name('admin.reservations.status.accept');
+					Route::get('/accept', 'BookingController@accept')->name('admin.bookings.status.accept');
 
 					// Pending
-					Route::get('/pending', 'ReservationController@pending')->name('admin.reservations.status.pending');
+					Route::get('/pending', 'BookingController@pending')->name('admin.bookings.status.pending');
 				});
 
 				// Delete/Archive
-				Route::group(['middleware' => ['permissions:reservations_tab_delete']], function() {
-					Route::get('/archive', 'ReservationController@archive')->name('admin.reservations.archive');
-					Route::get('/restore', 'ReservationController@restore')->name('admin.reservations.restore');
+				Route::group(['middleware' => ['permissions:bookings_tab_delete']], function() {
+					Route::get('/archive', 'BookingController@archive')->name('admin.bookings.archive');
+					Route::get('/restore', 'BookingController@restore')->name('admin.bookings.restore');
 
-					Route::get('/delete', 'ReservationController@delete')->name('admin.reservations.delete');
+					Route::get('/delete', 'BookingController@delete')->name('admin.bookings.delete');
+				});
+
+				// ADDITIONAL ORDERS
+				Route::group(['prefix' => 'additional-orders'], function() {
+					// Index
+					Route::get('/', 'AdditionalOrderController@index')->name('admin.bookings.additional-orders.index');
+
+					// Create
+					Route::get('/create', 'AdditionalOrderController@create')->name('admin.bookings.additional-orders.create');
+					Route::post('/store', 'AdditionalOrderController@store')->name('admin.bookings.additional-orders.store');
+
+					Route::group(['prefix' => '{order_id}'], function() {
+						// Show
+						Route::get('/', 'AdditionalOrderController@show')->name('admin.bookings.additional-orders.show');
+
+						// Edit
+						Route::get('/edit', 'AdditionalOrderController@edit')->name('admin.bookings.additional-orders.edit');
+						Route::post('/update', 'AdditionalOrderController@update')->name('admin.bookings.additional-orders.update');
+
+						// Delete
+						Route::get('/void', 'AdditionalOrderController@delete')->name('admin.bookings.additional-orders.void')->middleware(['password.confirm']);
+					});
 				});
 			});
 
 			// Index
-			Route::get('/', 'ReservationController@index')->name('admin.reservations.index');
+			Route::get('/', 'BookingController@index')->name('admin.bookings.index');
 		});
 
 		// INVENTORY

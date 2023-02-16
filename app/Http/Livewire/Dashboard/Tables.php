@@ -138,10 +138,15 @@ class Tables extends Component
 				else if (strlen($c) > 0) {
 					// Splice the condition.
 					$splice = explode(" ", preg_replace("/(\s+)/", " ", $c));
-					$clazz = $clazz->where($splice[0], $splice[1], $splice[2]);
+					$splice[3] = count($splice) >= 4 ? $splice[3] : false;
+					
+					// Identifies if the comparison is between columns or not.
+					if ($splice[3])
+						$clazz = $clazz->whereColumn($splice[0], $splice[1], $splice[2]);
+					else
+						$clazz = $clazz->where($splice[0], $splice[1], $splice[2]);
 				}
 			}
-
 			$data = $clazz->paginate(10);
 		}
 		else {

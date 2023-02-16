@@ -31,13 +31,13 @@
 						<div class="row">
 							{{-- ITEM NAME --}}
 							<div class="form-group col-12">
-								<label class="h5" for="title">Item Name</label>
+								<label class="h5" for="item_name">Item Name</label>
 								<input class="form-control" type="text" name="item_name" value="{{ old('item_name') }}"/>
 							</div>
 
 							{{-- QUANTITY --}}
 							<div class="form-group col-12">
-								<label class="h5" for="title">Quantity</label>
+								<label class="h5" for="quantity">Quantity</label>
 								<div class="input-group">
 									<div class="input-group-prepend">
 										<button type="button" class="btn btn-secondary quantity-decrement"><i class="fas fa-minus"></i></button>
@@ -53,6 +53,20 @@
 							<div class="form-group col-12">
 								<label class="h5" for="measurement_unit">Unit of Measurement</label>
 								<input class="form-control" type="text" name="measurement_unit" value="{{ old('measurement_unit') }}"/>
+							</div>
+
+							{{-- CRITICAL LEVEL --}}
+							<div class="form-group col-12">
+								<label class="h5" for="critical_level">Critical Level</label>
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<button type="button" class="btn btn-secondary quantity-decrement"><i class="fas fa-minus"></i></button>
+									</div>
+									<input class="form-control" type="number" min="0" max="4294967295" name="critical_level" value="{{ old('critical_level') ? old('critical_level') : '0' }}"/>
+									<div class="input-group-append">
+										<button type="button" class="btn btn-secondary quantity-increment"><i class="fas fa-plus"></i></button>
+									</div>
+								</div>
 							</div>
 
 							{{-- IS ACTIVE --}}
@@ -99,12 +113,12 @@
 		$("#is_active").prop("checked", {{ old('is_active') or "true" }});
 
 		$(document).on('click', '.quantity-decrement:not(.disabled)', (e, elm) => {
-			$(e.currentTarget).parent().parent().find('[name=quantity]').trigger('change', ['-', elm]);
-		}).on('mousedown', '.quantity-decrement:not(.disabled)', (e) => {
+			$(e.currentTarget).parent().parent().find('[type=number]').trigger('change', ['-', elm]);
+		}).on('mousedown', '.quantity-decrement', (e) => {
 			let obj = $(e.currentTarget);
 			let id = setInterval(() => {obj.trigger('click')}, 100);
 			obj.attr('data-id', id);
-		}).on('mouseup mouseleave', '.quantity-decrement:not(.disabled)', (e) => {
+		}).on('mouseup mouseleave', '.quantity-decrement', (e) => {
 			let obj = $(e.currentTarget);
 			let id = parseInt(obj.attr('data-id'));
 			clearInterval(id);
@@ -112,19 +126,19 @@
 		});
 
 		$(document).on('click', '.quantity-increment:not(.disabled)', (e, elm) => {
-			$(e.currentTarget).parent().parent().find('[name=quantity]').trigger('change', ['+', elm]);
-		}).on('mousedown', '.quantity-increment:not(.disabled)', (e) => {
+			$(e.currentTarget).parent().parent().find('[type=number]').trigger('change', ['+', elm]);
+		}).on('mousedown', '.quantity-increment', (e) => {
 			let obj = $(e.currentTarget);
 			let id = setInterval(() => {obj.trigger('click')}, 100);
 			obj.attr('data-id', id);
-		}).on('mouseup mouseleave', '.quantity-increment:not(.disabled)', (e) => {
+		}).on('mouseup mouseleave', '.quantity-increment', (e) => {
 			let obj = $(e.currentTarget);
 			let id = parseInt(obj.attr('data-id'));
 			clearInterval(id);
 			obj.removeAttr('data-id');
 		});
 
-		$('[name=quantity]').on('change', (e, operation, elm) => {
+		$('[type=number]').on('change', (e, operation, elm) => {
 			let obj = $(e.currentTarget);
 			let val = parseInt(obj.val());
 

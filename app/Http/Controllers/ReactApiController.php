@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Announcement;
-use App\Reservation;
+use App\Booking;
 use App\ContactInformation; # added
 use App\ActivityLog; # added
 
@@ -36,8 +36,8 @@ class ReactApiController extends Controller
 	}
 
 	// RESERVATIONS
-	protected function reservationsCreate(Request $req) {
-		extract(Reservation::validate($req));
+	protected function bookingsCreate(Request $req) {
+		extract(Booking::validate($req));
 
 		if ($validator->fails()) {
 			return response()
@@ -59,29 +59,29 @@ class ReactApiController extends Controller
 			$price *= $req->pax;
 			$price += ($req->extension * 500);
 
-			$reservation = Reservation::create([
+			$booking = Booking::create([
 				'start_at' => $start_at,
 				'end_at' => $end_at,
-				'reserved_at' => $req->reservation_date,
+				'reserved_at' => $req->booking_date,
 				'extension' => $req->extension,
 				'price' => $price,
 				'pax' => $req->pax,
 				'phone_numbers' => implode("|", $req->phone_numbers)
 			]);
 
-			$reservation->menus()->attach($req->menu);
+			$booking->menus()->attach($req->menu);
 
 			$iterations = max(count($req->contact_name), count($req->contact_email));
 			for ($i = 0; $i < $iterations; $i++) {
 				$ci = ContactInformation::create([
 					'contact_name' => $req->contact_name["{$i}"],
 					'email' => $req->contact_email["{$i}"],
-					'reservation_id' => $reservation->id
+					'booking_id' => $booking->id
 				]);
 			}
 
 			// Reduce the inventoy for realtime update
-			foreach ($reservation->menus as $m) {
+			foreach ($booking->menus as $m) {
 				$response = $m->reduceInventory();
 
 				if (!$response->success) {
@@ -103,7 +103,7 @@ class ReactApiController extends Controller
 		}
 
 		ActivityLog::log(
-			"Reservation created through user form.",
+			"Booking created through user form.",
 			null,
 			false
 		);
@@ -111,7 +111,7 @@ class ReactApiController extends Controller
 		return response()
 			->json([
 				'success' => true,
-				'flash_success' => 'Successfully added a new reservation'
+				'flash_success' => 'Successfully added a new booking'
 			]);
 	}
 }

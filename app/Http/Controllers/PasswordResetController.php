@@ -79,7 +79,7 @@ class PasswordResetController extends Controller
 		ActivityLog::log(
 			"Password for '{$req->email}' reset requested.",
 			null,
-			true
+			"PasswordReset"
 		);
 
 		return redirect()
@@ -172,7 +172,7 @@ class PasswordResetController extends Controller
 		ActivityLog::log(
 			"Password for '{$user->email}' updated.",
 			null,
-			true
+			"PasswordReset"
 		);
 
 		return redirect()

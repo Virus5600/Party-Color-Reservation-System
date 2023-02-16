@@ -7,21 +7,13 @@ import { faClock, faPhone, faLocationArrow } from '@fortawesome/free-solid-svg-i
 import locationImage from './img/location.png';
 import appearanceImage from './img/appearance.png';
 
-import './style.css';
-
 const AboutUs = () => {
     return (
         <div className='AboutUs' id='AboutUs'>
-            <div className='container'>
-                <h1>About Us</h1>
-                <div className='row'>
-                    <div className='col'>
-                        <TimeLocation />
-                    </div>
-                    <div className='col-md mt-3'>
-                        <Appearance />
-                    </div>
-                </div>
+            <h1>ABOUT US</h1>
+            <div className='d-flex justify-content-evenly'>
+                <TimeLocation />
+                <Appearance />
             </div>
 
         </div>
@@ -66,13 +58,9 @@ const TimeLocation = () => {
                 <div className='col-auto'>
                     <FontAwesomeIcon icon={faLocationArrow} className='h5 my-0' />
                 </div>
-                <div className='col'>
-                    3F, 1 Chome-2-12 Tsuboya, Naha, Okinawa 902-0065, Japan
+                <div>
+                    <img className='img-fluid' src={locationImage} alt='location map of party color' />
                 </div>
-            </div>
-            <hr />
-            <div>
-                <img className='img-fluid' src={locationImage} alt='location map of party color' />
             </div>
         </div>
     );

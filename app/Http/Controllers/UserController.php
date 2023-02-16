@@ -37,16 +37,8 @@ class UserController extends Controller
 	protected function login() {
 		if (!Auth::check())
 			return view('admin.login');
-		else {
-
-			ActivityLog::log(
-				"User login.",
-				null,
-				true
-			);
-
+		else
 			return redirect()->route('admin.dashboard');
-		}
 	}
 
 	protected function authenticate(Request $req) {
@@ -106,10 +98,26 @@ class UserController extends Controller
 								]);
 								$pr = PasswordReset::where('email', '=', $user->email)->first();
 								$pr->generateToken()->generateExpiration();
+
+								ActivityLog::log(
+									"Locked account of {$user->email} after 5 incorrect attempts",
+									$user->id,
+									"User",
+									null,
+									true
+								);
 							}
 							// Otherwise, fetch the row to use the already generated data
 							else {
 								$pr = PasswordReset::where('email', '=', $user->email)->first();
+
+								ActivityLog::log(
+									"Login attempt to {$user->email} after lockout",
+									$user->id,
+									"User",
+									null,
+									true
+								);
 							}
 							
 							$args = [
@@ -125,6 +133,12 @@ class UserController extends Controller
 						$msg = 'Exceeded 5 tries, account locked';
 					}
 					$user->save();
+
+					ActivityLog::log(
+						"Login attempted for {$user->email}.",
+						$user->id,
+						"User"
+					);
 					
 					DB::commit();
 				} catch (Exception $e) {
@@ -143,13 +157,16 @@ class UserController extends Controller
 
 	protected function logout() {
 		if (Auth::check()) {
+			$auth = Auth::user();
 			auth()->logout();
 			Session::flush();
 
 			ActivityLog::log(
-				"User logout.",
-				null,
-				true
+				"User {$auth->email} logout",
+				$auth->id,
+				"User",
+				$auth->id,
+				false
 			);
 
 			return redirect(route('home'))->with('flash_success', 'Logged out!');
@@ -266,9 +283,11 @@ class UserController extends Controller
 		}
 
 		ActivityLog::log(
-			"User '" . trim($user->getName()) . "' created.",
-			null,
-			true
+			"User '" . trim($user->getName()) . "' created under the email of '{$user->email}' as {$user->type->name}.",
+			$user->id,
+			"User",
+			Auth::user()->id,
+			false
 		);
 
 		return redirect()
@@ -375,9 +394,10 @@ class UserController extends Controller
 		}
 
 		ActivityLog::log(
-			"User '{trim($user->getName())}' updated.",
-			null,
-			true
+			"User '{$user->email}' updated.",
+			$user->id,
+			"User",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -446,9 +466,10 @@ class UserController extends Controller
 		}
 
 		ActivityLog::log(
-			"User '{$user->getName()}' changed password.",
-			null,
-			true
+			"User '{$user->email}' changed password.",
+			$user->id,
+			"User",
+			Auth::user()->id
 		);
 
 		return response()
@@ -505,9 +526,10 @@ class UserController extends Controller
 		}
 
 		ActivityLog::log(
-			"User '{$user->getName()}' reverted back to type permissions.",
-			null,
-			true
+			"User '{$user->email}' reverted back to type permissions.",
+			$user->id,
+			"User",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -614,9 +636,10 @@ class UserController extends Controller
 		}
 
 		ActivityLog::log(
-			"User '{$user->getName()}' updated permissions.",
-			null,
-			true
+			"User '{$user->email}' updated permissions.",
+			$user->id,
+			"User",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -647,9 +670,10 @@ class UserController extends Controller
 		}
 
 		ActivityLog::log(
-			"User '{$user->getName()}' deactivated account.",
-			null,
-			true
+			"User '{$user->email}' deactivated account.",
+			$user->id,
+			"User",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -685,9 +709,10 @@ class UserController extends Controller
 		}
 
 		ActivityLog::log(
-			"User '{$user->getName()}' reactivated account.",
-			null,
-			true
+			"User '{$user->email()}' reactivated account.",
+			$user->id,
+			"User",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -709,6 +734,9 @@ class UserController extends Controller
 
 			if ($user->avatar != 'default.png')
 					File::delete(public_path() . '/uploads/users/' . $user->avatar);
+			
+			$email = $user->email;
+
 			$user->forceDelete();
 
 			DB::commit();
@@ -722,10 +750,14 @@ class UserController extends Controller
 		}
 
 		ActivityLog::log(
-			"User '{$user->getName()}' permanently deleted.",
+			"User '{$user->email}' permanently deleted.",
 			null,
-			true
+			"User",
+			Auth::user()->id,
+			false
 		);
+
+		ActivityLog::itemDeleted($id);
 
 		return redirect()
 			->route('admin.users.index')

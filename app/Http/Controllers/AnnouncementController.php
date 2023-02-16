@@ -143,8 +143,9 @@ class AnnouncementController extends Controller
 		
 		ActivityLog::log(
 			"Announcement '{$announcement->title}' uploaded.",
-			null,
-			true
+			$announcement->id,
+			'Announcement',
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -308,7 +309,6 @@ class AnnouncementController extends Controller
 
 			$announcement->content = substr($content, strlen("<div>"), strlen("{$content}") - strlen("<div></div>"));
 			$announcement->save();
-			// Log::debug("Updated Content: {$announcement->content}");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -322,8 +322,9 @@ class AnnouncementController extends Controller
 
 		ActivityLog::log(
 			"Announcement '{$announcement->title}' updated.",
-			null,
-			true
+			$announcement->id,
+			'Announcement',
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -358,8 +359,9 @@ class AnnouncementController extends Controller
 
 		ActivityLog::log(
 			"Announcement '{$announcement->title}' published.",
-			null,
-			true
+			$announcement->id,
+			"Announcement",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -393,14 +395,15 @@ class AnnouncementController extends Controller
 		}
 
 		ActivityLog::log(
-			"Announcement '{$announcement->title}' unpublished.",
-			null,
-			true
+			"Announcement '{$announcement->title}' drafted.",
+			$announcement->id,
+			"Announcement",
+			Auth::user()->id
 		);
 
 		return redirect()
 			->back()
-			->with('flash_success', 'Successfully unpublished announcement');
+			->with('flash_success', 'Successfully drafted announcement');
 	}
 
 	protected function delete(Request $req, $id) {
@@ -427,8 +430,9 @@ class AnnouncementController extends Controller
 
 		ActivityLog::log(
 			"Announcement '{$announcement->title}' moved to trash.",
-			null,
-			true
+			$announcement->id,
+			"Announcement",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -465,8 +469,9 @@ class AnnouncementController extends Controller
 
 		ActivityLog::log(
 			"Announcement '{$announcement->title}' restored.",
-			null,
-			true
+			$announcement->id,
+			"Announcement",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -506,8 +511,11 @@ class AnnouncementController extends Controller
 		ActivityLog::log(
 			"Announcement '{$announcement->title}' permanently deleted.",
 			null,
-			true
+			"Announcement",
+			Auth::user()->id
 		);
+
+		ActivityLog::itemDeleted($id);
 
 		return redirect()
 			->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])

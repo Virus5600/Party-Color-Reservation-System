@@ -6,7 +6,7 @@ import './style.css';
 import { Link } from 'react-router-dom';
 
 
-const QuickReservation = () => {
+export default function QuickReservation() {
     return (
         <div className='quick-reservation container'>
             <div className="container">
@@ -18,7 +18,18 @@ const QuickReservation = () => {
                         <Link className='reserve-button' to='/reservation'>RESERVE</Link>
                     </div>
 
-                    <div className="Prices col-lg-5">
+
+                    <div className='Reservation-temp'>
+                        <span className='title'>BBQ</span><br />
+                        <span className='caption'>(including drink all you can)</span><br />
+                        <span className='time'>2hrs</span><br />
+                        <button className='reserve-button' onClick={onReservationClick}>RESERVE</button>
+                    </div>
+
+
+                    <div className='Prices'>
+
+
                         <div className='price-description'>
                             <span className='person-type'>Adult・senior high</span><br />
                             <span className='price'>¥3,500</span>
@@ -33,13 +44,12 @@ const QuickReservation = () => {
                             <span className='person-type'>elementary</span><br />
                             <span className='price'>¥1,000</span>
                         </div>
+
                     </div>
+
                 </div>
-
             </div>
-
         </div>
-    );
-};
 
-export default QuickReservation;
+    );
+}

@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en-US">
 	<head>
+		@php
+		$webName = App\Settings::getValue('web-name');
+		$webDesc = App\Settings::getValue('web-name');
+		$webLogoInstance = App\Settings::getInstance('web-logo');
+		$webLogo = $webLogoInstance->getImage(!$webLogoInstance->is_file);
+		@endphp
+
 		{{-- META DATA --}}
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -8,23 +15,23 @@
 
 		{{-- SITE META --}}
 		<meta name="type" content="website">
-		<meta name="title" content="{{ App\Settings::getValue('web-name') }}">
-		<meta name="description" content="{{ App\Settings::getValue('web-desc') }}">
+		<meta name="title" content="{{ $webName }}">
+		<meta name="description" content="{{ $webDesc }}">
 		<meta name="image" content="{{ asset('images/meta-banner.jpg') }}">
 		<meta name="keywords" content="{{ env('APP_KEYW') }}">
-		<meta name="application-name" content="{{ App\Settings::getValue('web-name') }}">
+		<meta name="application-name" content="{{ $webName }}">
 
 		{{-- TWITTER META --}}
 		<meta name="twitter:card" content="summary_large_image">
-		<meta name="twitter:title" content="{{ App\Settings::getValue('web-name') }}">
-		<meta name="twitter:description" content="{{ App\Settings::getValue('web-desc') }}">
+		<meta name="twitter:title" content="{{ $webName }}">
+		<meta name="twitter:description" content="{{ $webDesc }}">
 		<meta name="twitter:image" content="{{asset('/images/meta-banner.jpg')}}">
 
 		{{-- OG META --}}
 		<meta name="og:url" content="{{Request::url()}}">
 		<meta name="og:type" content="website">
-		<meta name="og:title" content="{{ App\Settings::getValue('web-name') }}">
-		<meta name="og:description" content="{{ App\Settings::getValue('web-desc') }}">
+		<meta name="og:title" content="{{ $webName }}">
+		<meta name="og:description" content="{{ $webDesc }}">
 		<meta name="og:image" content="{{asset('/images/meta-banner.jpg')}}">
 
 		{{-- CSS --}}
@@ -39,10 +46,10 @@
 		<script type="text/javascript" id="for-js-disabled-js">$('head').append('<style id="for-js-disabled">#js-disabled { display: none; }</style>');$(document).ready(function() {$('#js-disabled').remove();$('#for-js-disabled').remove();$('#for-js-disabled-js').remove();});</script>
 
 		{{-- FAVICON --}}
-		<link rel="icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">
-		<link rel="shortcut icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">
-		<link rel="apple-touch-icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">
-		<link rel="mask-icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">
+		<link rel="icon" href="{{ $webLogo }}">
+		<link rel="shortcut icon" href="{{ $webLogo }}">
+		<link rel="apple-touch-icon" href="{{ $webLogo }}">
+		<link rel="mask-icon" href="{{ $webLogo }}">
 
 		{{-- TITLE --}}
 		<title>Admin Login - Party Color</title>

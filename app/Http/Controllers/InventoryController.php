@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Inventory;
 use App\ActivityLog;
 
+use Auth;
 use DB;
 use Log;
 use Exception;
@@ -37,6 +38,7 @@ class InventoryController extends Controller
 			'item_name' => 'required|string|max:255',
 			'quantity' => 'required|integer|max:4294967295',
 			'measurement_unit' => 'required|string|max:50',
+			'critical_level' => 'integer|min:0',
 		], [
 			'item_name.required' => 'Item name is required',
 			'item_name.string' => 'Item name should be a string',
@@ -47,6 +49,8 @@ class InventoryController extends Controller
 			'measurement_unit.required' => 'A unit of measurement is required',
 			'measurement_unit.string' => 'Unit of measurement should be a string',
 			'measurement_unit.max' => 'Unit of measurement should not be longer than 50 characters',
+			'critical_level.integer' => 'Critical level should be a number',
+			'critical_level.min' => 'Critical level should not be below 0',
 		]);
 
 		if ($validator->fails()) {
@@ -67,7 +71,8 @@ class InventoryController extends Controller
 			$item = Inventory::create([
 				'item_name' => $req->item_name,
 				'quantity' => $req->quantity,
-				'measurement_unit' => $req->measurement_unit
+				'measurement_unit' => $req->measurement_unit,
+				'critical_level' => $req->critical_level
 			]);
 
 			if (!$req->is_active)
@@ -85,8 +90,9 @@ class InventoryController extends Controller
 
 		ActivityLog::log(
 			"Item '{$req->item_name}' created.",
-			null,
-			true
+			$item->id,
+			"Inventory",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -126,6 +132,7 @@ class InventoryController extends Controller
 			'item_name' => 'required|string|max:255',
 			'quantity' => 'required|integer|max:4294967295',
 			'measurement_unit' => 'required|string|max:50',
+			'critical_level' => 'integer|min:0',
 		], [
 			'item_name.required' => 'Item name is required',
 			'item_name.string' => 'Item name should be a string',
@@ -136,6 +143,8 @@ class InventoryController extends Controller
 			'measurement_unit.required' => 'A unit of measurement is required',
 			'measurement_unit.string' => 'Unit of measurement should be a string',
 			'measurement_unit.max' => 'Unit of measurement should not be longer than 50 characters',
+			'critical_level.integer' => 'Critical level should be a number',
+			'critical_level.min' => 'Critical level should not be below 0',
 		]);
 
 		if ($validator->fails()) {
@@ -152,8 +161,9 @@ class InventoryController extends Controller
 			$item->item_name = $req->item_name;
 			$item->quantity = $req->quantity;
 			$item->measurement_unit = $req->measurement_unit;
+			$item->critical_level = $req->critical_level;
 			
-			if ($req->is_active == null) {
+			if ($req->is_active == null || $req->quantity <= 0) {
 				$item->delete();
 			} else {
 				$item->restore();
@@ -173,8 +183,9 @@ class InventoryController extends Controller
 
 		ActivityLog::log(
 			"Item '{$item->item_name}' updated.",
-			null,
-			true
+			$item->id,
+			"Inventory",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -207,10 +218,12 @@ class InventoryController extends Controller
 				]);
 		}
 
+		$prevCount = 0;
 		try {
 			DB::beginTransaction();
+			$prevCount = $item->quantity;
 
-			$item->quantity = $item->quantity + $req->quantity;
+			$item->quantity = $prevCount + $req->quantity;
 			$item->save();
 
 			DB::commit();
@@ -224,9 +237,10 @@ class InventoryController extends Controller
 		}
 
 		ActivityLog::log(
-			"Item '{$item->item_name}' increased.",
-			null,
-			true
+			"Item '{$item->item_name}' increased by '{$req->quantity}' from '{$prevCount}' to '{$item->quantity}'.",
+			$item->id,
+			"Inventory",
+			Auth::user()->id
 		);
 
 		return response()
@@ -259,8 +273,9 @@ class InventoryController extends Controller
 
 		ActivityLog::log(
 			"Item '{$item->item_name}' deactivated.",
-			null,
-			true
+			$item->id,
+			"Inventory",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -297,8 +312,9 @@ class InventoryController extends Controller
 
 		ActivityLog::log(
 			"Item '{$item->item_name}' activated.",
-			null,
-			true
+			$item->id,
+			"Inventory",
+			Auth::user()->id
 		);
 
 		return redirect()
@@ -333,8 +349,11 @@ class InventoryController extends Controller
 		ActivityLog::log(
 			"Item '{$item->item_name}' permanently deleted.",
 			null,
-			true
+			"Inventory",
+			Auth::user()->id
 		);
+
+		ActivityLog::itemDeleted($id);
 
 		return redirect()
 			->route('admin.inventory.index')

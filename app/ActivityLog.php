@@ -20,10 +20,15 @@ class ActivityLog extends Model
 		'is_automated',
 		'is_marked',
 		'reason',
+		'model_type',
+		'model_id'
 	];
 
 	// Relationship
 	private function user() { return $this->belongsTo('App\User'); }
+
+	// Morpher
+	private function model() { return $this->belongsTo("App\{$this->model_type}", 'model_type', 'id'); }
 
 	// Custom Functions
 	public function userF() {
@@ -33,14 +38,28 @@ class ActivityLog extends Model
 			return $this->email;
 	}
 
-	public static function log($action, $user_id = null, $is_automated = false) {
+	public function item(bool $asQuery = false) {
+		$modelType = $this->model_type;
+		$modelId = $this->model_id;
+
+		if ($modelType == null || $modelId == null)
+			return [];
+		else
+			return $asQuery ? $this->model() : $this->model;
+	}
+
+	public static function log($action, $model_id = null, $model_type = null, $user_id = null, $is_automated = false) {
+		$email = null;
 		if ($user_id == null && Auth::check()) {
 			$user_id = Auth::user()->id;
 			$email = Auth::user()->email;
 		}
 		else if ($user_id == null && !Auth::check()) {
 			$user_id = 0;
-			$email = null;
+		}
+		else if ($user_id != null) {
+			$user = User::find($user_id);
+			$email = $user->email;
 		}
 
 		ActivityLog::create([
@@ -48,8 +67,29 @@ class ActivityLog extends Model
 			'address' => Request::ip(),
 			'action' => $action,
 			'email' => $email,
-			'is_automated' => $is_automated ? 1 : 0
+			'is_automated' => $is_automated ? 1 : 0,
+			'model_id' => $model_id,
+			'model_type' => $model_type
 		]);
+	}
+
+	public static function itemDeleted($model_id) {
+		$logs = ActivityLog::where('model_id', '=', $model_id)->get();
+
+		if ($logs) {
+			try {
+				DB::beginTransaction();
+
+				foreach ($logs as $log) {
+					$log->model_id = null;
+					$log->save();
+				}
+
+				DB::commit();
+			} catch (Exception $e) {
+				DB::rollback();
+			}
+		}
 	}
 
 	public static function userDeleted($id, $lastEmail) {

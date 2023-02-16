@@ -19,7 +19,8 @@ class Inventory extends Model
 	protected $fillable = [
 		'item_name',
 		'quantity',
-		'measurement_unit'
+		'measurement_unit',
+		'critical_level',
 	];
 
     protected $casts = [
@@ -60,6 +61,8 @@ class Inventory extends Model
 
 			ActivityLog::log(
 				"Item '{$this->item_name}' permanently deleted.",
+				null,
+				"Inventory",
 				null,
 				true
 			);
