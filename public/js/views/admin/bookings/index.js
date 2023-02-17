@@ -320,7 +320,7 @@ $(document).ready(() => {
 												<hr class="hr-thick">
 
 												<ul>`;
-								for (let m of a.booking_menus)
+								for (let m of a.orderable)
 									htmlContent += `<li>${m.menu.name} (&times;${m.count})</li>`;
 							htmlContent +=
 												`</ul>

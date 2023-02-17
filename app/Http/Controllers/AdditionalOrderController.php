@@ -126,8 +126,8 @@ class AdditionalOrderController extends Controller
 
 		$additionalOrder = AdditionalOrder::withTrashed()
 			->with([
-				"bookingMenus",
-				"bookingMenus.menu"
+				"orderable",
+				"orderable.menu"
 			])
 			->find($order_id);
 
@@ -177,7 +177,7 @@ class AdditionalOrderController extends Controller
 				->with('flash_info', "Booking either does not exists or is already deleted");
 		}
 
-		$additionalOrder = AdditionalOrder::with(["bookingMenus", "bookingMenus.menu"])
+		$additionalOrder = AdditionalOrder::with(["orderable", "orderable.menu"])
 			->find($order_id);
 		if ($additionalOrder == null) {
 			return redirect()

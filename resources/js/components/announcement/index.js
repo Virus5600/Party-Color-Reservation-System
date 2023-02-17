@@ -4,10 +4,7 @@ import axios from 'axios';
 import './style.css';
 
 const Announcement = ({ onAnnouncementClick }) => {
-
-
     const [announcements, setAnnouncements] = useState([]);
-
 
     useEffect(() => {
         const API_ENDPOINT = 'api/react/announcements/fetch';
@@ -24,8 +21,6 @@ const Announcement = ({ onAnnouncementClick }) => {
             }
         }
         fetchAnnouncements();
-
-
     }, []);
 
 

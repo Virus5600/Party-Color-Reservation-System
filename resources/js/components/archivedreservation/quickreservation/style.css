@@ -1,130 +1,131 @@
 .Reservation-temp {
-    /* resize */
-    text-align: center;
-    margin-bottom: 30px;
-    align-items: center;
+	/* resize */
+	text-align: center;
+	margin-bottom: 30px;
+	align-items: center;
 
 }
 
 .Reservation-temp .title {
-    color: #F24141;
-    font-size: 100px;
-    font-weight: 900;
-    font-style: italic;
+	color: #F24141;
+	font-size: 100px;
+	font-weight: 900;
+	font-style: italic;
 
-    /* stroke */
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: #FFFFFF;
+	/* stroke */
+	-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: #FFFFFF;
 
-    /* spacing */
-    margin-bottom: 0px;
+	/* spacing */
+	margin-bottom: 0px;
 }
 
 .Reservation-temp .caption {
-    color: #FFED4A;
-    font-size: 20px;
-    font-weight: 900;
-    font-style: italic;
+	color: #FFED4A;
+	font-size: 20px;
+	font-weight: 900;
+	font-style: italic;
 
-    /* stroke */
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: #845C5C;
+	/* stroke */
+	-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: #845C5C;
 }
 
 .Reservation-temp .time {
-    color: #593A3A;
-    font-size: 40px;
-    font-weight: 900;
-    font-style: italic;
+	color: #593A3A;
+	font-size: 40px;
+	font-weight: 900;
+	font-style: italic;
 
-    /* stroke */
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: white;
+	/* stroke */
+	-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: white;
 }
 
 .Reservation-temp .reserve-button {
-    background-color: #873131;
-    color: #FFE500;
-    font-size: 40px;
-    font-weight: 900;
-    font-style: italic;
+	background-color: #873131;
+	color: #FFE500;
+	font-size: 40px;
+	font-weight: 900;
+	font-style: italic;
 
-    /* stroke */
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: white;
+	/* stroke */
+	-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: white;
 
-    /* border */
-    border-color: #A8AA32;
-    border-radius: 10px;
+	/* border */
+	border-color: #A8AA32;
+	border-radius: 10px;
 
-    /* spacing */
-    padding-left: 40px;
-    padding-right: 40px;
+	/* spacing */
+	padding-left: 40px;
+	padding-right: 40px;
 
-    text-decoration: none;
+	text-decoration: none;
 }
 
 .Prices {
-    text-align: center;
-    align-items: center;
+	text-align: center;
+	align-items: center;
 
 
-    /* spacing */
-    padding-top: 0px;
-    padding-bottom: 0px;
+	/* spacing */
+	padding-top: 0px;
+	padding-bottom: 0px;
 }
 
 .Prices .price-description {
-    color: white;
-    font-size: 40px;
-    font-weight: 700;
-    background-color: #a36565;
-    /* border */
-    border: 1px solid #941717;
+	color: white;
+	font-size: 40px;
+	font-weight: 700;
+	background-color: #a36565;
+	/* border */
+	border: 1px solid #941717;
 
 
 }
 
 .Prices .diff-style {
-    background-color: #a77878;
+	background-color: #a77878;
 }
 
 
 .Prices .person-type {
-    font-size: 20px;
+	font-size: 20px;
 }
 
 .Prices .price {
-    letter-spacing: 2px;
-    /* stroke */
-    /* -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: black; */
+	letter-spacing: 2px;
+	/* stroke */
+	/* -webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: black; */
 }
 
 .quick-reservation {
-    display: flex;
-    justify-content: space-around;
+	display: flex;
+	justify-content: space-around;
 
-    @media (max-width: 750px) {
-        .Reservation-temp .title {
-            font-size: 80px;
-        }
+	@media (max-width: 750px) {
+		.Reservation-temp .title {
+			font-size: 80px;
+		}
 
-        .Reservation-temp .time {
-            font-size: 30px;
-        }
+		.Reservation-temp .time {
+			font-size: 30px;
+		}
 
-        .Reservation-temp .reserve-button {
-            font-size: 25px;
-        }
+		.Reservation-temp .reserve-button {
+			font-size: 25px;
+		}
 
-    }
+	}
 
-    @media (max-width: 989px) {
-        .quick-reservation {
-            padding-top: 10px;
-            padding-bottom: 60px;
-            padding-left: 30px;
-            padding-right: 40px;
-        }
-    }
+	@media (max-width: 989px) {
+		.quick-reservation {
+			padding-top: 10px;
+			padding-bottom: 60px;
+			padding-left: 30px;
+			padding-right: 40px;
+		}
+	}
+}

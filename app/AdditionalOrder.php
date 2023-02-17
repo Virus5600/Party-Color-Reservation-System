@@ -38,7 +38,7 @@ class AdditionalOrder extends Model
 	// Relationships
 	public function booking() { return $this->belongsTo('App\Booking'); }
 	public function menus() { return $this->morphToMany('App\Menu', 'orderable', 'orderables')->withPivot('count'); }
-	public function bookingMenus() { return $this->morphMany('App\BookingMenu', 'orderable'); }
+	public function orderable() { return $this->morphMany('App\Orderable', 'orderable'); }
 
 	// Custom Functions
 	public function fetchPrice() {

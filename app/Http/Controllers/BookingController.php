@@ -128,8 +128,8 @@ class BookingController extends Controller
 				'menus',
 				'contactInformation',
 				'additionalOrders' => function($query) {return $query->withTrashed();},
-				'additionalOrders.bookingMenus',
-				'additionalOrders.bookingMenus.menu'
+				'additionalOrders.orderable',
+				'additionalOrders.orderable.menu'
 			])
 			->find($id);
 

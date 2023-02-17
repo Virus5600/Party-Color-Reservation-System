@@ -40,8 +40,6 @@ export async function loader() {
 export default function Announcement() {
     const announcements = useLoaderData();
 
-
-
     return (
         <div className='Announcement' id='Announcement'>
             <h1>Announcement</h1>
