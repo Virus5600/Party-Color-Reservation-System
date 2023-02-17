@@ -138,7 +138,7 @@
 			obj.removeAttr('data-id');
 		});
 
-		$('[type=number]').on('change', (e, operation, elm) => {
+		$(document).on('change', '[type=number]', (e, operation, elm) => {
 			let obj = $(e.currentTarget);
 			let val = parseInt(obj.val());
 

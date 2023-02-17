@@ -44,11 +44,11 @@
 						{{ $a->email }}
 					</td>
 
-					<td class="text-center align-midde mx-auto">
+					<td class="text-center align-middle mx-auto">
 						{{ $a->action }}
 					</td>
 
-					<td class="text-center align-midde mx-auto">
+					<td class="text-center align-middle mx-auto">
 						{{ $a->created_at->format("M d, Y h:i A") }}
 					</td>
 
@@ -71,6 +71,16 @@
 				</tr>
 				@endforelse
 			</tbody>
+
+			<tfoot>
+				<tr>
+					<td colspan="4">
+						<div class="d-flex align-middle">
+							{{ $activity->onEachSide(5)->links() }}
+						</div>
+					</td>
+				</tr>
+			</tfoot>
 		</table>
 	</div>
 </div>

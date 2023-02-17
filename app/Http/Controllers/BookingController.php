@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 use Carbon\Carbon;
 
@@ -92,14 +93,13 @@ class BookingController extends Controller
 				]);
 			}
 
-			// Reduce the inventoy for realtime update
-			foreach ($booking->menus as $m) {
-				$response = $m->reduceInventory();
-
-				if (!$response->success) {
-					throw new Exception($response->message);
-				}
-			}
+			// Logger
+			ActivityLog::log(
+				"Booking #{$booking->control_no} created.",
+				$booking->id,
+				"Booking",
+				Auth::user()->id
+			);
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -110,13 +110,6 @@ class BookingController extends Controller
 				->route('admin.bookings.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Booking #{$booking->control_no} created.",
-			$booking->id,
-			"Booking",
-			Auth::user()->id
-		);
 
 		return redirect()
 			->route('admin.bookings.index')
@@ -144,13 +137,72 @@ class BookingController extends Controller
 		$colorCode = $booking->getStatusColorCode($booking->getOverallStatus());
 		$status = $booking->getStatusText($booking->getOverallStatus());
 
+		// Check if this booking can be accomodated or not
+		$canAccomodate = true;
+		$relatedInventory = [];
+		$relatedInventoryName = [];
+		// Iterate through the booking's initial order
+		foreach ($booking->menus as $m) {
+			foreach ($m->menuItems as $i) {
+				// If the item is marked as unlimited
+				if ($i->is_unlimited)
+					continue;
+
+				// Proceed to check if stock is viable still if it is not unlimited
+				$item = $i->item()->withTrashed()->first();
+				$key = Str::snake($item->item_name);
+				if (array_key_exists($key, $relatedInventory)) {
+					$relatedInventory["$key"] += $i->amount * $m->pivot->count;
+				}
+				else {
+					array_push($relatedInventoryName, $item->item_name);
+					$relatedInventory["$key"] = $i->amount * $m->pivot->count;
+				}
+			}
+		}
+
+		// Iterate through the additional orders made, if there are any
+		if ($booking->additionalOrders != null) {
+			foreach ($booking->additionalOrders as $o) {
+				foreach ($o->menus as $m) {
+					foreach ($m->menuItems as $i) {
+						// If the item is marked as unlimited
+						if ($i->is_unlimited)
+							continue;
+
+						// Proceed to check if stock is viable still if it is not unlimited
+						$item = $i->item()->withTrashed()->first();
+						$key = Str::snake($item->item_name);
+						if (array_key_exists($key, $relatedInventory)) {
+							$relatedInventory["$key"] += $i->amount * $m->pivot->count;
+						}
+						else {
+							array_push($relatedInventoryName, $item->item_name);
+							$relatedInventory["$key"] = $i->amount * $m->pivot->count;
+						}
+					}
+				}
+			}
+		}
+
+		$inventory = Inventory::whereIn('item_name', $relatedInventoryName)->get();
+		$lackingInventory = [];
+		foreach ($inventory as $i) {
+			if ($i->quantity < $relatedInventory[Str::snake("$i->item_name")]) {
+				$canAccomodate = false;
+				$lackingInventory["{$i->item_name}"] = ($relatedInventory[Str::snake("$i->item_name")] - $i->quantity) . $i->measurement_unit;
+			}
+		}
+
 		return response()
 			->json([
 				'success' => true,
 				'message' => 'Booking found',
 				'booking' => $booking,
 				'colorCode' => $colorCode,
-				'status' => $status
+				'status' => $status,
+				'canAccomodate' => $canAccomodate,
+				'lackingInventory' => $lackingInventory
 			]);
 	}
 
@@ -217,14 +269,7 @@ class BookingController extends Controller
 			$booking->phone_numbers = implode("|", $req->phone_numbers);
 			$booking->save();
 
-			// Return the inventory for realtime update
-			foreach ($booking->menus as $m) {
-				$response = $m->returnInventory();
-
-				if (!$response->success) {
-					throw new Exception($response->message);
-				}
-			}
+			$this->pending($booking->id, true);
 
 			$booking->menus()->sync($req->menu);
 			$booking->contactInformation()->delete();
@@ -238,14 +283,13 @@ class BookingController extends Controller
 				]);
 			}
 
-			// Reduce the inventoy for realtime update
-			foreach ($booking->menus as $m) {
-				$response = $m->reduceInventory();
-
-				if (!$response->success) {
-					throw new Exception($response->message);
-				}
-			}
+			// Logger
+			ActivityLog::log(
+				"Booking #{$booking->control_no} updated.",
+				$booking->id,
+				"Booking",
+				Auth::user()->id
+			);
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -257,20 +301,16 @@ class BookingController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
-		ActivityLog::log(
-			"Booking #{$booking->control_no} updated.",
-			$booking->id,
-			"Booking",
-			Auth::user()->id
-		);
-
 		return redirect()
 			->route('admin.bookings.index')
-			->with('flash_success', 'Successfully updated booking');
+			->with('flash_success', "Successfully updated booking.")
+			->with('has_icon', "true")
+			->with('message', "Please re-evaluate the booking if it should still be accepted or not.")
+			->with('has_timer', "false");
 	}
 
 	protected function delete($id) {
-		$booking = Booking::withTrashed()->find($id);
+		$booking = Booking::withTrashed()->with(['menus'])->find($id);
 
 		if ($booking == null) {
 			Log::info("No such booking.", ["id" => $id, "booking" => $booking]);
@@ -283,16 +323,26 @@ class BookingController extends Controller
 			DB::beginTransaction();
 
 			// Return the inventory for realtime update
-			foreach ($booking->menus as $m) {
-				$response = $m->returnInventory();
+			if ($booking->items_returned == 0) {
+				foreach ($booking->menus as $m) {
+					$response = $m->returnInventory($m->pivot->count);
 
-				if (!$response->success) {
-					throw new Exception($response->message);
+					if (!$response->success) {
+						throw new Exception($response->message);
+					}
 				}
 			}
 
 			$control_no = $booking->control_no;
 			$booking->forceDelete();
+
+			// Logger
+			ActivityLog::log(
+				"Booking #{$control_no} deleted.",
+				$booking->id,
+				"Booking",
+				Auth::user()->id
+			);
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -303,13 +353,6 @@ class BookingController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
-		ActivityLog::log(
-			"Booking #{$control_no} deleted.",
-			$booking->id,
-			"Booking",
-			Auth::user()->id
-		);
-
 		ActivityLog::itemDeleted($id);
 
 		return redirect()
@@ -318,7 +361,7 @@ class BookingController extends Controller
 	}
 
 	protected function archive($id) {
-		$booking = Booking::find($id);
+		$booking = Booking::with(['menus'])->find($id);
 
 		if ($booking == null) {
 			Log::info("No such booking.", ["id" => $id, "booking" => $booking]);
@@ -332,16 +375,29 @@ class BookingController extends Controller
 
 			// Return the inventory for realtime update
 			if (!($booking->getOverallStatus() == Status::Happening || $booking->getOverallStatus() == Status::Done)) {
-				foreach ($booking->menus as $m) {
-					$response = $m->returnInventory();
+				if ($booking->items_returned == 0) {
+					foreach ($booking->menus as $m) {
+						$response = $m->returnInventory($m->pivot->count);
 
-					if (!$response->success) {
-						throw new Exception($response->message);
+						if (!$response->success) {
+							throw new Exception($response->message);
+						}
 					}
+
+					$booking->items_returned = 1;
+					$booking->save();
 				}
 			}
 
 			$booking->delete();
+
+			// Logger
+			ActivityLog::log(
+				"Booking #{$booking->control_no} archived.",
+				$booking->id,
+				"Booking",
+				Auth::user()->id
+			);
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -351,17 +407,10 @@ class BookingController extends Controller
 				->route('admin.bookings.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Booking #{$booking->control_no} archived.",
-			$booking->id,
-			"Booking",
-			Auth::user()->id
-		);
 	}
 
 	protected function accept($id) {
-		$booking = Booking::find($id);
+		$booking = Booking::with(['menus'])->find($id);
 
 		if ($booking == null) {
 			Log::info("No such booking.", ["id" => $id, "booking" => $booking]);
@@ -379,7 +428,7 @@ class BookingController extends Controller
 			if ($booking->items_returned == 1) {
 				// Reduce the inventoy for realtime update
 				foreach ($booking->menus as $m) {
-					$response = $m->reduceInventory();
+					$response = $m->reduceInventory($m->pivot->count);
 
 					if (!$response->success) {
 						throw new Exception($response->message);
@@ -393,6 +442,14 @@ class BookingController extends Controller
 			$booking->reason = null;
 			$booking->save();
 
+			// Logger
+			ActivityLog::log(
+				"Booking #{$booking->control_no} accepted.",
+				$booking->id,
+				"Booking",
+				Auth::user()->id
+			);
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -405,13 +462,6 @@ class BookingController extends Controller
 				]);
 		}
 
-		ActivityLog::log(
-			"Booking #{$booking->control_no} accepted.",
-			$booking->id,
-			"Booking",
-			Auth::user()->id
-		);
-
 		return response()
 			->json([
 				'success' => true,
@@ -421,7 +471,7 @@ class BookingController extends Controller
 	}
 
 	protected function reject(Request $req, $id) {
-		$booking = Booking::find($id);
+		$booking = Booking::with(['menus'])->find($id);
 
 		if ($booking == null) {
 			return response()
@@ -455,7 +505,7 @@ class BookingController extends Controller
 			if ($booking->items_returned == 0) {
 				// Return the inventory for realtime update
 				foreach ($booking->menus as $m) {
-					$response = $m->returnInventory();
+					$response = $m->returnInventory($m->pivot->count);
 
 					if (!$response->success) {
 						throw new Exception($response->message);
@@ -468,6 +518,14 @@ class BookingController extends Controller
 			$booking->reason = $req->reason;
 			$booking->status = ApprovalStatus::Rejected;
 			$booking->save();
+
+			// Logger
+			ActivityLog::log(
+				"Booking #{$booking->control_no} rejected.",
+				$booking->id,
+				"Booking",
+				Auth::user()->id
+			);
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -482,13 +540,6 @@ class BookingController extends Controller
 				]);
 		}
 
-		ActivityLog::log(
-			"Booking #{$booking->control_no} rejected.",
-			$booking->id,
-			"Booking",
-			Auth::user()->id
-		);
-
 		return response()
 			->json([
 				'success' => true,
@@ -497,8 +548,8 @@ class BookingController extends Controller
 			]);
 	}
 
-	protected function pending($id) {
-		$booking = Booking::find($id);
+	protected function pending($id, $automated = false) {
+		$booking = Booking::with(['menus'])->find($id);
 
 		if ($booking == null) {
 			Log::info("No such booking.", ["id" => $id, "booking" => $booking]);
@@ -513,22 +564,31 @@ class BookingController extends Controller
 		try {
 			DB::beginTransaction();
 
-			if ($booking->items_returned == 1) {
+			if ($booking->items_returned == 0) {
 				// Reduce the inventoy for realtime update
 				foreach ($booking->menus as $m) {
-					$response = $m->reduceInventory();
+					$response = $m->returnInventory($m->pivot->count);
 
 					if (!$response->success) {
 						throw new Exception($response->message);
 					}
 				}
 
-				$booking->items_returned = 0;
+				$booking->items_returned = 1;
 			}
 
 			$booking->status = ApprovalStatus::Pending;
 			$booking->reason = null;
 			$booking->save();
+
+			// Logger
+			ActivityLog::log(
+				trim("Booking {$booking->control_no} moved to pending. " . ($automated ? "This is an automated action after #{$booking->control_no} is updated." : "")),
+				$booking->id,
+				"Booking",
+				Auth::user()->id,
+				$automated
+			);
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -542,13 +602,6 @@ class BookingController extends Controller
 					'message' => ''
 				]);
 		}
-
-		ActivityLog::log(
-			"Booking {$booking->control_no} moved to pending.",
-			$booking->id,
-			"Booking",
-			Auth::user()->id
-		);
 
 		return response()
 			->json([

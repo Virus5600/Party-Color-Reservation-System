@@ -35,8 +35,17 @@ class Inventory extends Model
 			try {
 				DB::beginTransaction();
 
-				if ($inventory->quantity <= 0)
+				if ($inventory->quantity <= 0) {
 					$inventory->delete();
+
+					ActivityLog::log(
+						"Item {$i->item_name} set to inactive after stock has reached less than or equals to 0{$inventory->measurement_unit}.",
+						$i->id,
+						"Inventory",
+						Auth::user()->id,
+						true
+					);
+				}
 
 				DB::commit();
 			} catch (Exception $e) {
@@ -78,6 +87,6 @@ class Inventory extends Model
 	}
 
 	public static function getForDeletion() {
-		return Inventory::withTrashed()->whereDate('updated_at', '<', now()->subYears(5))->get();
+		return Inventory::onlyTrashed()->whereDate('updated_at', '<', now()->subYears(5))->get();
 	}
 }

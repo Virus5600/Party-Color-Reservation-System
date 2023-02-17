@@ -40,11 +40,11 @@
 								<label class="h5" for="title">Quantity</label>
 								<div class="input-group">
 									<div class="input-group-prepend">
-										<button type="button" class="btn btn-secondary"><i class="fas fa-minus"></i></button>
+										<button type="button" class="btn btn-secondary quantity-decrement"><i class="fas fa-minus"></i></button>
 									</div>
 									<input class="form-control" type="number" min="0" max="4294967295" name="quantity" value="{{ $item->quantity }}"/>
 									<div class="input-group-append">
-										<button type="button" class="btn btn-secondary"><i class="fas fa-plus"></i></button>
+										<button type="button" class="btn btn-secondary quantity-increment"><i class="fas fa-plus"></i></button>
 									</div>
 								</div>
 							</div>
@@ -138,7 +138,7 @@
 			obj.removeAttr('data-id');
 		});
 
-		$('[type=number]').on('change', (e, operation, elm) => {
+		$(document).on('change', '[type=number]', (e, operation, elm) => {
 			let obj = $(e.currentTarget);
 			let val = parseInt(obj.val());
 

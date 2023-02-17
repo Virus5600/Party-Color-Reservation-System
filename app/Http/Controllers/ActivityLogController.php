@@ -8,7 +8,8 @@ use App\ActivityLog;
 class ActivityLogController extends Controller
 {
 	protected function index(Request $req) {
-		$activity = ActivityLog::latest()->get();
+		$activity = ActivityLog::latest()
+			->paginate(25);
 
 		return view('admin.activity-log.index', [
 			'activity' => $activity

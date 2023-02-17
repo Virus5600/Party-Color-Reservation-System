@@ -216,48 +216,52 @@ $(document).ready(() => {
 					let callback = `updateCalendar(${data.data_id})`;
 
 					// ACTION BUTTONS
-					let pendingButtons = `<button onclick="updateCalendar(${booking.id}, '${approveBooking.replace('%241', booking.id)}', undefined, true, 'Are you sure you want to approve this booking?')" class="btn btn-success"><i class="fas fa-circle-check mr-2"></i>Approve</button>
-						<button class="btn btn-danger" data-scf="Reason" data-scf-name="reason" data-scf-custom-title="Reason for rejection" data-scf-target-uri="${rejectBooking.replace('%241', booking.id)}" data-scf-use-textarea='true' data-scf-callback='${callback}'><i class="fas fa-circle-xmark mr-2"></i>Reject</a>`;
+					let pendingButtons = `<button onclick="updateCalendar(${booking.id}, '${approveBooking.replace('%241', booking.id)}', undefined, true, 'Are you sure you want to approve this booking?')" class="btn btn-success"><i class="fas fa-circle-check mr-0 mr-sm-2"></i><span class="d-none d-sm-inline-block">Approve</span></button>
+						<button class="btn btn-danger" data-scf="Reason" data-scf-name="reason" data-scf-custom-title="Reason for rejection" data-scf-target-uri="${rejectBooking.replace('%241', booking.id)}" data-scf-use-textarea='true' data-scf-callback='${callback}'><i class="fas fa-circle-xmark mr-0 mr-sm-2"></i><span class="d-none d-sm-inline-block">Reject</span></a>`;
 					
-					let approvedButtons = `<button onclick="updateCalendar(${booking.id}, '${pendingBooking.replace('%241', booking.id)}', undefined, true, 'Are you sure you want to move this to pending?')" class="btn btn-warning"><i class="fas fa-clock mr-2"></i>Pending</a>
-						<button class="btn btn-danger" data-scf="Reason" data-scf-name="reason" data-scf-custom-title="Reason for rejection" data-scf-target-uri="${rejectBooking.replace('%241', booking.id)}" data-scf-use-textarea='true' data-scf-callback='${callback}'><i class="fas fa-circle-xmark mr-2"></i>Reject</a>`;
+					let approvedButtons = `<button onclick="updateCalendar(${booking.id}, '${pendingBooking.replace('%241', booking.id)}', undefined, true, 'Are you sure you want to move this to pending?')" class="btn btn-warning"><i class="fas fa-clock mr-0 mr-sm-2"></i><span class="d-none d-sm-inline-block">Pending</span></a>
+						<button class="btn btn-danger" data-scf="Reason" data-scf-name="reason" data-scf-custom-title="Reason for rejection" data-scf-target-uri="${rejectBooking.replace('%241', booking.id)}" data-scf-use-textarea='true' data-scf-callback='${callback}'><i class="fas fa-circle-xmark mr-0 mr-sm-2"></i><span class="d-none d-sm-inline-block">Reject</span></a>`;
 					
-					let rejectedButtons = `<button onclick="updateCalendar(${booking.id}, '${approveBooking.replace('%241', booking.id)}', undefined, true, 'Are you sure you want to approve this booking?')" class="btn btn-success"><i class="fas fa-circle-check mr-2"></i>Approve</button>
-						<button onclick="updateCalendar(${booking.id}, '${pendingBooking.replace('%241', booking.id)}', undefined, true, 'Are you sure you want to move this to pending?')" class="btn btn-warning"><i class="fas fa-clock mr-2"></i>Pending</a>`;
+					let rejectedButtons = `<button onclick="updateCalendar(${booking.id}, '${approveBooking.replace('%241', booking.id)}', undefined, true, 'Are you sure you want to approve this booking?')" class="btn btn-success"><i class="fas fa-circle-check mr-0 mr-sm-2"></i><span class="d-none d-sm-inline-block">Approve</span></button>
+						<button onclick="updateCalendar(${booking.id}, '${pendingBooking.replace('%241', booking.id)}', undefined, true, 'Are you sure you want to move this to pending?')" class="btn btn-warning"><i class="fas fa-clock mr-0 mr-sm-2"></i><span class="d-none d-sm-inline-block">Pending</span></a>`;
 
 					// ADDITIONAL ORDER BUTTONS
 					let additionalOrderButtons = `<a href="${additionalOrdersIndex.replace('%241', booking.id)}" class="btn btn-primary">Additional Orders</a>`;
 
 					// Subtotal of all additional orders
-					let additionalOrdersSubtotal = 0;
-					for (let a of booking.additional_orders)
-						if (a.deleted_at == null)
+					let additionalOrdersSubtotal = 0, additionalExtension = 0;
+					for (let a of booking.additional_orders) {
+						if (a.deleted_at == null) {
 							additionalOrdersSubtotal += parseFloat(a.price);
+							additionalExtension += parseFloat(a.extension);
+						}
+					}
 
 					htmlContent = `
 						<div class="card">
-							<h4 class="card-header d-flex">
+							<h4 class="card-header d-flex flex-wrap">
 								<span class="w-100 w-lg-50 mr-lg-auto">${date.toLocaleDateString(window.lang, dateOpt)} ${booking.start_at} - ${booking.end_at}</span>
 								<span class="w-100 w-lg-50 ml-lg-auto">${currencySymbol} ${parseFloat(parseFloat(booking.price) + additionalOrdersSubtotal).toFixed(2)}</span>
 							</h4>
 							
 							<div class="card-body">
 								<div class="row text-left">
-									<div class="col-12 col-lg-6 my-3 my-lg-0">
+									<div class="col-12 col-lg-6">
 										<p><b>Control Number:</b> #${booking.control_no}</p>
-									</div>
-
-									<div class="col-12 col-lg-6 my-3 my-lg-0">
-										<p><b>Booking Type:</b> ${booking.booking_type}</p>
-									</div>
-
-									<div class="col-12 col-lg-6 my-3 my-lg-0">
+										
 										<p><b>Pax:</b> &times;${booking.pax} people${booking.pax > 1 ? 's' : ''}</p>
+										
 										<p><b>Created:</b> ${createdAt.toLocaleDateString(window.lang, fulldateOpt)}</p>
 									</div>
-									
-									<div class="col-12 col-lg-6 my-3 my-lg-0">
-										<p><b>Extension:</b> ${booking.extension * 60} min (${booking.extension} hrs)</p>
+
+									<div class="col-12 col-lg-6">
+										<p><b>Booking Type:</b> ${booking.booking_type.charAt(0).toUpperCase() + booking.booking_type.slice(1)}</p>
+										
+										<p class="d-flex justify-content-between">
+											<span><b>Extension:</b> ${booking.extension * 60} min (${booking.extension} hrs)</span>
+											<span>${currencySymbol} ${parseFloat(booking.extension * 500).toFixed(2)}</span>
+										</p>
+										
 										<p><b>Phone Numbers:</b> ${phoneNumbers}</p>
 									</div>
 								</div>
@@ -266,26 +270,31 @@ $(document).ready(() => {
 							<div class="card-body text-left">
 								<div class="row">
 									<div class="col-12 col-lg-6">
-										<div class="d-flex justify-content-between">
-											<span class="h3">Menus</span>
+										<div class="d-flex flex-wrap justify-content-between">
+											<span class="h3 text-center text-lg-left">Menus</span>
 											<span class="my-auto">${currencySymbol}${booking.price}</span>
 										</div>
 
-										<ul>`;
+										<ul class="pl-0 pl-lg-4" style="list-style-type: none;">`;
 					// Write down booking menus
-					for (let m of booking.menus)
-						htmlContent += `<li>${m.name} (&times;${m.pivot.count})</li>`;
+					for (let m of booking.menus) {
+						htmlContent += `
+											<li class="d-flex flex-wrap justify-content-center justify-content-sm-between">
+												<span class="mt-2 my-sm-auto">${m.name} (&times;${m.pivot.count})</span>
+												<span class="mb-2 my-sm-auto">${currencySymbol} ${m.price} (&times;${m.pivot.count})</span>
+											</li>`;
+					}
 					htmlContent += `
 										</ul>
 									</div>
 
 									<div class="col-12 col-lg-6">
-										<h3>Contacts</h3>
+										<h3 class="text-center text-sm-left">Contacts</h3>
 										
-										<ul>`;
+										<ul class="pl-0 pl-lg-4" style="list-style-type: none;">`;
 					// Write down booking contacts
 					for (let c of booking.contact_information)
-						htmlContent += `<li>${c.contact_name} [<a href="mailto:${c.email}">${c.email}</a>]</li>`;
+						htmlContent += `	<li class="text-center text-lg-left">${c.contact_name} [<a href="mailto:${c.email}">${c.email}</a>]</li>`;
 					htmlContent += 	`
 										</ul>
 									</div>
@@ -297,10 +306,10 @@ $(document).ready(() => {
 							<div class="card-body text-left">
 								<div class="row my-3">
 									<div class="col-12 col-lg-6">
-										<h3>Additional Orders</h3>
+										<h3 class="text-center text-sm-left">Additional Orders</h3>
 									</div>
 
-									<div class="col-12 col-lg-6 d-flex justify-content-evenly">
+									<div class="col-12 col-lg-6 d-flex justify-content-center justify-content-sm-start">
 										<i class="fas fa-square mr-2 text-danger my-auto"></i>
 										<span class="my-auto">Voided</span>
 									</div>
@@ -312,18 +321,30 @@ $(document).ready(() => {
 						for (let a of booking.additional_orders) {
 							htmlContent +=
 										`<div class="col-12 col-lg-6 p-2">
-											<div class="container-fluid p-2 border rounded border-secondary ${a.deleted_at == null ? '' : 'bg-danger text-white'}">
-												<div class="d-flex justify-content-between">
-													<span class="h5">Subtotal: </span>
-													<span class="my-auto">${currencySymbol}${a.price}</span>
-												</div>
-												<hr class="hr-thick">
+											<div class="container-fluid p-2 h-100 border rounded border-secondary ${a.deleted_at == null ? '' : 'bg-danger text-white'} d-flex flex-column justify-content-between">
+												<div>
+													<div class="d-flex flex-wrap justify-content-between my-3 my-lg-auto">
+														<span class="h5 m-0">Subtotal: </span>
+														<span class="my-auto">${currencySymbol}${a.price}</span>
+													</div>
+													<hr class="hr-thick">
 
-												<ul>`;
-								for (let m of a.orderable)
-									htmlContent += `<li>${m.menu.name} (&times;${m.count})</li>`;
+													<p>Menu: </p>
+													<ul class="pl-0 pl-lg-4">`;
+								for (let m of a.orderable) {
+										htmlContent += `<li class="d-flex flex-wrap justify-content-between my-3 my-lg-auto">
+															<span>${m.menu.name} (&times;${m.count})</span>
+															<span>${currencySymbol} ${m.menu.price} (&times;${m.count})</span>
+														</li>`;
+								}
 							htmlContent +=
-												`</ul>
+													`</ul>
+												</div>
+
+												<p class="d-flex justify-content-between">
+													<span>Extension: ${a.extension * 60} min (${a.extension} hrs)</span>
+													<span>${currencySymbol} ${parseFloat(a.extension * 500).toFixed(2)}</span>
+												</p>
 											</div>
 										</div>`;
 						}
@@ -337,7 +358,22 @@ $(document).ready(() => {
 							
 							<div class="card-body text-left m-0 p-0">
 								<div class="card">
-									<h3 class="card-header" style="color: white; background-color: ${response.colorCode}">Booking Status (${response.status})</h3>`;
+									<h3 class="card-header d-flex flex-wrap justify-content-between" style="color: white; background-color: ${response.colorCode}">
+										<span class="mb-2 mx-auto my-md-auto mx-md-0 text-center text-md-left">Booking Status (${response.status})</span>`;
+					if (response.status == "Pending") {
+						htmlContent += `
+										<small class="my-auto mx-auto mx-md-0">
+											<small>
+												${response.canAccomodate ? `<small class="badge badge-pill badge-success">` : `<button data-toggle="modal" data-target="#lackingItems" class="btn btn-danger badge badge-pill badge-danger">`}
+													${response.canAccomodate ? "<b>Can</b> be accomodated" : "<b>Cannot</b> be accomodated"}
+												${response.canAccomodate ? `</small>` : `</button>`}
+											</small>
+										</small>`;
+					}
+
+					htmlContent +=
+										`
+									</h3>`;
 					if (response.colorCode == "#dc3545") {
 						htmlContent += `
 									<div class="card-body">
@@ -350,7 +386,7 @@ $(document).ready(() => {
 							</div>
 
 							<div class="card-footer">
-								<div class="btn-group" role="group" aria-label="Booking Actions">`;
+								<div class="btn-group my-1" role="group" aria-label="Booking Actions">`;
 					// Displaying Booking Action Buttons
 					if (["Happening", "Done", "Ghosted", "Cancelled", "Rejected", "Unknown"].includes(response.status))
 						htmlContent += `<button class="btn btn-primary" disabled>Edit</button>`;
@@ -361,11 +397,11 @@ $(document).ready(() => {
 								</div>`;
 					// Displaying athe additional orders button
 					htmlContent += `
-								<div class="btn-group" role="group" aria-label="Status Actions">
+								<div class="btn-group my-1" role="group" aria-label="Status Actions">
 									${additionalOrderButtons}
 								</div>
 								
-								<div class="btn-group" role="group" aria-label="Status Actions" id="statusActionButtons">`;
+								<div class="btn-group my-1" role="group" aria-label="Status Actions" id="statusActionButtons">`;
 					// Displaying Status Action Buttons
 					if (response.status == 'Pending')
 						htmlContent += pendingButtons;
@@ -378,6 +414,40 @@ $(document).ready(() => {
 							</div>
 						</div>
 					`;
+
+					if (!response.canAccomodate) {
+							htmlContent += `
+						<div class="modal fade" id="lackingItems" tabindex="-1" aria-labelledby="lackingItems" aria-hidden="true">
+							<div class="modal-dialog modal-dialog-centered modal-md">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title h3">List of Inventories that are lacking</h5>
+
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+
+									<div class="modal-body">
+										<ul class="list-group">
+											<li class="list-group-item d-flex justify-content-between">
+												<span>Item</span>
+												<span>Amount</span>
+											</li>`;
+							for (let l in response.lackingInventory) {
+								htmlContent += `
+											<li class="list-group-item d-flex justify-content-between">
+												<span>${l}</span>
+												<span>${response.lackingInventory[l]}</span>
+											</li>`;
+							}
+							htmlContent += `
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>`;
+						}
 				}
 				else {
 					htmlContent = `
@@ -400,7 +470,10 @@ $(document).ready(() => {
 				showConfirmButton: false,
 				showCloseButton: true,
 				focusConfirm: false,
-				width: `75%`
+				width: `75%`,
+				customClass: {
+					popup: `w-100 w-lg-auto`
+				},
 			});
 		}
 	});

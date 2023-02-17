@@ -97,7 +97,7 @@ $maxCap = App\Settings::getValue('capacity');
 									<div class="row" id="menuField">
 										{{-- IF THERE ARE MULTIPLE OR OLD VALUES --}}
 										@php ($index = 0)
-										@foreach ($additionalOrder->bookingMenus as $om)
+										@foreach ($additionalOrder->orderable as $o)
 										{{-- ORIGINAL --}}
 										<div class="col-12 col-lg-4 my-2 position-relative" {{ $index == 0 ? 'id=origMenuForm' : '' }}>
 											<div class="card h-100">
@@ -112,7 +112,7 @@ $maxCap = App\Settings::getValue('capacity');
 																data-subtext="{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . "{$m->price} - {$m->getFromDuration("H")} " . Str::plural("hour", $m->getFromDuration("H")) . " and {$m->getFromDuration("i")} " . Str::plural("minute", $m->getFromDuration("i")) }}"
 																data-price="{{ $m->price }}"
 																data-duration="{{ $m->getFromDuration() }}"
-																{{ $om->menu->name == $m->name ? 'selected' : '' }}
+																{{ $o->menu->name == $m->name ? 'selected' : '' }}
 																>
 																{{ $m->name }}
 															</option>
@@ -123,7 +123,7 @@ $maxCap = App\Settings::getValue('capacity');
 
 													<div class="form-group">
 														<label for="count" class="form-label">Count</label>
-														<input type="number" min="1" class="form-control" name="count[]" value="{{ $om->count }}" required>
+														<input type="number" min="1" class="form-control" name="count[]" value="{{ $o->count }}" required>
 														<span class="text-danger text-wrap validation">{{ $errors->first("count.{$index}") }}</span>
 													</div>
 												</div>

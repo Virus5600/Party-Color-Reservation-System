@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Carbon\Carbon;
 
+use Auth;
 use DB;
 use Exception;
 use Log;
@@ -36,7 +37,7 @@ class Menu extends Model
 	}
 
 	// Relationships
-	public function items() { return $this->belongsToMany('App\Inventory', 'menu_items', 'menu_id', 'inventory_id'); }
+	public function items() { return $this->belongsToMany('App\Inventory', 'menu_items', 'menu_id', 'inventory_id')->withPivot('amount', 'is_unlimited'); }
 	public function menuItems() { return $this->hasMany('App\MenuItem', 'menu_id', 'id'); }
 	public function bookings() { return $this->morphedByMany('App\Booking', 'orderables'); }
 	public function additionalOrders() { return $this->morphedByMany('App\AdditionalOrder', 'orderables'); }
@@ -51,7 +52,7 @@ class Menu extends Model
 		return Carbon::parse($this->duration)->format($format);
 	}
 
-	public function reduceInventory() {
+	public function reduceInventory($count = 1) {
 		$notReduced = [];
 		$response = json_decode(json_encode([
 			"success" => true,
@@ -62,15 +63,20 @@ class Menu extends Model
 		try {
 			DB::beginTransaction();
 
-			foreach($this->items as $i) {
-				if ($i->trashed()) {
-					array_push($notReduced, $i->item_name);
-					continue;
-				}
+			foreach($this->items()->withTrashed()->get() as $i) {
+				$menuItem = $this->menuItems()->where('inventory_id', '=', $i->id)->first();
 
-				$i->quantity = $i->quantity - $this->menuItems()->where('inventory_id', '=', $i->id)->first()->amount;
+				$i->quantity = $i->quantity - ($menuItem->amount * $count);
 				$i->save();
 			}
+
+			ActivityLog::log(
+				"Menu {$this->name} reduced its items.",
+				$this->id,
+				"Menu",
+				Auth::user()->id,
+				true
+			);
 			
 			DB::commit();
 		} catch (Exception $e) {
@@ -86,7 +92,7 @@ class Menu extends Model
 		return $response;
 	}
 
-	public function returnInventory() {
+	public function returnInventory($count = 1) {
 		$notReturned = [];
 		$response = json_decode(json_encode([
 			"success" => true,
@@ -97,15 +103,31 @@ class Menu extends Model
 		try {
 			DB::beginTransaction();
 
-			foreach($this->items as $i) {
-				if ($i->trashed()) {
-					array_push($notReturned, $i->item_name);
-					continue;
-				}
+			foreach($this->items()->withTrashed()->get() as $i) {
+				$menuItem = $this->menuItems()->where('inventory_id', '=', $i->id)->first();
 
-				$i->quantity = $i->quantity + $this->menuItems()->where('inventory_id', '=', $i->id)->first()->amount;
+				$i->quantity = $i->quantity + ($menuItem->amount * $count);
 				$i->save();
+
+				if ($i->quantity > 0) {
+					$i->restore();
+					ActivityLog::log(
+						"Item {$i->item_name} set to active after stock has been returned.",
+						$i->id,
+						"Inventory",
+						Auth::user()->id,
+						true
+					);
+				}
 			}
+
+			ActivityLog::log(
+				"Menu {$this->name} returned its items.",
+				$this->id,
+				"Menu",
+				Auth::user()->id,
+				true
+			);
 			
 			DB::commit();
 		} catch (Exception $e) {

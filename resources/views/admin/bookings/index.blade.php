@@ -49,7 +49,7 @@
 	</div>
 	{{-- STATUS END --}}
 
-	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3" id="booking_details">
+	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3 h-100" id="booking_details">
 		<span id="fullscreen_trigger" class="position-relative show-expand d-lg-none" data-target="#booking_details" data-affected="#calendar_container">
 			<svg class="text-secondary btn btn-light m-1 p-1 position-absolute" style="top: 0; right: 0; width: 2rem; height: 2rem;" aria-labelledby="fullscreen_toggle" role="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
 				<title id="fullscreen_toggle">Toggle Fullscreen</title>
@@ -60,34 +60,8 @@
 			</svg>
 		</span>
 
-		<div class="container-fluid p-3" id="calendar_container">
-			<div id="calendar" class="mx-auto"></div>
-
-			{{-- Modal --}}
-			<div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-hidden="true">
-				<div class="modal-dialog modal-dialog-centered" role="document">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title" id="exampleModalCenterTitle">Booking Information</h5>
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button>
-						</div>
-			
-						<div class="modal-body">
-							'start_at': <br>
-							'end_at': <br>
-							'reserved_at': <br>
-							'pax': <br>
-							'contact_name':
-						</div>
-
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-						</div>
-					</div>
-				</div>
-			</div>
+		<div class="container-fluid p-3 py-5 py-lg-3 h-100" id="calendar_container">
+			<div id="calendar" class="mx-auto h-100"></div>
 		</div>
 	</div>
 </div>
