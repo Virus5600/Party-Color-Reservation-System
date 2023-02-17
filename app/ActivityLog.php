@@ -15,7 +15,7 @@ class ActivityLog extends Model
 	protected $fillable = [
 		'user_id',
 		'email',
-		'address',
+		'ip_address',
 		'action',
 		'is_automated',
 		'is_marked',
@@ -64,7 +64,7 @@ class ActivityLog extends Model
 
 		ActivityLog::create([
 			'user_id' => $user_id,
-			'address' => Request::ip(),
+			'ip_address' => Request::ip(),
 			'action' => $action,
 			'email' => $email,
 			'is_automated' => $is_automated ? 1 : 0,

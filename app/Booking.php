@@ -62,7 +62,7 @@ class Booking extends Model
 
 	// Relationships
 	public function additionalOrders() { return $this->hasMany('App\AdditionalOrder'); }
-	public function menus() { return $this->morphToMany('App\Menu', 'orderable', 'booking_menus')->withPivot('count'); }
+	public function menus() { return $this->morphToMany('App\Menu', 'orderable', 'orderables')->withPivot('count'); }
 	public function contactInformation() { return $this->hasMany('App\ContactInformation'); }
 
 	// Public Function

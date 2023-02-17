@@ -17,7 +17,7 @@ class CreateActivityLogsTable extends Migration
 			$table->id();
 			$table->bigInteger('user_id')->unsigned()->default(0);
 			$table->string('email')->nullable();
-			$table->string('address')->nullable();
+			$table->string('ip_address')->nullable();
 			$table->string('action')->nullable();
 			$table->tinyInteger('is_automated')->default(0);
 			$table->tinyInteger('is_marked')->default(0);

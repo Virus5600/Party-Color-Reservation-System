@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBookingMenusTable extends Migration
+class OrderablesTable extends Migration
 {
 	/**
 	 * Run the migrations.
@@ -13,7 +13,7 @@ class CreateBookingMenusTable extends Migration
 	 */
 	public function up()
 	{
-		Schema::create('booking_menus', function (Blueprint $table) {
+		Schema::create('orderables', function (Blueprint $table) {
 			$table->morphs('orderable');
 			$table->bigInteger('menu_id')->unsigned();
 			$table->integer('count')->unsigned();
@@ -29,6 +29,6 @@ class CreateBookingMenusTable extends Migration
 	 */
 	public function down()
 	{
-		Schema::dropIfExists('booking_menus');
+		Schema::dropIfExists('orderables');
 	}
 }
