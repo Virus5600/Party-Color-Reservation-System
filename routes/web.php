@@ -276,4 +276,5 @@ Route::group(['prefix' => 'admin'], function() {
 
 // React (User) Routing. This is handled by react router instead of the web.php
 Route::get('/{path?}', 'PageController@index')
+	->where('path', '.*')
 	->name('home');
