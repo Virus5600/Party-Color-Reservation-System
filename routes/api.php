@@ -13,16 +13,20 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 // LARAVEL API ENDPOINTS
-// (Admin) Search box request
-Route::post('/admin-search/{id}', 'ApiController@adminSearch')->name('adminSearch');
+Route::group(['middleware' => ['auth:sanctum']], function() {
+	// (Admin) Search box request
+	Route::post('/admin-search/{id}', 'ApiController@adminSearch')->name('adminSearch');
 
-// Removing Image
-Route::post('/remove-image', 'ApiController@removeImage')->name('removeImage');
+	// Removing Image
+	Route::post('/remove-image', 'ApiController@removeImage')->name('removeImage');
 
-// Fetch Booking Event
-Route::get('/booking/{id}', 'ApiController@fetchBookingEvent')->name('bookings.fetch-event');
-Route::get('/booking/fetch/{monthYear?}', 'ApiController@fetchBookingFromRange')->name('api.admin.bookings.fetch');
+	// Fetch Booking Event
+	Route::get('/booking/{id}', 'ApiController@fetchBookingEvent')->name('bookings.fetch-event');
+	Route::get('/booking/fetch/{monthYear?}', 'ApiController@fetchBookingFromRange')->name('api.admin.bookings.fetch');
+});
+
 
 // REACT API ENDPOINTS //
 Route::group(['prefix' => 'react'], function() {

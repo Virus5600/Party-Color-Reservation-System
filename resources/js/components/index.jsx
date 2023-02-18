@@ -52,7 +52,7 @@ const router = createBrowserRouter([
         element: <Nav />,
         children: [
             {
-                path: 'home',
+                path: '/',
                 element: <Home />,
                 loader: loaderQuickAnnouncement,
 
@@ -84,7 +84,7 @@ const router = createBrowserRouter([
                 loader: loaderAnnouncementContent,
             },
             {
-                path: 'aboutus',
+                path: 'about-us',
                 element: <AboutUs />,
             },
         ],

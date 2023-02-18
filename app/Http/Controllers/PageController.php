@@ -26,8 +26,10 @@ class PageController extends Controller
 	}
 
 	// USER PAGES
-	protected function index() {
-		return view('index');
+	protected function index(Request $req) {
+		return view('index', [
+			'loadedPage' => $req->path()
+		]);
 	}
 
 	protected function redirectToDashboard() {

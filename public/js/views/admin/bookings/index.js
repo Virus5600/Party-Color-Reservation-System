@@ -389,7 +389,7 @@ $(document).ready(() => {
 								<div class="btn-group my-1" role="group" aria-label="Booking Actions">`;
 					// Displaying Booking Action Buttons
 					if (["Happening", "Done", "Ghosted", "Cancelled", "Rejected", "Unknown"].includes(response.status))
-						htmlContent += `<button class="btn btn-primary" disabled>Edit</button>`;
+						htmlContent += `<button class="btn btn-primary" disabled title="Cannot be edited">Edit</button>`;
 					else
 						htmlContent += `<a href="${editBooking.replace('%241', data.data_id)}" class="btn btn-primary">Edit</a>`;
 					htmlContent += `
@@ -397,11 +397,11 @@ $(document).ready(() => {
 								</div>`;
 					// Displaying athe additional orders button
 					htmlContent += `
-								<div class="btn-group my-1" role="group" aria-label="Status Actions">
+								<div class="btn-group my-1" role="group" aria-label="Aditional Orders">
 									${additionalOrderButtons}
 								</div>
 								
-								<div class="btn-group my-1" role="group" aria-label="Status Actions" id="statusActionButtons">`;
+								<div class="btn-group my-1" role="group" aria-label="Change Status Actions" id="statusActionButtons">`;
 					// Displaying Status Action Buttons
 					if (response.status == 'Pending')
 						htmlContent += pendingButtons;
@@ -459,7 +459,7 @@ $(document).ready(() => {
 					html: htmlContent,
 				});
 			}).fail((response) => {
-				console.log(response);
+				console.error(response);
 			});
 
 			Swal.fire({
@@ -499,7 +499,6 @@ const updateCalendar = async function(id, route, reqType = 'get', shouldConfirm 
 			if (reqType == 'get') {
 				skipUpdate = true;
 				$.get(route, (response) => {
-					console.log(response);
 					if (response.success) {
 						updateBG();
 
@@ -538,6 +537,12 @@ const updateCalendar = async function(id, route, reqType = 'get', shouldConfirm 
 	}
 
 	const updateBG = () => {
+		$.ajaxSetup({
+			headers: {
+				'Authorization': `Bearer ${$("meta[name=bearer]").attr('content')}`
+			}
+		});
+
 		$.get(bookingFetchOne.replace('%241', id), (response) => {
 			eventCal.setProp('color', response.props.statusColorCode);
 		});

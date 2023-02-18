@@ -40,6 +40,7 @@
 	<body>
 		<div id="app"></div>
 		
+		<script id="forRemoval">const loadedPage = "{{ $loadedPage }}"; $("#forRemoval").remove();</script>
 		<script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
 	</body>
 </html>

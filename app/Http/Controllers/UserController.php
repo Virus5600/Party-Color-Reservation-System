@@ -16,7 +16,6 @@ use App\User;
 use App\UserPermission;
 use App\ActivityLog;
 
-use Auth;
 use DB;
 use Exception;
 use File;
@@ -24,7 +23,6 @@ use Hash;
 use Location;
 use Log;
 use Mail;
-use Session;
 use Validator;
 
 class UserController extends Controller
@@ -35,7 +33,7 @@ class UserController extends Controller
 	}
 
 	protected function login() {
-		if (!Auth::check())
+		if (!auth()->check())
 			return view('admin.login');
 		else
 			return redirect()->route('admin.dashboard');
@@ -52,7 +50,7 @@ class UserController extends Controller
 
 		$authenticated = false;
 		if (!$user->locked) {
-			$authenticated = Auth::attempt([
+			$authenticated = auth()->attempt([
 				'email' => $req->email,
 				'password' => $req->password
 			]);
@@ -73,6 +71,9 @@ class UserController extends Controller
 					Log::error($e);
 				}
 			}
+
+			$token = $user->createToken('authenticated');
+			session(["bearer" => $token->plainTextToken]);
 
 			return redirect()
 				->intended(route('admin.dashboard'))
@@ -156,10 +157,12 @@ class UserController extends Controller
 	}
 
 	protected function logout() {
-		if (Auth::check()) {
-			$auth = Auth::user();
+		if (auth()->check()) {
+			$auth = auth()->user();
+			$auth->tokens()->delete();
+			
 			auth()->logout();
-			Session::flush();
+			session()->flush();
 
 			ActivityLog::log(
 				"User {$auth->email} logout",
@@ -268,7 +271,7 @@ class UserController extends Controller
 				'subject' => 'Account Created',
 				'req' => $reqArgs,
 				'email' => $req->email,
-				'recipients' => [$req->email, Auth::user()->email]
+				'recipients' => [$req->email, auth()->user()->email]
 			];
 			AccountNotification::dispatch($user, "creation", $args)->afterCommit();
 
@@ -286,7 +289,7 @@ class UserController extends Controller
 			"User '" . trim($user->getName()) . "' created under the email of '{$user->email}' as {$user->type->name}.",
 			$user->id,
 			"User",
-			Auth::user()->id,
+			auth()->user()->id,
 			false
 		);
 
@@ -397,7 +400,7 @@ class UserController extends Controller
 			"User '{$user->email}' updated.",
 			$user->id,
 			"User",
-			Auth::user()->id
+			auth()->user()->id
 		);
 
 		return redirect()
@@ -469,7 +472,7 @@ class UserController extends Controller
 			"User '{$user->email}' changed password.",
 			$user->id,
 			"User",
-			Auth::user()->id
+			auth()->user()->id
 		);
 
 		return response()
@@ -529,7 +532,7 @@ class UserController extends Controller
 			"User '{$user->email}' reverted back to type permissions.",
 			$user->id,
 			"User",
-			Auth::user()->id
+			auth()->user()->id
 		);
 
 		return redirect()
@@ -639,7 +642,7 @@ class UserController extends Controller
 			"User '{$user->email}' updated permissions.",
 			$user->id,
 			"User",
-			Auth::user()->id
+			auth()->user()->id
 		);
 
 		return redirect()
@@ -673,7 +676,7 @@ class UserController extends Controller
 			"User '{$user->email}' deactivated account.",
 			$user->id,
 			"User",
-			Auth::user()->id
+			auth()->user()->id
 		);
 
 		return redirect()
@@ -712,7 +715,7 @@ class UserController extends Controller
 			"User '{$user->email()}' reactivated account.",
 			$user->id,
 			"User",
-			Auth::user()->id
+			auth()->user()->id
 		);
 
 		return redirect()
@@ -753,7 +756,7 @@ class UserController extends Controller
 			"User '{$user->email}' permanently deleted.",
 			null,
 			"User",
-			Auth::user()->id,
+			auth()->user()->id,
 			false
 		);
 

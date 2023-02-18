@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Carbon\Carbon;
 
+use Auth;
 use DB;
 use Exception;
 use Log;
@@ -39,8 +40,8 @@ class Inventory extends Model
 					$inventory->delete();
 
 					ActivityLog::log(
-						"Item {$i->item_name} set to inactive after stock has reached less than or equals to 0{$inventory->measurement_unit}.",
-						$i->id,
+						"Item {$inventory->item_name} set to inactive after stock has reached less than or equals to 0{$inventory->measurement_unit}.",
+						$inventory->id,
 						"Inventory",
 						Auth::user()->id,
 						true

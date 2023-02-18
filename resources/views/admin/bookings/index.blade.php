@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
-
 @extends('layouts.admin')
 
 @section('title', 'Bookings')
@@ -69,6 +67,7 @@
 
 @section('meta')
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="bearer" content="{{ session('bearer') }}">
 @endsection
 
 @section('css')

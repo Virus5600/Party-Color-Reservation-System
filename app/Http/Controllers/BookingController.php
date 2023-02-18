@@ -331,6 +331,15 @@ class BookingController extends Controller
 						throw new Exception($response->message);
 					}
 				}
+
+				foreach ($booking->additionalOrders as $o) {
+					foreach ($o->menus as $m) {
+						$response = $m->returnInventory($m->pivot->count);
+
+						if (!$response->success)
+							throw new Exception($response->message);
+					}
+				}
 			}
 
 			$control_no = $booking->control_no;
@@ -347,6 +356,7 @@ class BookingController extends Controller
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
+			Log::error($e);
 
 			return redirect()
 				->route('admin.bookings.index')
@@ -384,6 +394,15 @@ class BookingController extends Controller
 						}
 					}
 
+					foreach ($booking->additionalOrders as $o) {
+						foreach ($o->menus as $m) {
+							$response = $m->returnInventory($m->pivot->count);
+
+							if (!$response->success)
+								throw new Exception($response->message);
+						}
+					}
+
 					$booking->items_returned = 1;
 					$booking->save();
 				}
@@ -402,6 +421,7 @@ class BookingController extends Controller
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
+			Log::error($e);
 
 			return redirect()
 				->route('admin.bookings.index')
@@ -435,6 +455,15 @@ class BookingController extends Controller
 					}
 				}
 
+				foreach ($booking->additionalOrders as $o) {
+					foreach ($o->menus as $m) {
+						$response = $m->reduceInventory($m->pivot->count);
+
+						if (!$response->success)
+							throw new Exception($response->message);
+					}
+				}
+
 				$booking->items_returned = 0;
 			}
 
@@ -453,6 +482,7 @@ class BookingController extends Controller
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
+			Log::error($e);
 
 			return response()
 				->json([
@@ -509,6 +539,15 @@ class BookingController extends Controller
 
 					if (!$response->success) {
 						throw new Exception($response->message);
+					}
+				}
+
+				foreach ($booking->additionalOrders as $o) {
+					foreach ($o->menus as $m) {
+						$response = $m->returnInventory($m->pivot->count);
+
+						if (!$response->success)
+							throw new Exception($response->message);
 					}
 				}
 
@@ -571,6 +610,15 @@ class BookingController extends Controller
 
 					if (!$response->success) {
 						throw new Exception($response->message);
+					}
+				}
+
+				foreach ($booking->additionalOrders as $o) {
+					foreach ($o->menus as $m) {
+						$response = $m->returnInventory($m->pivot->count);
+
+						if (!$response->success)
+							throw new Exception($response->message);
 					}
 				}
 
