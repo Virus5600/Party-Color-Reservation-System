@@ -14,7 +14,9 @@ export default function Home() {
     return (
         <div className='Home'>
             <div className=''>
-                <img src={mainImage} className='img-fluid' />
+                <Link to="/">
+                    <img src={mainImage} className='img-fluid' />
+                </Link>
             </div>
             <QuickReservation />
 
