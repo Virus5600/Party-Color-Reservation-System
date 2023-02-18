@@ -3,20 +3,22 @@
 }
 
 
-.Home .main-image img {
+/* .Home .main-image img {
     width: 100%;
     height: 25vw;
     object-fit: cover;
-}
+} */
 
 p {
+    color: black;
     background-color: white;
     text-align: center;
 }
 
-a {
+.moredetails {
     color: black;
 
+    text-decoration: underline;
 }
 
 a:hover {

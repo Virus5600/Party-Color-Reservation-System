@@ -13,13 +13,13 @@ import { Link } from 'react-router-dom';
 export default function Home() {
     return (
         <div className='Home'>
-            <div className='main-image container-mb'>
+            <div className=''>
                 <img src={mainImage} className='img-fluid' />
             </div>
             <QuickReservation />
 
             <Announcement />
-            <p className='Announcement-more'><Link to='/announcement'>more details</Link></p>
+            <p className=''><Link to='/announcement' className='moredetails'>more details</Link></p>
         </div>
     );
 }
