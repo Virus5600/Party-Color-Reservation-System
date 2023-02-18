@@ -79,7 +79,7 @@ const AnnouncementItem = ({ id, poster, created_at, title, summary }) => {
     };
 
     return (
-        <Link to={`/announcement/${id}`}>
+        <Link to={`/announcements/${id}`}>
             <div className='AnnouncementItem'>
                 <div className='AnnouncementItem-image'>
                     <img src={poster.replace("{id}", id)} />

@@ -19,7 +19,7 @@ export default function Home() {
             <QuickReservation />
 
             <Announcement />
-            <p className=''><Link to='/announcement' className='moredetails'>more details</Link></p>
+            <p className=''><Link to='/announcements' className='moredetails'>more details</Link></p>
         </div>
     );
 }
