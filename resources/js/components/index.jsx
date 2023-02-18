@@ -74,12 +74,12 @@ const router = createBrowserRouter([
                 element: <ReservationSuccess />,
             },
             {
-                path: 'announcement',
+                path: 'announcements',
                 element: <Announcement />,
                 loader: loaderAnnouncement,
             },
             {
-                path: 'announcement/:announcementId',
+                path: 'announcements/:announcementId',
                 element: <AnnouncementContent />,
                 loader: loaderAnnouncementContent,
             },
