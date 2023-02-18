@@ -17,9 +17,3 @@
 .Appearance-image {
     text-align: center;
 }
-
-.Appearance img {
-    width: 500px;
-    height: 420px;
-    object-fit: fill;
-}

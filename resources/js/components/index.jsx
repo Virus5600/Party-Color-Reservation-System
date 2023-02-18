@@ -13,7 +13,7 @@ import Reservation from './reservation';
 import ReservationConfirmation from './reservation/reservationconfirmation';
 import ReservationSuccess from './reservation/reservationsuccess';
 import Announcement from './announcement';
-import AnnouncementContent from './announcement/announcementcontent';
+import AnnouncementContent from './announcement/announcementcontent/index';
 import AboutUs from './aboutus';
 
 import {
@@ -101,4 +101,3 @@ ReactDOM.render(
     </React.StrictMode>,
     document.getElementById('app')
 );
-

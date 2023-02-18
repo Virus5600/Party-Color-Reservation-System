@@ -10,15 +10,15 @@ import Announcement from '../announcement';
 import { Link } from 'react-router-dom';
 
 
-export default function Home({ onReservationClick, onAnnouncementClick }) {
+export default function Home() {
     return (
         <div className='Home'>
             <div className='main-image container-mb'>
                 <img src={mainImage} className='img-fluid' />
             </div>
-            <QuickReservation onReservationClick={onReservationClick} />
+            <QuickReservation />
 
-            <Announcement onAnnouncementClick={onAnnouncementClick} />
+            <Announcement />
             <p className='Announcement-more'><Link to='/announcement'>more details</Link></p>
         </div>
     );
