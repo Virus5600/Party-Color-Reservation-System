@@ -28,26 +28,27 @@ export default function AnnouncementContent() {
     console.log(announcement);
 
     return (
-
         <>
             <div className='AnnouncementContent'>
                 <div>
                     <div className='AnnouncementContent-title'>
-                        "{announcement.title}""
+                        "{announcement.title}"
                     </div>
+                    
                     <div className='AnnouncementContent-summary'>
                         {announcement.summary}
-                    </div><hr /><br />
+                    </div>
+                    <hr/>
+                    <br/>
+                    
                     <div className='AnnouncementContent-content'>
                         {ReactHtmlParser(announcement.content)}
                     </div>
-
                 </div>
-
             </div>
-            <div className=' d-flex justify-content-center mt-2'>
-                <button className='btn btn-primary'><Link to='/announcement'>back</Link></button>
 
+            <div className=' d-flex justify-content-center mt-2'>
+                <Link to='/announcements' className="btn btn-primary">Back</Link>
             </div>
         </>
 

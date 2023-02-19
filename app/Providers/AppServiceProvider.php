@@ -36,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
 		}
 
 		// Uses alias instead of their path names
-		Relation::enforceMorphMap([
+		Relation::morphMap([
 			'booking' => 'App\Booking',
 			'additional_order' => 'App\AdditionalOrder',
 		]);

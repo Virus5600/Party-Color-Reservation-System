@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Str;
+
 use App\Announcement;
 use App\AnnouncementContentImage;
 use App\ActivityLog;
@@ -80,7 +82,7 @@ class AnnouncementController extends Controller
 		try {
 			DB::beginTransaction();
 
-			$slug = preg_replace('/\s+/', '_', $req->title);
+			$slug = Str::of($req->title)->slug('-');
 
 			// Content will be "To add..." to filter images
 			$announcement = Announcement::create([
@@ -115,7 +117,7 @@ class AnnouncementController extends Controller
 				$image = str_replace($replace, '', $i->getAttribute('src'));
 				$image_name = $slug . '-内容' . uniqid() . '.' . $extension;
 
-				Storage::disk('root')->put('/announcements/'.$announcement->id.'/'.$image_name, base64_decode($image));
+				Storage::disk('root')->put('/announcements/'.$announcement->id.'/'.$image_name, base64_decode($image), 'public');
 
 				AnnouncementContentImage::create([
 					'announcement_id' => $announcement->id,
@@ -235,7 +237,7 @@ class AnnouncementController extends Controller
 		try {
 			DB::beginTransaction();
 
-			$slug = preg_replace('/\s+/', '_', $req->title);
+			$slug = Str::of($req->title)->slug('-');
 
 			// Content will be "To add..." to filter images
 			$announcement->title = $req->title;
@@ -275,7 +277,7 @@ class AnnouncementController extends Controller
 					$image = str_replace($replace, '', $i->getAttribute('src'));
 					$image_name = $slug . '-内容' . uniqid() . '.' . $extension;
 
-					Storage::disk('root')->put('/announcements/'.$announcement->id.'/'.$image_name, base64_decode($image));
+					Storage::disk('root')->put('/announcements/'.$announcement->id.'/'.$image_name, base64_decode($image), 'public');
 
 					AnnouncementContentImage::create([
 						'announcement_id' => $announcement->id,

@@ -14,12 +14,14 @@ export default function Home() {
     return (
         <div className='Home'>
             <div className=''>
-                <img src={mainImage} className='img-fluid' />
+                <Link to="/">
+                    <img src={mainImage} className='img-fluid' />
+                </Link>
             </div>
             <QuickReservation />
 
             <Announcement />
-            <p className=''><Link to='/announcement' className='moredetails'>more details</Link></p>
+            <p className=''><Link to='/announcements' className='moredetails'>more details</Link></p>
         </div>
     );
 }

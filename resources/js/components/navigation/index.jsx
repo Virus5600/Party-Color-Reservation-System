@@ -13,7 +13,7 @@ export default function Navigation() {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		navigate('/home', { replace: true });
+		navigate(`/${loadedPage}`, { replace: true });
 	}, []);
 
 	const listStyle = {
@@ -44,37 +44,41 @@ export default function Navigation() {
 						</button>
 						<div className="navbar-collapse collapse" id="navbarSupportedContent">
 							<ul className="nav nav-pills ms-auto mb-2 mb-lg-0">
-								<li style={listStyle} >
-									<NavLink
-										to='home'
-										className={({ isActive, isPending }) =>
-											isActive ? 'nav-active' : ''
-										}
-									>Home</NavLink>
+								{/* HOME */}
+								<li style={listStyle}>
+									<NavLink to='/' className={({ isActive, isPending }) => isActive ? 'nav-active' : ''}>
+										Home
+									</NavLink>
 								</li>
-								<li style={listStyle} ><NavLink to='reservation' className={({ isActive, isPending }) =>
-									isActive ? 'nav-active' : ''
-								}>Reservation</NavLink></li>
-								<li style={listStyle}><NavLink to='announcement' className={({ isActive, isPending }) =>
-									isActive ? 'nav-active' : ''
-								}>Announcement</NavLink></li>
-								<li style={listStyle}><NavLink to='aboutus' className={({ isActive, isPending }) =>
-									isActive ? 'nav-active' : ''
-								}>About Us</NavLink></li>
+								
+								{/* RESERVATION */}
+								<li style={listStyle} >
+									<NavLink to='reservation' className={({ isActive, isPending }) => isActive ? 'nav-active' : ''}>
+										Reservation
+									</NavLink>
+								</li>
+
+								{/* RESERVATION */}
+								<li style={listStyle}>
+									<NavLink to='announcements' className={({ isActive, isPending }) => isActive ? 'nav-active' : ''}>
+										Announcement
+									</NavLink>
+								</li>
+								
+								{/* ABOUT US */}
+								<li style={listStyle}>
+									<NavLink to='about-us' className={({ isActive, isPending }) => isActive ? 'nav-active' : ''}>
+										About Us
+									</NavLink>
+								</li>
 							</ul>
 						</div>
 					</div>
 				</nav>
-
 			</div>
-
 
 			{/* Navbar end */}
 			<Outlet />
-
 		</>
-
-
 	);
-
 }

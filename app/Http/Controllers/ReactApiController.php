@@ -16,6 +16,10 @@ use Log;
 class ReactApiController extends Controller
 {
 	// ANNOUNCEMENTS
+	protected function fetchSingleAnnouncement(Request $req) {
+		
+	}
+
 	protected function fetchAnnouncements(Request $req) {
 		$announcements = Announcement::select(
 			DB::raw("
