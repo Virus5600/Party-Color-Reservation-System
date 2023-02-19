@@ -42,31 +42,31 @@ const ReservationDetails = () => {
 	return (
 		<Form method='post' className='px-sm-5 p-4'>
 
-      <InputRow isRequired={true} inputs={[
-        { type: 'text', name: 'first_name', label: 'First Name', reservationInfo, },
-        { type: 'text', name: 'last_name', label: 'Last Name', reservationInfo, },
+      <InputRow inputs={[
+        { type: 'text', name: 'first_name', label: 'First Name', isRequired: true, reservationInfo, },
+        { type: 'text', name: 'last_name', label: 'Last Name', isRequired: true,reservationInfo, },
       ]} />
 
-      <InputRow isRequired={true} inputs={[
-        { type: 'email', name: 'email', label: 'Email', placeholder: 'ex: myname@example.com', colspan: '2', reservationInfo, },
+      <InputRow inputs={[
+        { type: 'email', name: 'email', label: 'Email', placeholder: 'ex: myname@example.com', isRequired: true, reservationInfo, },
       ]} />
 
-      <InputRow isRequired={true} inputs={[
-        { type: 'text', name: 'phone', label: 'Phone', colspan: '2', reservationInfo, },
+      <InputRow inputs={[
+        { type: 'text', name: 'phone', label: 'Phone', isRequired: true, reservationInfo, },
       ]} />
 
-      <InputRow isRequired={true} inputs={[
-        { type: 'number', name: 'no_guests', label: 'Guest Count', colspan: '2', min_value: 1, reservationInfo, },
-        { type: 'date', name: 'date', label: 'Date', reservationInfo, },
-        { type: 'time', name: 'starting_time', label: 'Start Time', min_value: '17:00', max_value: '19:00', reservationInfo, },
+      <InputRow inputs={[
+        { type: 'number', name: 'no_guests', label: 'Guest Count', min_value: 1, isRequired: true, reservationInfo, },
+        { type: 'date', name: 'date', label: 'Date', isRequired: true, reservationInfo, },
+        { type: 'time', name: 'starting_time', label: 'Start Time', min_value: '17:00', max_value: '19:00', isRequired: true, reservationInfo, },
       ]} />
 
-      <InputRow isRequired={false} inputs={[
-        { type: 'number', name: 'time_extension', label: 'Time Extension', colspan: '2', min_value: 1, reservationInfo, },
+      <InputRow inputs={[
+        { type: 'number', name: 'time_extension', label: 'Time Extension', min_value: 1, isRequired: false, reservationInfo, },
       ]} />
 
-      <InputRow isRequired={false} inputs={[
-        { type: 'text', name: 'special_request', label: 'Special Requests', colspan: '2', reservationInfo, },
+      <InputRow inputs={[
+        { type: 'textArea', name: 'special_request', label: 'Special Requests', isRequired: false, reservationInfo},
       ]} />
       
       <div className='text-end mt-4'>
@@ -77,7 +77,7 @@ const ReservationDetails = () => {
 }
 
 
-const InputRow = ({ inputs, isRequired }) => {
+const InputRow = ({ inputs }) => {
 	return (
       <div className='row g-4 mb-3'>
         {
@@ -90,9 +90,8 @@ const InputRow = ({ inputs, isRequired }) => {
               placeholder={input.placeholder}
               min={input.min_value}
               max={input.max_value}
-              colspan={input.colspan}
               onCountChange={input.onCountChange}
-              isRequired={isRequired}
+              isRequired={input.isRequired}
               reservationInfo={input.reservationInfo}
             />)
           }
@@ -101,11 +100,17 @@ const InputRow = ({ inputs, isRequired }) => {
 };
 
 const InputField = ({ type, name, label, placeholder, min, max, isRequired, reservationInfo }) => {
+  let field;
+  if (type == "textArea") {
+    field = <textArea name={name} defaultValue={reservationInfo[name] == null ? '' : reservationInfo[name]} placeholder={placeholder} required={isRequired} className="form-control" id={name}></textArea>
+  } else {
+    field = <input type={type} name={name} defaultValue={reservationInfo[name] == null ? '' : reservationInfo[name]} placeholder={placeholder} min={min} max={max} required={isRequired} className="form-control" id={name}></input>
+  }
 	return (
 		<div className="col-md">
       <label for={name} className="form-label text-white">{label}</label>
       {isRequired ? '' : <a className='text-white text-opacity-50 fw-light'> (Optional)</a>}
-      <input type={type} name={name} defaultValue={reservationInfo[name] == null ? '' : reservationInfo[name]} placeholder={placeholder} min={min} max={max} required={isRequired} className="form-control" id={name}></input>
+      {field}
     </div>
 	);
 };
