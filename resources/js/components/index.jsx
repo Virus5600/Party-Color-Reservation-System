@@ -9,6 +9,8 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 // components (pages)
 import Home from './home';
 import Nav from './navigation';
+import ReservationSelection from './reservation/reservationselection';
+import ReservationView from './reservation/reservationview';
 import Reservation from './reservation';
 import ReservationConfirmation from './reservation/reservationconfirmation';
 import ReservationSuccess from './reservation/reservationsuccess';
@@ -58,10 +60,18 @@ const router = createBrowserRouter([
 
             },
             {
+                path: 'reservationselection',
+                element: <ReservationSelection />,
+            },
+            {
                 path: 'reservation',
                 element: <Reservation />,
                 loader: reservationLoader,
                 action: confirmAction,
+            },
+            {
+                path: '/viewreservation',
+                element: <ReservationView />,
             },
             {
                 path: 'reservation/confirm',
