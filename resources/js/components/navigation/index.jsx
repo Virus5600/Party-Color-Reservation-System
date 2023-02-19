@@ -10,11 +10,11 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 
 
 export default function Navigation() {
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 
-	useEffect(() => {
-		navigate(`/${loadedPage}`, { replace: true });
-	}, []);
+	// useEffect(() => {
+	// 	navigate(`/${loadedPage}`, { replace: true });
+	// }, []);
 
 	const listStyle = {
 		color: '#A52A2A',
@@ -50,10 +50,10 @@ export default function Navigation() {
 										Home
 									</NavLink>
 								</li>
-								
+
 								{/* RESERVATION */}
 								<li style={listStyle} >
-									<NavLink to='reservation' className={({ isActive, isPending }) => isActive ? 'nav-active' : ''}>
+									<NavLink to='reservationselection' className={({ isActive, isPending }) => isActive ? 'nav-active' : ''}>
 										Reservation
 									</NavLink>
 								</li>
@@ -64,7 +64,7 @@ export default function Navigation() {
 										Announcement
 									</NavLink>
 								</li>
-								
+
 								{/* ABOUT US */}
 								<li style={listStyle}>
 									<NavLink to='about-us' className={({ isActive, isPending }) => isActive ? 'nav-active' : ''}>
