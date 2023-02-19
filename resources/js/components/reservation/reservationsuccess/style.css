@@ -6,12 +6,6 @@
 
 .ReservationSuccess {
     font-size: 20px;
-    padding: 20px;
-    width: 40%;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 20px;
-    margin-bottom: 20px;
     background-color: #1D7B3E;
     border-radius: 10px;
 }
@@ -31,4 +25,9 @@
 
 .ReservationSuccess-links .link:hover {
     opacity: 0.7;
+}
+
+.container-small {
+    width: 800px;
+    max-width: 100%;
 }
