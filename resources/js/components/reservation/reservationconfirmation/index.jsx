@@ -17,9 +17,15 @@ export async function action() {
 
 }
 
-export default function ReservationConfirmation() {
+export default function ReservationConfirmation(other) {
+    var reservationInfo;
 
-    const reservationInfo = useLoaderData();
+    if (other.forViewReservation == true) { // to use in reservationview component
+        reservationInfo = other.reservationInfo;
+    } else {
+        reservationInfo = useLoaderData();
+    }
+
 
     const {
         first_name,
@@ -50,13 +56,32 @@ export default function ReservationConfirmation() {
 
 
 
+
                     </tbody>
                 </table>
-                <div className='ReservationDetailsConfirmation-buttons'>
-                    <button className='btn btn-danger' ><Link to='/reservation'>edit</Link></button>
-                    <button className='btn btn-success' type='submit'>reserve</button>
-                </div>
+                {
+                    other.forViewReservation ? <ReservationButtonsForView /> : <ReservationButtons />
+                }
             </Form>
+        </div>
+    );
+}
+
+
+const ReservationButtons = () => {
+    return (
+        <div className='ReservationDetailsConfirmation-buttons'>
+            <button className='btn btn-danger' ><Link to='/reservation'>edit</Link></button>
+            <button className='btn btn-success' type='submit'>reserve</button>
+        </div>
+
+    );
+}
+
+const ReservationButtonsForView = () => {
+    return (
+        <div className='ReservationDetailsConfirmation-buttons'>
+            <button className='btn btn-danger' type='submit'>cancel request</button>
         </div>
     );
 }
