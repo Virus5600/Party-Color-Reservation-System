@@ -62,7 +62,7 @@ export default function ReservationConfirmation() {
 const FieldValue = ({ label, data }) => {
     return (
         <div className='row mb-3'>
-            <div className='col text-end' style={{ fontWeight: '900' }}>
+            <div className='col-5 text-end' style={{ fontWeight: '900' }}>
                 {label}:
             </div>
             <div className='col'>
