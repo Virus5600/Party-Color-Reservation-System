@@ -1,4 +1,4 @@
-import './style.css';
+import '../style.css';
 
 import axios from 'axios';
 
@@ -35,42 +35,40 @@ export default function ReservationConfirmation() {
 
 
     return (
-        <div className='ReservationDetailsConfirmation'>
-            <Form method='post'>
-                <table>
-                    <tbody>
-
-                        <ReservationDetailsConfirmationTR label={'Full Name'} data={first_name + ' ' + last_name} />
-                        <ReservationDetailsConfirmationTR label={'Email'} data={email} />
-                        <ReservationDetailsConfirmationTR label={'Phone'} data={phone} />
-                        <ReservationDetailsConfirmationTR label={'#ofGuests'} data={no_guests} />
-                        <ReservationDetailsConfirmationTR label={'Reservation'} data={date + ' ' + starting_time} />
-                        <ReservationDetailsConfirmationTR label={'Time Extension'} data={time_extension} />
-                        <ReservationDetailsConfirmationTR label={'Any Special Requests'} data={special_request} />
-
-
-
-                    </tbody>
-                </table>
-                <div className='ReservationDetailsConfirmation-buttons'>
-                    <button className='btn btn-danger' ><Link to='/reservation'>edit</Link></button>
-                    <button className='btn btn-success' type='submit'>reserve</button>
-                </div>
-            </Form>
+        <div className='container container-small'>
+            <div className='background m-5'>
+				<h1 className='text-center text-white'>Reservation Details</h1>
+				
+                <Form method='post' className='px-sm-5 p-4'>
+                    <div className="text-white">
+                        <FieldValue label={'Full Name'} data={first_name + ' ' + last_name} />
+                        <FieldValue label={'Email'} data={email} />
+                        <FieldValue label={'Phone'} data={phone} />
+                        <FieldValue label={'Guest Count'} data={no_guests} />
+                        <FieldValue label={'Reservation'} data={date + ' ' + starting_time} />
+                        <FieldValue label={'Time Extension'} data={time_extension} />
+                        <FieldValue label={'Special Requests'} data={special_request} />
+                    </div>
+                    <div className='text-end mt-4'>
+                        <button className='btn btn-danger me-2'><Link to='/reservation'>Edit</Link></button>
+                        <button className='btn btn-success' type='submit'>Confirm</button>
+                    </div>
+                </Form>
+			</div>
         </div>
     );
 }
 
-const ReservationDetailsConfirmationTR = ({ label, data }) => {
+const FieldValue = ({ label, data }) => {
     return (
-        <tr className='ReservationDetailsConfirmationTR'>
-            <td style={{ fontWeight: '900' }}>
-                {label}
-            </td>
-            <td>
-                {data == '' ? 'NA' : data}
-            </td>
-        </tr>
+        <div className='row mb-3'>
+            <div className='col-5 text-end' style={{ fontWeight: '900' }}>
+                {label}:
+            </div>
+            <div className='col'>
+                {data == '' ? 'N/A' : data}
+            </div>
+        </div>
     );
 
 }
