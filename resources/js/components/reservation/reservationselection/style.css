@@ -1,0 +1,43 @@
+.ReservationSelection {
+    display: flex;
+    justify-content: center;
+    gap: 100px;
+
+    margin: 50px;
+}
+
+.ReservationSelectionCard-outer {
+    background-color: #F4F0F0;
+
+
+    padding: 10px;
+}
+
+.ReservationSelectionCard-inner {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    gap: 50px;
+    cursor: pointer;
+
+    padding: 40px;
+}
+
+.ReservationSelectionCard-inner p {
+    text-decoration: underline;
+    font-weight: 900;
+
+}
+
+.ReservationSelectionCard-inner img {
+    width: 170px;
+    height: 170px;
+}
+
+.ReservationSelectionCard-inner:hover {
+    opacity: 0.7;
+}
+
+.ReservationSelectionCardInner-link {
+    /*  */
+}
