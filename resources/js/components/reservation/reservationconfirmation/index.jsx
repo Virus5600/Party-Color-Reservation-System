@@ -39,7 +39,9 @@ export default function ReservationConfirmation(other) {
         last_name,
         email,
         phone,
-        no_guests,
+        adult_senior,
+        junior,
+        elementary,
         date,
         starting_time,
         time_extension,
@@ -58,7 +60,9 @@ export default function ReservationConfirmation(other) {
                         <FieldValue label={'Full Name'} data={first_name + ' ' + last_name} />
                         <FieldValue label={'Email'} data={email} />
                         <FieldValue label={'Phone'} data={phone} />
-                        <FieldValue label={'Guest Count'} data={no_guests} />
+                        <FieldValue label={'adult/senior'} data={adult_senior} />
+                        <FieldValue label={'junior'} data={junior} />
+                        <FieldValue label={'elementary'} data={elementary} />
                         <FieldValue label={'Reservation'} data={date + ' ' + starting_time} />
                         <FieldValue label={'Time Extension'} data={time_extension} />
                         <FieldValue label={'Special Requests'} data={special_request} />
@@ -78,7 +82,7 @@ export default function ReservationConfirmation(other) {
 const ReservationButtons = () => {
     return (
         <div className='text-end mt-4'>
-            <button className='btn btn-danger' me-2><Link to='/reservation'>edit</Link></button>
+            <Link to='/reservation'><button className='btn btn-danger me-2' >edit</button></Link>
             <button className='btn btn-success' type='submit'>reserve</button>
         </div>
 
