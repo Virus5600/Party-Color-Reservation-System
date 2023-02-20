@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // LARAVEL API ENDPOINTS
-Route::group(['middleware' => ['auth:sanctum']], function() {
+Route::group(['middleware' => ['auth:sanctum']], function () {
 	// (Admin) Search box request
 	Route::post('/admin-search/{id}', 'ApiController@adminSearch')->name('adminSearch');
 
@@ -29,18 +29,31 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
 
 
 // REACT API ENDPOINTS //
-Route::group(['prefix' => 'react'], function() {
+
+/*
+api connection 
+- add reservations
+- view reservation
+- cancel request reservation
+- view announcements
+- view individual announcement
+*/
+
+
+Route::group(['prefix' => 'react'], function () {
 	// Announcements
-	Route::group(['prefix' => 'announcements'], function() {
+	Route::group(['prefix' => 'announcements'], function () {
 		// All
 		Route::get('/fetch', 'ReactApiController@fetchAnnouncements')->name('api.react.announcements.fetch');
 
 		// Show (1 Item)
 		Route::get('/{id}', 'ReactApiController@fetchSingleAnnouncement')->name('api.react.announcements.show');
-	});
+	}
+	);
 
 	// Booking
-	Route::group(['prefix' => 'bookings'], function() {
+	Route::group(['prefix' => 'bookings'], function () {
 		Route::post('/create', 'ReactApiController@bookingsCreate')->name('api.react.bookings.create');
-	});
+	}
+	);
 });
