@@ -59,15 +59,13 @@ export default function ReservationView() {
 
 
     return (
-        <>
-            <div className='ReservationView'>
-                <ViewReservation onViewClick={handleViewClick} />
-                <hr />
-                {
-                    reservationInfo == null ? <></> : <ReservationConfirmation forViewReservation={true} reservationInfo={reservationInfo} />
-                }
-            </div>
-        </>
+        <div>
+            <ViewReservation onViewClick={handleViewClick} />
+            <hr />
+            {
+                reservationInfo == null ? <></> : <ReservationConfirmation forViewReservation={true} reservationInfo={reservationInfo} />
+            }
+        </div>
     );
 }
 
@@ -86,16 +84,18 @@ const ViewReservation = ({ onViewClick }) => {
 
 
     return (
-        <div className='ViewReservation'>
-            <div className='ViewReservation-input'>
-                <input type='text' onChange={handleInputControlNumber} /><br />
-                <span >enter the control number to view the reservation</span>
+        <div className='container container-small'>
+            <div className="m-5">
+                <label htmlFor='cnum' className="form-label">Control Number</label>
+                <div className="row g-2">
+                    <div className='col'>
+                        <input type='text' placeholder='Input your control number here...' onChange={handleInputControlNumber} className='form-control my-0' id='cnum'/>
+                    </div>
+                    <div className='col-sm-auto text-end'>
+                        <button onClick={handleViewButton} className='btn btn-success' >View Reservation</button>
+                    </div>
+                </div>
             </div>
-            <div className='ViewReservation-buttons'>
-                <button onClick={handleViewButton}>view</button>
-            </div>
-
-
         </div>
     );
 }
