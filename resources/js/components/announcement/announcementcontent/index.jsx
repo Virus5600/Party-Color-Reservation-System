@@ -4,28 +4,33 @@ import './style.css';
 
 import ReactHtmlParser from 'react-html-parser';
 
+import axios from 'axios';
+
 import { useLoaderData, Link } from 'react-router-dom';
 
-export function loader({ params }) {
+export async function loader({ params }) {
+    let announcement;
 
-    if (sessionStorage.getItem('latestannouncement') == null) {
+    // if (sessionStorage.getItem('latestannouncement') == null) {
 
-        const announcements = JSON.parse(sessionStorage.getItem('announcement'));
-        const _announcements = announcements.filter(announcement => announcement.id == params.announcementId);
-        return _announcements[0];
-    }
+    //     const announcements = JSON.parse(sessionStorage.getItem('announcement'));
+    //     const _announcements = announcements.filter(announcement => announcement.id == params.announcementId);
+    //     return _announcements[0];
+    // }
 
-    const announcements = JSON.parse(sessionStorage.getItem('latestannouncement'));
-    const _announcements = announcements.filter(announcement => announcement.id == params.announcementId);
-    console.log(_announcements[0]);
-    return _announcements[0];
-
+    // const announcements = JSON.parse(sessionStorage.getItem('latestannouncement'));
+    // const _announcements = announcements.filter(announcement => announcement.id == params.announcementId);
+    // console.log(_announcements[0]);
+    // return _announcements[0];
+    const API = 'api/react/announcements';
+    await axios.get(`${API}/${params.announcementId}`).then(res => {
+        announcement = res.data.announcement;
+    }).catch(res => console.log(res));
+    return announcement;
 }
 
 export default function AnnouncementContent() {
     const announcement = useLoaderData();
-    console.log('fsdfdfaf');
-    console.log(announcement);
 
     return (
         <>
