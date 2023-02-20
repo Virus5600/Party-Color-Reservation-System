@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Announcement;
 use App\Booking;
-use App\ContactInformation; # added
-use App\ActivityLog; # added
+use App\ContactInformation;
+use App\ActivityLog;
 
 use DB;
 use Exception;
@@ -16,8 +16,26 @@ use Log;
 class ReactApiController extends Controller
 {
 	// ANNOUNCEMENTS
-	protected function fetchSingleAnnouncement(Request $req) {
-		
+	protected function fetchSingleAnnouncement(Request $req, $id) {
+		$announcement = Announcement::find($id);
+
+		if ($announcement == null) {
+			return response()
+				->json([
+					"success" => false,
+					"message_type" => "error",
+					"message" => "The announcement either does not exists or is already deleted.",
+					"announcement" => null
+				]);
+		}
+
+		return response()
+			->json([
+				"success" => true,
+				"message_type" => "success",
+				"message" => "Announcement exists",
+				"announcement" => $announcement
+			]);
 	}
 
 	protected function fetchAnnouncements(Request $req) {

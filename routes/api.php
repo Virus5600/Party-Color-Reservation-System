@@ -32,7 +32,11 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
 Route::group(['prefix' => 'react'], function() {
 	// Announcements
 	Route::group(['prefix' => 'announcements'], function() {
+		// All
 		Route::get('/fetch', 'ReactApiController@fetchAnnouncements')->name('api.react.announcements.fetch');
+
+		// Show (1 Item)
+		Route::get('/{id}', 'ReactApiController@fetchSingleAnnouncement')->name('api.react.announcements.show');
 	});
 
 	// Booking
