@@ -12,21 +12,36 @@ export function loader() {
 export async function action() {
     const raw_session_data = sessionStorage.getItem('reservationInfo');
     const reservationInfo = JSON.parse(raw_session_data);
-    await handleReserveClick(reservationInfo);
-    return redirect('/reservation/success');
+    const result = await handleReserveClick(reservationInfo);
+    console.log('result:', result);
+    if (result == null) {
+        const reservationsuccess = true;
+        sessionStorage.setItem('reservationsuccess', JSON.stringify(reservationsuccess));
+        return redirect('/reservation/success');
+    }
 
+
+    return redirect('/reservation');
 }
 
-export default function ReservationConfirmation() {
+export default function ReservationConfirmation(other) {
+    var reservationInfo;
 
-    const reservationInfo = useLoaderData();
+    if (other.forViewReservation == true) { // to use in reservationview component
+        reservationInfo = other.reservationInfo;
+    } else {
+        reservationInfo = useLoaderData();
+    }
+
 
     const {
         first_name,
         last_name,
         email,
         phone,
-        no_guests,
+        adult_senior,
+        junior,
+        elementary,
         date,
         starting_time,
         time_extension,
@@ -35,31 +50,56 @@ export default function ReservationConfirmation() {
 
 
     return (
+
         <div className='container container-small'>
             <div className='background m-5'>
-				<h1 className='text-center text-white'>Reservation Details</h1>
-				
+                <h1 className='text-center text-white'>Reservation Details</h1>
+
                 <Form method='post' className='px-sm-5 p-4'>
                     <div className="text-white">
                         <FieldValue label={'Full Name'} data={first_name + ' ' + last_name} />
                         <FieldValue label={'Email'} data={email} />
                         <FieldValue label={'Phone'} data={phone} />
-                        <FieldValue label={'Guest Count'} data={no_guests} />
+                        <FieldValue label={'adult/senior'} data={adult_senior} />
+                        <FieldValue label={'junior'} data={junior} />
+                        <FieldValue label={'elementary'} data={elementary} />
                         <FieldValue label={'Reservation'} data={date + ' ' + starting_time} />
                         <FieldValue label={'Time Extension'} data={time_extension} />
                         <FieldValue label={'Special Requests'} data={special_request} />
                     </div>
-                    <div className='text-end mt-4'>
-                        <button className='btn btn-danger me-2'><Link to='/reservation'>Edit</Link></button>
-                        <button className='btn btn-success' type='submit'>Confirm</button>
-                    </div>
+                    {
+                        other.forViewReservation ? <ReservationButtonsForView /> : <ReservationButtons />
+                    }
                 </Form>
-			</div>
+            </div>
+
         </div>
     );
 }
 
+
+
+const ReservationButtons = () => {
+    return (
+        <div className='text-end mt-4'>
+            <Link to='/reservation'><button className='btn btn-danger me-2' >edit</button></Link>
+            <button className='btn btn-success' type='submit'>reserve</button>
+        </div>
+
+    );
+}
+
+const ReservationButtonsForView = () => {
+    return (
+        <div className='text-end mt-4'>
+            <button className='btn btn-danger' type='submit'>cancel request</button>
+        </div>
+    );
+}
+
+
 const FieldValue = ({ label, data }) => {
+
     return (
         <div className='row mb-3'>
             <div className='col-5 text-end' style={{ fontWeight: '900' }}>
@@ -130,4 +170,5 @@ const handleReserveClick = async ({
         alert('internal error');
 
     });
+    return result;
 }

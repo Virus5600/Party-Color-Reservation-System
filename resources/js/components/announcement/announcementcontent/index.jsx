@@ -34,13 +34,13 @@ export default function AnnouncementContent() {
                     <div className='AnnouncementContent-title'>
                         "{announcement.title}"
                     </div>
-                    
+
                     <div className='AnnouncementContent-summary'>
                         {announcement.summary}
                     </div>
-                    <hr/>
-                    <br/>
-                    
+                    <hr />
+                    <br />
+
                     <div className='AnnouncementContent-content'>
                         {ReactHtmlParser(announcement.content)}
                     </div>
