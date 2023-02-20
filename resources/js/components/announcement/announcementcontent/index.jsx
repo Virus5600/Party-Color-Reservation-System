@@ -29,19 +29,19 @@ export default function AnnouncementContent() {
 
     return (
         <>
-            <div className='AnnouncementContent'>
+            <div className='fs-3 w-75 mx-auto mt-5 bg-light p-3 rounded-1 text-center'>
                 <div>
-                    <div className='AnnouncementContent-title'>
+                    <h1 className='py-0'>
                         "{announcement.title}"
-                    </div>
-
-                    <div className='AnnouncementContent-summary'>
+                    </h1>
+                    
+                    <div className='fs-5 opacity-75'>
                         {announcement.summary}
                     </div>
-                    <hr />
-                    <br />
-
-                    <div className='AnnouncementContent-content'>
+                    <hr className='dark'/>
+                    <br/>
+                    
+                    <div className='fs-6'>
                         {ReactHtmlParser(announcement.content)}
                     </div>
                 </div>
