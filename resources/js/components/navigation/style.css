@@ -1,15 +1,9 @@
-.Nav {
-  position: sticky;
-  top: 0;
-
-
-  width: 100%;
-
+.nav-bg {
   background-image: url('./img/main_background.png');
   background-repeat: repeat;
 }
 
-.Nav a {
+.nav-bg a {
   color: #A52A2A;
 
 
