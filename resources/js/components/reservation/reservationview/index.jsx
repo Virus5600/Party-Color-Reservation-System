@@ -13,8 +13,8 @@ import { redirect } from 'react-router-dom';
 // under development
 export async function action() {
     const API = '';
-    await axios.post(`${API}`).then(res => console.log(res)).catch(res => console.log(res));
-    return redirect('');
+    const result = await axios.post(`${API}`).then(res => console.log(res)).catch(res => console.log(res));
+    return redirect('/reservation/cancel');
 }
 
 
@@ -24,12 +24,14 @@ export default function ReservationView() {
 
 
     const handleViewClick = (control_number) => {
+        // sessionStorage.setItem('reservationInfo', JSON.stringify(reservationInfo));
         // setReservationInfo(getReservationInfo(control_number));
 
 
 
 
-        // for testing
+        // remove this after implementing API view reservation
+        // for testing ///////////////////////////////
         const reservationInfo = {
             first_name: 'Kenji',
             last_name: 'Sugino',
@@ -42,7 +44,7 @@ export default function ReservationView() {
             special_request: '',
         };
         setReservationInfo(reservationInfo)
-
+        ///////////////////////////////////////////////
 
 
     }
