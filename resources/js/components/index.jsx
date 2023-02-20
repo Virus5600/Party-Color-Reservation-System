@@ -81,7 +81,25 @@ const router = createBrowserRouter([
             },
             {
                 path: 'reservation/success',
-                element: <ReservationSuccess />,
+                element: <ReservationSuccess
+                    title={'Your reservation has been confirmed!'}
+                    description={'An email confirmation has been sent to you.'}
+                    linkLabel={'make'}
+                    link={'/reservation'}
+                    backgroundStyle={{ backgroundColor: '#1D7B3E' }}
+                    iconStyle={{ color: '#00ff59a1' }}
+
+                />,
+            },
+            {
+                path: 'reservation/cancel',
+                element: <ReservationSuccess
+                    title={'Your cancel request has been sent!'}
+                    description={'We will inform you about your cancel request sooner'}
+                    linkLabel={'view'}
+                    link={'/viewreservation'}
+                    backgroundStyle={{ backgroundColor: '#B83939' }}
+                    iconStyle={{ color: '#871A1A' }} />,
             },
             {
                 path: 'announcements',

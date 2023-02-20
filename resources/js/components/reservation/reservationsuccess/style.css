@@ -6,12 +6,10 @@
 
 .ReservationSuccess {
     font-size: 20px;
-    background-color: #1D7B3E;
     border-radius: 10px;
 }
 
 .ReeservationSuccess-icon {
-    color: #00ff59a1;
     width: 50px;
     height: 50px;
     background-color: white, 0.9;
