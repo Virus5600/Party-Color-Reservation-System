@@ -4,9 +4,23 @@ import './style.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // react router
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-export default function ReservationSuccess({ title, description, linkLabel, link, backgroundStyle, iconStyle }) {
+import { useEffect } from 'react';
+
+export default function ReservationSuccess({ title, description, linkLabel, link, backgroundStyle, iconStyle, isSuccess }) {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        let reservationstatus = isSuccess ? sessionStorage.getItem('reservationsuccess') : sessionStorage.getItem('reservationcancel');
+        reservationstatus = JSON.parse(reservationstatus);
+        console.log(reservationstatus);
+        if (reservationstatus == null) {
+            navigate('/', { replace: true });
+        }
+        sessionStorage.removeItem('reservationstatus');
+    }, []);
+
     return (
         <div className='container container-small'>
             <div className='ReservationSuccess m-5 p-sm-4 p-3' style={backgroundStyle}>

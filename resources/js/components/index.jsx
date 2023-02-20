@@ -88,6 +88,7 @@ const router = createBrowserRouter([
                     link={'/reservation'}
                     backgroundStyle={{ backgroundColor: '#1D7B3E' }}
                     iconStyle={{ color: '#00ff59a1' }}
+                    isSuccess={true}
 
                 />,
             },
@@ -99,7 +100,10 @@ const router = createBrowserRouter([
                     linkLabel={'view'}
                     link={'/viewreservation'}
                     backgroundStyle={{ backgroundColor: '#B83939' }}
-                    iconStyle={{ color: '#871A1A' }} />,
+                    iconStyle={{ color: '#871A1A' }}
+                    isSuccess={false}
+                />,
+
             },
             {
                 path: 'announcements',

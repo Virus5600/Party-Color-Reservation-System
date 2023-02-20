@@ -12,9 +12,16 @@ export function loader() {
 export async function action() {
     const raw_session_data = sessionStorage.getItem('reservationInfo');
     const reservationInfo = JSON.parse(raw_session_data);
-    await handleReserveClick(reservationInfo);
-    return redirect('/reservation/success');
+    const result = await handleReserveClick(reservationInfo);
+    console.log('result:', result);
+    if (result == null) {
+        const reservationsuccess = true;
+        sessionStorage.setItem('reservationsuccess', JSON.stringify(reservationsuccess));
+        return redirect('/reservation/success');
+    }
 
+
+    return redirect('/reservation');
 }
 
 export default function ReservationConfirmation(other) {
@@ -159,4 +166,5 @@ const handleReserveClick = async ({
         alert('internal error');
 
     });
+    return result;
 }
