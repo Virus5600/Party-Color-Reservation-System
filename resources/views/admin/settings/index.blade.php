@@ -80,7 +80,7 @@
 				</div>
 
 				{{-- STORE CAPACITY --}}
-				<div class="col-6 col-lg-3 mx-auto">
+				<div class="col-6 col-lg-4 mx-auto">
 					<div class="form-group">
 						<label for="capacity" class="form-label">Store Capacity</label>
 						<input type="number" class="form-control w-100" min="1" max="2147483647" name="capacity" id="capacity" value="{{ App\Settings::getValue('capacity') == null ? '50' : App\Settings::getValue('capacity') }}" required>
@@ -88,8 +88,25 @@
 					</div>
 				</div>
 
+				{{-- EXTENSION FEE --}}
+				<div class="col-6 col-lg-4 mx-auto">
+					<div class="form-group">
+						<label for="extension_fee" class="form-label">Extension Fee</label>
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text">{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) }}</span>
+							</div>
+							<input type="number" class="form-control w-auto" min="1" max="2147483647" name="extension_fee" id="extension_fee" value="{{ App\Settings::getValue('extension_fee') == null ? '500' : App\Settings::getValue('extension_fee') }}" required>
+							<div class="input-group-append">
+								<span class="input-group-text">/hr</span>
+							</div>
+						</div>
+						<span class="text-danger small">{{$errors->first('extension_fee')}}</span>
+					</div>
+				</div>
+
 				{{-- DAY SCHEDULE --}}
-				<div class="col-6 col-lg-3 mx-auto">
+				<div class="col-6 col-lg-4 mx-auto">
 					<div class="form-group">
 						<label for="day-schedule" class="form-label">Day Schedule</label><br>
 

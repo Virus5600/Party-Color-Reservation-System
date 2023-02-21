@@ -43,7 +43,7 @@ Route::group(['prefix' => 'admin'], function() {
 	Route::post('/authenticate', 'UserController@authenticate')->name('authenticate');
 
 	// NEEDED AUTH
-	Route::group(['middleware' => ['auth']], function() {
+	Route::group(['middleware' => ['auth', 'auth:sanctum']], function() {
 		// API PASSWORD CONFIRM
 		Route::get('/confirm-password', 'ApiController@confirmPassword')->name('password.confirm');
 		Route::post('/check-password', 'ApiController@checkPassword')->middleware('throttle:6,1')->name('password.confirm.check');
@@ -147,17 +147,41 @@ Route::group(['prefix' => 'admin'], function() {
 		Route::group(['prefix' => 'menu', 'middleware' => ['permissions:menu_tab_access']], function() {
 			// Create
 			Route::group(['prefix' => 'create', 'middleware' => ['permissions:menu_tab_create']], function() {
-				Route::get('/', 'MenuController@create')->name('admin.menu.create');
 				Route::post('/store', 'MenuController@store')->name('admin.menu.store');
 			});
 
 			Route::group(['prefix' => '{id}'], function() {
-				// Show
-				Route::get('/', 'MenuController@show')->name('admin.menu.show');
+				// MENU VARIATION (Menu's show)
+				Route::group(['prefix' => 'variations', 'middleware' => ['permissions:menu_var_tab_access']], function() {
+					// Index
+					Route::get('/', 'MenuVariationController@index')->name('admin.menu.variation.index');
+
+					// Create
+					Route::group(['prefix' => 'create', 'middleware' => ['permissions:menu_var_tab_create']], function() {
+						Route::get('/', 'MenuVariationController@create')->name('admin.menu.variation.create');
+						Route::post('/store', 'MenuVariationController@store')->name('admin.menu.variation.store');
+					});
+
+					Route::group(['prefix' => '{vid}'], function() {
+						// Show
+						Route::get('/', 'MenuVariationController@show')->name('admin.menu.variation.show');
+
+						// Edit
+						Route::group(['middleware' => ['permissions:menu_var_tab_edit']], function() {
+							Route::get('/edit', 'MenuVariationController@edit')->name('admin.menu.variation.edit');
+							Route::post('/update', 'MenuVariationController@update')->name('admin.menu.variation.update');
+						});
+
+						// Delete
+						Route::group(['middleware' => ['permissions:menu_var_tab_delete']], function() {
+							Route::get('/delete', 'MenuVariationController@delete')->name('admin.menu.variation.delete');
+							Route::get('/restore', 'MenuVariationController@restore')->name('admin.menu.variation.restore');
+						});
+					});
+				});
 
 				// Edit
 				Route::group(['middleware' => ['permissions:menu_tab_edit']], function() {
-					Route::get('/edit', 'MenuController@edit')->name('admin.menu.edit');
 					Route::post('/update', 'MenuController@update')->name('admin.menu.update');
 				});
 

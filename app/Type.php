@@ -21,7 +21,7 @@ class Type extends Model
 
 	// Relationships
 	protected function users() { return $this->hasMany('App\User'); }
-	protected function permissions() { return $this->belongsToMany('App\Permission', 'type_permissions'); }
+	public function permissions() { return $this->belongsToMany('App\Permission', 'type_permissions'); }
 
 	// Custom Functions
 	public function hasPermission(...$permissions) {

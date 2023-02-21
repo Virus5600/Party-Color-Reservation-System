@@ -3,6 +3,12 @@
 @section('title', 'Additional Orders')
 
 @section('content')
+
+@php
+$extensionFee = App\Settings::getValue('extension_fee');
+$currencySign = (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL);
+@endphp
+
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-12 col-md mt-3">
@@ -35,13 +41,30 @@
 					</p>
 
 					<ul class="list-group">
-						@foreach($additionalOrder->bookingMenus as $bm)
+						@foreach($additionalOrder->orderable as $om)
 						<li class="list-group-item {{ $additionalOrder->trashed() ? "bg-danger border-light" : "" }}">
-							<span class="float-left">{{ $bm->menu->name }}</span>
-							<span class="float-right">&times;{{ $bm->count }}</span>
+							<span class="float-left">{{ $om->menuVariation->name }}</span>
+							<span class="float-right">&times;{{ $om->count }}</span>
 						</li>
 						@endforeach
 					</ul>
+
+					<hr class="hr-thick">
+
+					<p class="h5">Extension:</p>
+					<ul style="list-style-type: none;">
+						<li class="d-flex flex-row flex-wrap justify-content-between">
+							<span>{{ $additionalOrder->extension }} {{ Str::plural("hr", $additionalOrder->extension) }} ({{ $additionalOrder->extension * 60 }} {{ Str::plural("min", ($additionalOrder->extension * 60)) }})</span>
+							<span>{{ "{$currencySign}" . ($additionalOrder->extension * $extensionFee) }}</span>
+						</li>
+					</ul>
+
+					<hr class="hr-thick">
+
+					<p class="h5 d-flex justify-content-between">
+						<span class="font-weight-bold">Total:</span>
+						<span>{{ $additionalOrder->fetchPrice(false) }}</span>
+					</p>
 				</div>
 				
 				<div class="card-footer text-center">

@@ -37,12 +37,17 @@ class AdditionalOrder extends Model
 
 	// Relationships
 	public function booking() { return $this->belongsTo('App\Booking'); }
-	public function menus() { return $this->morphToMany('App\Menu', 'orderable', 'orderables')->withPivot('count'); }
+	public function menus() { return $this->morphToMany('App\MenuVariation', 'orderable', 'orderables')->withPivot('count'); }
 	public function orderable() { return $this->morphMany('App\Orderable', 'orderable'); }
 
 	// Custom Functions
-	public function fetchPrice() {
-		return (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . " $this->price";
+	public function fetchPrice($orderOnly = false) {
+		$price = $this->price;
+
+		if (!$orderOnly)
+			$price -= ($this->extension * Settings::getValue('extension_fee'));
+
+		return (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . " $price";
 	}
 
 	// STATIC FUNCTIONS
@@ -56,7 +61,7 @@ class AdditionalOrder extends Model
 			"price" => "required|numeric|min:0",
 			'extension' => "nullable|numeric|between:0,4",
 			'menu' => "required|array|min:1",
-			'menu.*' => "required|numeric|exists:menus,id",
+			'menu.*' => "required|numeric|exists:menu_variations,id",
 			"count" => "required|array|min:1",
 			"count.*" => "required|numeric|between:1,{$storeCap}"
 		];
@@ -87,7 +92,7 @@ class AdditionalOrder extends Model
 		$hoursToAdd = 0;
 		$minutesToAdd = 0;
 		foreach ($req->menu as $mi) {
-			$menu["{$mi}"] = Menu::find($mi);
+			$menu["{$mi}"] = MenuVariation::find($mi);
 			
 			// Compares what hour has the highest among the menus selected
 			$hoursComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("H");

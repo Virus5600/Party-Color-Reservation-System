@@ -15,9 +15,9 @@ use App\Booking;
 use App\ContactInformation;
 use App\Inventory;
 use App\Menu;
+use App\MenuVariation;
 use App\Settings;
 
-use Auth;
 use DB;
 use Exception;
 use Log;
@@ -49,7 +49,7 @@ class BookingController extends Controller
 		if ($validator->fails()) {
 			return redirect()
 				->back()
-				->withErrors($validator->messages())
+				->withErrors($validator)
 				->withInput()
 				->with("new_contact_index",  $newContactIndex);
 		}
@@ -59,10 +59,9 @@ class BookingController extends Controller
 
 			$price = 0;
 
-			foreach ($menu as $v)
-				$price += $v->price;
-			$price *= $req->pax;
-			$price += ($req->extension * 500);
+			foreach ($req->menu as $k => $v)
+				$price += (MenuVariation::find($v)->price * $req->amount[$k]);
+			$price += ($req->extension * Settings::getValue("extension_fee"));
 
 			$booking = Booking::create([
 				'control_no' => Booking::createControlNumber(),
@@ -76,17 +75,17 @@ class BookingController extends Controller
 				'phone_numbers' => implode("|", $req->phone_numbers)
 			]);
 
-			foreach ($req->menu as $v)
+			foreach ($req->menu as $k => $v)
 				$booking->menus()
 					->attach([
 						$v => [
-							'count' => $req->pax
+							'count' => $req->amount[$k]
 						]
 					]);
 
 			$iterations = max(count($req->contact_name), count($req->contact_email));
 			for ($i = 0; $i < $iterations; $i++) {
-				$ci = ContactInformation::create([
+				ContactInformation::create([
 					'contact_name' => $req->contact_name["{$i}"],
 					'email' => $req->contact_email["{$i}"],
 					'booking_id' => $booking->id
@@ -98,7 +97,7 @@ class BookingController extends Controller
 				"Booking #{$booking->control_no} created.",
 				$booking->id,
 				"Booking",
-				Auth::user()->id
+				auth()->user()->id
 			);
 
 			DB::commit();
@@ -119,10 +118,12 @@ class BookingController extends Controller
 	protected function show($id) {
 		$booking = Booking::with([
 				'menus',
+				'menus.menu:id,name',
 				'contactInformation',
 				'additionalOrders' => function($query) {return $query->withTrashed();},
 				'additionalOrders.orderable',
-				'additionalOrders.orderable.menu'
+				'additionalOrders.orderable.menuVariation',
+				'additionalOrders.orderable.menuVariation.menu:id,name'
 			])
 			->find($id);
 
@@ -143,13 +144,13 @@ class BookingController extends Controller
 		$relatedInventoryName = [];
 		// Iterate through the booking's initial order
 		foreach ($booking->menus as $m) {
-			foreach ($m->menuItems as $i) {
+			foreach ($m->items as $i) {
 				// If the item is marked as unlimited
 				if ($i->is_unlimited)
 					continue;
 
 				// Proceed to check if stock is viable still if it is not unlimited
-				$item = $i->item()->withTrashed()->first();
+				$item = $i->variationItem()->first();
 				$key = Str::snake($item->item_name);
 				if (array_key_exists($key, $relatedInventory)) {
 					$relatedInventory["$key"] += $i->amount * $m->pivot->count;
@@ -165,13 +166,13 @@ class BookingController extends Controller
 		if ($booking->additionalOrders != null) {
 			foreach ($booking->additionalOrders as $o) {
 				foreach ($o->menus as $m) {
-					foreach ($m->menuItems as $i) {
+					foreach ($m->items as $i) {
 						// If the item is marked as unlimited
 						if ($i->is_unlimited)
 							continue;
 
 						// Proceed to check if stock is viable still if it is not unlimited
-						$item = $i->item()->withTrashed()->first();
+						$item = $i->variationItem()->first();
 						$key = Str::snake($item->item_name);
 						if (array_key_exists($key, $relatedInventory)) {
 							$relatedInventory["$key"] += $i->amount * $m->pivot->count;
@@ -245,7 +246,7 @@ class BookingController extends Controller
 		if ($validator->fails()) {
 			return redirect()
 				->back()
-				->withErrors($validator->messages()->merge($validator->messages()))
+				->withErrors($validator)
 				->withInput()
 				->with("new_contact_index",  $newContactIndex);
 		}
@@ -255,11 +256,11 @@ class BookingController extends Controller
 
 			$price = 0;
 
-			foreach ($menu as $v)
-				$price += $v->price;
-			$price *= $req->pax;
-			$price += ($req->extension * 500);
+			foreach ($req->menu as $k => $v)
+				$price += (MenuVariation::find($v)->price * $req->amount[$k]);
+			$price += ($req->extension * Settings::getValue("extension_fee"));
 
+			$booking->booking_type = $req->booking_type;
 			$booking->start_at = $start_at;
 			$booking->end_at = $end_at;
 			$booking->reserved_at = $req->booking_date;
@@ -271,7 +272,15 @@ class BookingController extends Controller
 
 			$this->pending($booking->id, true);
 
-			$booking->menus()->sync($req->menu);
+			$booking->menus()->detach();
+			foreach ($req->menu as $k => $v)
+				$booking->menus()
+					->attach([
+						$v => [
+							'count' => $req->amount[$k]
+						]
+					]);
+
 			$booking->contactInformation()->delete();
 
 			$iterations = max(count($req->contact_name), count($req->contact_email));
@@ -288,7 +297,7 @@ class BookingController extends Controller
 				"Booking #{$booking->control_no} updated.",
 				$booking->id,
 				"Booking",
-				Auth::user()->id
+				auth()->user()->id
 			);
 
 			DB::commit();
@@ -350,7 +359,7 @@ class BookingController extends Controller
 				"Booking #{$control_no} deleted.",
 				$booking->id,
 				"Booking",
-				Auth::user()->id
+				auth()->user()->id
 			);
 
 			DB::commit();
@@ -415,7 +424,7 @@ class BookingController extends Controller
 				"Booking #{$booking->control_no} archived.",
 				$booking->id,
 				"Booking",
-				Auth::user()->id
+				auth()->user()->id
 			);
 
 			DB::commit();
@@ -476,7 +485,7 @@ class BookingController extends Controller
 				"Booking #{$booking->control_no} accepted.",
 				$booking->id,
 				"Booking",
-				Auth::user()->id
+				auth()->user()->id
 			);
 
 			DB::commit();
@@ -563,7 +572,7 @@ class BookingController extends Controller
 				"Booking #{$booking->control_no} rejected.",
 				$booking->id,
 				"Booking",
-				Auth::user()->id
+				auth()->user()->id
 			);
 
 			DB::commit();
@@ -587,7 +596,7 @@ class BookingController extends Controller
 			]);
 	}
 
-	protected function pending($id, $automated = false) {
+	public function pending($id, $automated = false) {
 		$booking = Booking::with(['menus'])->find($id);
 
 		if ($booking == null) {
@@ -634,7 +643,7 @@ class BookingController extends Controller
 				trim("Booking {$booking->control_no} moved to pending. " . ($automated ? "This is an automated action after #{$booking->control_no} is updated." : "")),
 				$booking->id,
 				"Booking",
-				Auth::user()->id,
+				auth()->user()->id,
 				$automated
 			);
 

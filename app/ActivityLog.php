@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use Auth;
+use DB;
 use Request;
 
 class ActivityLog extends Model
@@ -50,17 +50,20 @@ class ActivityLog extends Model
 
 	public static function log($action, $model_id = null, $model_type = null, $user_id = null, $is_automated = false) {
 		$email = null;
-		if ($user_id == null && Auth::check()) {
-			$user_id = Auth::user()->id;
-			$email = Auth::user()->email;
+		if ($user_id == null && auth()->check() && !$is_automated) {
+			$user_id = auth()->user()->id;
+			$email = auth()->user()->email;
 		}
-		else if ($user_id == null && !Auth::check()) {
+		else if ($user_id == null && !auth()->check()) {
 			$user_id = 0;
 		}
 		else if ($user_id != null) {
 			$user = User::find($user_id);
 			$email = $user->email;
 		}
+
+		if ($user_id == null)
+			$user_id = 0;
 
 		ActivityLog::create([
 			'user_id' => $user_id,

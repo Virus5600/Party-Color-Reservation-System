@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 
 use Carbon\Carbon;
 
-use Auth;
 use DB;
 use Exception;
 use Log;
@@ -43,7 +42,7 @@ class Inventory extends Model
 						"Item {$inventory->item_name} set to inactive after stock has reached less than or equals to 0{$inventory->measurement_unit}.",
 						$inventory->id,
 						"Inventory",
-						Auth::user()->id,
+						null,
 						true
 					);
 				}
@@ -57,8 +56,8 @@ class Inventory extends Model
 	}
 
 	// Relationships
-	public function menus() { return $this->belongsToMany('App\Menu', 'menu_items', 'inventory_id', 'menu_id'); }
-	public function menuItem() { return $this->belongsTo('App\MenuItem', 'id', 'inventory_id'); }
+	public function menus() { return $this->belongsToMany('App\MenuVariation', 'menu_variation_items', 'inventory_id', 'menu_variation_id'); }
+	public function variationItem() { return $this->belongsTo('App\MenuVariationItem', 'id', 'inventory_id'); }
 
 	// Custom Functions
 	public function getInStock() {

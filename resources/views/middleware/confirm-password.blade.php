@@ -108,9 +108,13 @@
 								<a href="{{ route('forgot-password.index') }}" class="text-primary small" id="forgotPassword">Forgot Password?</a>
 							</div>
 
+							@if (session()->missing("confirmPassPrev"))
+							@php(session()->put("confirmPassPrev", url()->previous()))
+							@endif
+
 							<div class="form-group text-center">
 								<button type="submit" class="btn btn-primary" data-action="submit">Submit</button>
-								<a href="{{ url()->previous() }}" class="btn btn-secondary">Cancel</a>
+								<a href="{{ session()->get("confirmPassPrev") }}" class="btn btn-secondary">Cancel</a>
 							</div>
 						</form>
 					</div>

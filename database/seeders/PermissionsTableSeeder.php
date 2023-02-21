@@ -105,6 +105,31 @@ class PermissionsTableSeeder extends Seeder
 			'slug' => 'menu_tab_delete'
 		]);
 
+		// MENU VARIATION
+		$menuVarPerm = Permission::create([
+			'parent_permission' => $menuPerm->id,
+			'name' => 'Menu Variation Tab Access',
+			'slug' => 'menu_var_tab_access'
+		]);
+
+		Permission::create([
+			'parent_permission' => $menuVarPerm->id,
+			'name' => 'Menu Variation Tab Create',
+			'slug' => 'menu_var_tab_create'
+		]);
+
+		Permission::create([
+			'parent_permission' => $menuVarPerm->id,
+			'name' => 'Menu Variation Tab Edit',
+			'slug' => 'menu_var_tab_edit'
+		]);
+
+		Permission::create([
+			'parent_permission' => $menuVarPerm->id,
+			'name' => 'Menu Variation Tab Delete',
+			'slug' => 'menu_var_tab_delete'
+		]);
+
 		// Permission::create([
 		// 	'parent_permission' => $menuPerm->id,
 		// 	'name' => 'Menu Tab Perma Delete',

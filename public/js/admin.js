@@ -57,4 +57,12 @@ $(document).ready(() => {
 
 	// Select Picker
 	$('select.selectpicker').selectpicker();
+
+	// Dropdown fix
+	$('.enlarge-on-hover .dropdown').on('show.bs.dropdown', (e) => {
+		$(e.currentTarget).closest(".enlarge-on-hover").css("z-index", 1);
+	}).on('hide.bs.dropdown', (e) => {
+		$(e.currentTarget).closest(".enlarge-on-hover").css("z-index", 0);
+	});
+	$('.enlarge-on-hover .dropdown').trigger('hide.bs.dropdown');
 });

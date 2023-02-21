@@ -17,16 +17,12 @@ class MenuTableSeeder extends Seeder
 	{
 		Menu::create([
 			'id' => 1,
-			'name' => 'BBQ Plan',
-			'price' => 3500,
-			'duration' => '02:00'
+			'name' => 'BBQ Plan'
 		]);
 
 		Menu::create([
 			'id' => 2,
-			'name' => 'Drink All You Can',
-			'price' => 1200,
-			'duration' => '01:00'
+			'name' => 'Drink All You Can'
 		]);
 	}
 }
