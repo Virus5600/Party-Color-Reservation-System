@@ -12,9 +12,8 @@ export function loader() {
 export async function action() {
     const raw_session_data = sessionStorage.getItem('reservationInfo');
     const reservationInfo = JSON.parse(raw_session_data);
-    const result = await handleReserveClick(reservationInfo);
-    console.log('result:', result);
-    if (result == null) {
+    const isSuccess = await handleReserveClick(reservationInfo);
+    if (isSuccess == true) {
         const reservationsuccess = true;
         sessionStorage.setItem('reservationsuccess', JSON.stringify(reservationsuccess));
         return redirect('/reservation/success');
@@ -119,16 +118,20 @@ const handleReserveClick = async ({
     last_name,
     email,
     phone,
-    no_guests,
+    adult_senior,
+    junior,
+    elementary,
     date,
     starting_time,
     time_extension,
     special_request,
 }) => {
 
+    let isSuccess = false;
+
     const token = document.querySelector('meta[name=csrf-token]').content;
 
-    const API_TO_SEND_RESERVATION = '/api/react/reservations/create';
+    const API_TO_SEND_RESERVATION = '/api/react/bookings/create';
 
 
     const result = await axios.post(API_TO_SEND_RESERVATION, {
@@ -136,11 +139,11 @@ const handleReserveClick = async ({
         contact_name: [first_name + ' ' + last_name],
         contact_email: [email],
         phone_numbers: phone,
-        pax: Number(no_guests),
-        reservation_date: date,
+        pax: Number(adult_senior) + Number(junior) + Number(elementary),
+        booking_date: date,
         time_hour: Number(starting_time.split(':')[0]),
         time_min: Number(starting_time.split(':')[1]),
-        reservation_time: Number(starting_time.split(':')[0]),
+        booking_time: Number(starting_time.split(':')[0]),
         extension: time_extension == '' ? 0 : Number(time_extension),
         specialRequest: special_request,
 
@@ -155,8 +158,10 @@ const handleReserveClick = async ({
         const data = response.data
         if (data.success) {
             sessionStorage.removeItem('reservationInfo');
+            isSuccess = true;
             alert('success');
         } else {
+            alert('internal error');
             for (const key in data.errors) {
                 if (data.errors.hasOwnProperty(key)) {
                     alert(`${data.errors[key]}`);
@@ -170,5 +175,5 @@ const handleReserveClick = async ({
         alert('internal error');
 
     });
-    return result;
+    return isSuccess;
 }
