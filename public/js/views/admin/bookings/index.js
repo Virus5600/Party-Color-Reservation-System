@@ -301,6 +301,18 @@ $(document).ready(() => {
 								</div>
 							</div>
 
+							<div class="card-body text-left">
+								<div class="row">
+									<div class="col-12">
+										<h3 class="text-left">Special Request</h3>
+
+										<div class="card">
+											<div class="card-body ${booking.special_request == null ? "text-center" : ""}">${booking.special_request == null ? "[No Special Request]" : booking.special_request}</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
 							<hr class="hr-thick">
 							
 							<div class="card-body text-left">

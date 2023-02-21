@@ -72,7 +72,8 @@ class BookingController extends Controller
 				'extension' => $req->extension,
 				'price' => $price,
 				'pax' => $req->pax,
-				'phone_numbers' => implode("|", $req->phone_numbers)
+				'phone_numbers' => implode("|", $req->phone_numbers),
+				'special_request' => $req->special_request
 			]);
 
 			foreach ($req->menu as $k => $v)

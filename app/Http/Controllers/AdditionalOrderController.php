@@ -11,7 +11,6 @@ use App\Inventory;
 use App\Menu;
 use App\Settings;
 
-use Auth;
 use DB;
 use Exception;
 use Log;
@@ -99,7 +98,7 @@ class AdditionalOrderController extends Controller
 				"Created additional order for order #{$booking->control_no}",
 				$additionalOrder->id,
 				"AdditionalOrder",
-				Auth::user()->id,
+				auth()->user()->id,
 				false
 			);
 			
@@ -230,7 +229,7 @@ class AdditionalOrderController extends Controller
 				"Updated additional order for order #{$booking->control_no}",
 				$additionalOrder->id,
 				"AdditionalOrder",
-				Auth::user()->id,
+				auth()->user()->id,
 				false
 			);
 			
@@ -246,7 +245,6 @@ class AdditionalOrderController extends Controller
 
 		return redirect()
 			->route('admin.bookings.additional-orders.index', [$booking->id])
-			->with('flash_success', 'Successfully added additional order')
 			->with('flash_success', 'Successfully added additional order')
 			->with('has_icon', "true")
 			->with('message', "Please re-evaluate the booking if it should still be accepted or not.")
@@ -271,8 +269,20 @@ class AdditionalOrderController extends Controller
 		try {
 			DB::beginTransaction();
 
+			app(BookingController::class)->pending($booking->id, true);
+
 			$additionalOrder->delete();
 			$additionalOrder->save();
+
+			// Logger
+			ActivityLog::log(
+				"Voided an additional order for order #{$booking->control_no}",
+				null,
+				"AdditionalOrder",
+				auth()->user()->id,
+				false
+			);
+
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -286,6 +296,9 @@ class AdditionalOrderController extends Controller
 
 		return redirect()
 			->route('admin.bookings.additional-orders.index', [$booking_id])
-			->with("flash_success", "Successfully voided the order");
+			->with("flash_success", "Successfully voided the order")
+			->with('has_icon', "true")
+			->with('message', "Please re-evaluate the booking if it should still be accepted or not.")
+			->with('has_timer', "false");
 	}
 }

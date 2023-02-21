@@ -35,6 +35,7 @@ class Booking extends Model
 		'status',
 		'reason',
 		'items_returned',
+		'special_request',
 	];
 
 	protected $casts = [
@@ -218,6 +219,7 @@ class Booking extends Model
 			'contact_name' => "required_unless:contact_email,null|array|min:1",
 			'contact_email' => "required_unless:contact_name,null|array|min:1",
 			'contact_email.*' => "distinct:ignore_case",
+			'special_request' => "nullable|string|max:1000",
 		];
 
 		$validationMsg = [
@@ -268,6 +270,9 @@ class Booking extends Model
 			"contact_email.*.email" => "Contact email should be a valid email",
 			"contact_email.*.distinct" => "Contact email already provided",
 			"contact_email.*.max" => "Contact email is capped at 255",
+			"special_request..nullable" => "",
+			"special_request.string" => "Malformed content...",
+			"special_request.max" => "A maximum of 100 characters is the allowed limit"
 		];
 
 		$req->merge([

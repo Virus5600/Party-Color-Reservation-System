@@ -141,6 +141,14 @@ $extensionFee = App\Settings::getValue('extension_fee');
 									</div>
 									<span class="text-danger text-wrap">{{ $errors->first('extension') }}</span>
 								</div>
+
+								{{-- SPECIAL REQUEST --}}
+								<div class="form-group col-12 text-counter-parent">
+									<label for="special_request" class="form-label">Special Request</label>
+									<textarea name="special_request" id="special_request" class="form-control not-resizable text-counter-input" rows="3" data-max="1000" required>{{ $booking->special_request }}</textarea>
+									<span class="text-counter small">1000</span>
+									<span class="text-danger small">{{$errors->first('special_request')}}</span>
+								</div>
 							</div>
 						</div>
 
@@ -333,11 +341,13 @@ $extensionFee = App\Settings::getValue('extension_fee');
 
 @section('css')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/custom-tagify.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('css/util/text-counter.css') }}" />
 @endsection
 
 @section('scripts')
 <script type="text/javascript" src="{{ asset('js/util/confirm-leave.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/util/disable-on-submit.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/util/text-counter.js') }}"></script>
 <script type="text/javascript">
 	window.swalAlert = function (arr) {
 		Swal.fire({
