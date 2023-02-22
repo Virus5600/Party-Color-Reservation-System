@@ -54,7 +54,7 @@ export default function Navigation() {
 							{/* RESERVATION */}
 
 							<li className='nav-item' style={listStyle} >
-								<NavLink to='reservation' className={({ isActive, isPending }) => isActive ? 'nav-active' : ''}>
+								<NavLink to='reservationselection' className={({ isActive, isPending }) => isActive ? 'nav-active' : ''}>
 
 									Reservation
 								</NavLink>
