@@ -41,6 +41,10 @@ Route::group(['prefix' => 'react'], function () {
 
 	// Booking
 	Route::group(['prefix' => 'bookings'], function () {
+		// Create
 		Route::post('/create', 'ReactApiController@bookingsCreate')->name('api.react.bookings.create');
+
+		// Show
+		Route::post('/view', 'ReactApiController@bookingsShow')->name('api.react.bookings.show');
 	});
 });

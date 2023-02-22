@@ -2,8 +2,8 @@
 
 namespace App\Enum;
 
-abstract class ApprovalStatus {
-    const Pending = 10;
-    const Approved = 11;
-    const Rejected = 12;
+enum ApprovalStatus : int {
+    case Pending = 10;
+    case Approved = 11;
+    case Rejected = 12;
 }

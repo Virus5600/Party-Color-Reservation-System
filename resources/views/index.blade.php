@@ -42,5 +42,6 @@
 		
 		<script id="forRemoval">const loadedPage = "{{ $loadedPage == "/" ? "" : $loadedPage }}"; document.getElementById("forRemoval").remove();</script>
 		<script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
+		<script type="text/javascript" src="{{ asset('js/util/swal-flash.js') }}"></script>
 	</body>
 </html>

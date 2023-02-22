@@ -66,6 +66,9 @@ class Booking extends Model
 	public function menus() { return $this->morphToMany('App\MenuVariation', 'orderable', 'orderables')->withPivot('count'); }
 	public function contactInformation() { return $this->hasMany('App\ContactInformation'); }
 
+	// Conditional Relationships
+	public function primaryContactInformation() { return $this->hasOne('App\ContactInformation', 'booking_id')->oldest(); }
+
 	// Public Function
 	public function getStatus() {
 		$start = Carbon::parse("{$this->reserved_at} {$this->start_at}");
@@ -91,20 +94,22 @@ class Booking extends Model
 		}
 	}
 
-	public function getOverallStatus() {
+	public function getOverallStatus($asValue = false) {
 		if ($this->trashed())
 			return "#1e2b37";
 
-		$approvalStatus = $this->status;
+		$status = $this->status;
+
+		$approvalStatus = Status::tryFrom($status) ?? (ApprovalStatus::tryFrom($status) ?? $status);
 		$bookingStatus = $this->getStatus();
 
 		if ($approvalStatus == ApprovalStatus::Approved) {
-			return $bookingStatus;
+			return $asValue ? $bookingStatus->value : $bookingStatus;
 		}
 		else {
 			if ($approvalStatus == ApprovalStatus::Pending && ($bookingStatus == Status::Happening || $bookingStatus == Status::Done))
-				return Status::Ghosted;
-			return $approvalStatus;
+				return $asValue ? Status::Ghosted->value : Status::Ghosted;
+			return $status;
 		}
 	}
 
@@ -113,10 +118,13 @@ class Booking extends Model
 		if ($this->trashed())
 			return "#1e2b37";
 
+		if (is_numeric($status))
+			$status = Status::tryFrom($status) ?? (ApprovalStatus::tryFrom($status) ?? $status);
+
 		switch ($status) {
 			case Status::Coming:
 				return "#17a2b8";
-			
+
 			case Status::Happening:
 				return "#007bff";
 
@@ -141,6 +149,9 @@ class Booking extends Model
 	public function getStatusText($status) {
 		if ($this->trashed())
 			return "Archived";
+		
+		if (is_numeric($status))
+			$status = Status::tryFrom($status) ?? (ApprovalStatus::tryFrom($status) ?? $status);
 
 		switch ($status) {
 			case Status::Coming:

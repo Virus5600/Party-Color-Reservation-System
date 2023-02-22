@@ -4,20 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Carbon\Carbon;
+
+use App\Enum\ApprovalStatus;
+use App\Enum\Status;
+
+use App\ActivityLog;
 use App\Announcement;
 use App\Booking;
 use App\ContactInformation;
-use App\ActivityLog;
+use App\MenuVariation;
+use App\Settings;
 
 use DB;
 use Exception;
 use Log;
+use Validator;
 
 class ReactApiController extends Controller
 {
 	// ANNOUNCEMENTS
-	protected function fetchSingleAnnouncement(Request $req, $id)
-	{
+	protected function fetchSingleAnnouncement(Request $req, $id) {
 		$announcement = Announcement::find($id);
 
 		if ($announcement == null) {
@@ -39,8 +46,7 @@ class ReactApiController extends Controller
 			]);
 	}
 
-	protected function fetchAnnouncements(Request $req)
-	{
+	protected function fetchAnnouncements(Request $req) {
 		$announcements = Announcement::select(
 			DB::raw("
 				`id`,
@@ -61,8 +67,7 @@ class ReactApiController extends Controller
 	}
 
 	// RESERVATIONS
-	protected function bookingsCreate(Request $req)
-	{
+	protected function bookingsCreate(Request $req) {
 		extract(Booking::validate($req));
 
 		if ($validator->fails()) {
@@ -73,19 +78,6 @@ class ReactApiController extends Controller
 					'errors' => $validator->messages()
 				]);
 		}
-
-
-
-		// for testing ////////////////////////////////////////////
-		return response()->json([
-			'success' => true,
-			'flash_success' => 'Successfully added a new booking'
-		]);
-		// about sa email ////////////////////////////////////////////
-
-
-
-
 		try {
 			DB::beginTransaction();
 
@@ -122,6 +114,8 @@ class ReactApiController extends Controller
 					'booking_id' => $booking->id
 				]);
 			}
+			
+			// CREATE MAILER TO THE CONTACT PERSON
 
 			// Logger
 			ActivityLog::log(
@@ -138,13 +132,107 @@ class ReactApiController extends Controller
 			DB::rollback();
 			Log::error($e);
 
-			return redirect()
-				->route('admin.bookings.index')
-				->with('flash_error', 'Something went wrong, please try again later');
+			return response()
+				->json([
+					'success' => false,
+					'type' => 'fatal_error',
+					'errors' => "Something went wrong, please try again later"
+				]);
 		}
 
-		return redirect()
-			->route('admin.bookings.index')
-			->with('flash_success', 'Successfully added a new booking');
+		return response()
+				->json([
+					'success' => true,
+					'type' => 'success',
+					'message' => 'Successfully added a new booking'
+				]);
+	}
+
+	protected function bookingsShow(Request $req) {
+		$validator = Validator::make($req->all(), [
+			'control_no' => 'required|numeric|between:0,9999999999'
+		], [
+			'control_no.required' => 'Control number is required',
+			'control_no.numeric' => 'Control number is only composed of numbers',
+			'control_no.between' => 'Control number is only 10 characters long',
+		]);
+
+		if ($validator->fails()) {
+			return response()
+				->json([
+					'success' => false,
+					'type' => 'validation',
+					'errors' => $validator->messages()
+				]);
+		}
+
+		try {
+			DB::beginTransaction();
+
+			$booking = Booking::with([
+					'primaryContactInformation:booking_id,contact_name,email',
+					'menus:duration,menu_id,name,price'
+				])
+				->where('control_no', '=', $req->control_no)
+				->first()
+				->makeHidden([
+					"id",
+					"booking_type",
+					"control_no",
+					"created_at",
+					"updated_at",
+					"deleted_at"
+				]);
+
+			$start = Carbon::parse("{$booking->reserved_at} {$booking->start_at}");
+			$end = Carbon::parse("{$booking->reserved_at} {$booking->end_at}");
+
+			$doNotReturn = false;
+			$status = "finished";
+			if (now()->gt($start) && now()->lt($end)) {
+				$doNotReturn = true;
+				$status = "ongoing";
+			}
+			else if (now()->gt($start) && now()->gt($end)) {
+				$doNotReturn = true;
+			}
+			
+			if ($doNotReturn) {
+				return response()
+					->json([
+						'success' => false,
+						'type' => 'finished',
+						'errors' => "Reservation is already {$status}"
+					]);
+			}
+
+			$status_types = [];
+			$sn = array_merge(array_column(Status::cases(), "name"), array_column(ApprovalStatus::cases(), "name"));
+			$sv = array_merge(array_column(Status::cases(), "value"), array_column(ApprovalStatus::cases(), "value"));
+
+			for ($i = 0; $i < count($sn); $i++)
+				$status_types[$sn[$i]] = $sv[$i];
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return response()
+				->json([
+					'success' => false,
+					'type' => 'fatal_error',
+					'errors' => "Something went wrong, please try again later"
+				]);
+		}
+
+		return response()
+			->json([
+				'success' => true,
+				'type' => 'success',
+				'message' => 'Booking fetched Successfully',
+				'booking' => $booking,
+				'status_types' => $status_types
+			]);
 	}
 }

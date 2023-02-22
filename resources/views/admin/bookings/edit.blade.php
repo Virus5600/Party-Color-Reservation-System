@@ -145,7 +145,7 @@ $extensionFee = App\Settings::getValue('extension_fee');
 								{{-- SPECIAL REQUEST --}}
 								<div class="form-group col-12 text-counter-parent">
 									<label for="special_request" class="form-label">Special Request</label>
-									<textarea name="special_request" id="special_request" class="form-control not-resizable text-counter-input" rows="3" data-max="1000" required>{{ $booking->special_request }}</textarea>
+									<textarea name="special_request" id="special_request" class="form-control not-resizable text-counter-input" rows="3" data-max="1000">{{ $booking->special_request }}</textarea>
 									<span class="text-counter small">1000</span>
 									<span class="text-danger small">{{$errors->first('special_request')}}</span>
 								</div>

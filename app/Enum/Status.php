@@ -2,11 +2,11 @@
 
 namespace App\Enum;
 
-abstract class Status {
-    const Coming = 0;
-    const Happening = 1;
-    const Done = 2;
-    const Cancelled = 3;
-    const Ghosted = 4;
-    const NonExistent = 5;
+enum Status : int {
+    case Coming = 0;
+    case Happening = 1;
+    case Done = 2;
+    case Cancelled = 3;
+    case Ghosted = 4;
+    case NonExistent = 5;
 }
