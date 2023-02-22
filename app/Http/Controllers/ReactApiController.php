@@ -66,8 +66,7 @@ class ReactApiController extends Controller
 				->json([
 					'success' => false,
 					'type' => 'validation',
-					'errors' => $validator->messages(),
-					'newContactIndex' => $newContactIndex
+					'errors' => $validator->messages()
 				]);
 		}
 
@@ -76,64 +75,62 @@ class ReactApiController extends Controller
 
 			$price = 0;
 
-			foreach ($menu as $v)
-				$price += $v->price;
-			$price *= $req->pax;
-			$price += ($req->extension * 500);
+			foreach ($req->menu as $k => $v)
+				$price += (MenuVariation::find($v)->price * $req->amount[$k]);
+			$price += ($req->extension * Settings::getValue("extension_fee"));
 
 			$booking = Booking::create([
+				'control_no' => Booking::createControlNumber(),
+				'booking_type' => 'reservation',
 				'start_at' => $start_at,
 				'end_at' => $end_at,
 				'reserved_at' => $req->booking_date,
 				'extension' => $req->extension,
 				'price' => $price,
 				'pax' => $req->pax,
-				'phone_numbers' => implode("|", $req->phone_numbers)
+				'phone_numbers' => implode("|", $req->phone_numbers),
+				'special_request' => $req->special_request
 			]);
 
-			$booking->menus()->attach($req->menu);
+			foreach ($req->menu as $k => $v)
+				$booking->menus()
+					->attach([
+						$v => [
+							'count' => $req->amount[$k]
+						]
+					]);
 
 			$iterations = max(count($req->contact_name), count($req->contact_email));
 			for ($i = 0; $i < $iterations; $i++) {
-				$ci = ContactInformation::create([
+				ContactInformation::create([
 					'contact_name' => $req->contact_name["{$i}"],
 					'email' => $req->contact_email["{$i}"],
 					'booking_id' => $booking->id
 				]);
 			}
 
-			// Reduce the inventoy for realtime update
-			foreach ($booking->menus as $m) {
-				$response = $m->reduceInventory();
-
-				if (!$response->success) {
-					throw new Exception($response->message);
-				}
-			}
+			// Logger
+			ActivityLog::log(
+				"Reservation #{$booking->control_no} created via the User Reservation.",
+				$booking->id,
+				"Booking",
+				null,
+				false,
+				false
+			);
 
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
 			Log::error($e);
 
-			return response()
-				->json([
-					'success' => false,
-					'type' => 'error',
-					'flash_error' => 'Something went wrong, please try again later'
-				]);
+			return redirect()
+				->route('admin.bookings.index')
+				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
-		ActivityLog::log(
-			"Booking created through user form.",
-			null,
-			false
-		);
-
-		return response()
-			->json([
-				'success' => true,
-				'flash_success' => 'Successfully added a new booking'
-			]);
+		return redirect()
+			->route('admin.bookings.index')
+			->with('flash_success', 'Successfully added a new booking');
 	}
 }
