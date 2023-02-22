@@ -10,11 +10,11 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 
 
 export default function Navigation() {
-	// const navigate = useNavigate();
+	const navigate = useNavigate();
 
-	// useEffect(() => {
-	// 	navigate(`/${loadedPage}`, { replace: true });
-	// }, []);
+	useEffect(() => {
+		navigate(`/${loadedPage}`, { replace: true });
+	}, []);
 
 	const listStyle = {
 		color: '#A52A2A',

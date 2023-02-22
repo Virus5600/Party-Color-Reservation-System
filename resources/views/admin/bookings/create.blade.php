@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Booking')
+@section('title', 'Booking - Create')
 
 @section('content')
 
@@ -9,6 +9,7 @@ $datetime = now()->timezone('Asia/Tokyo');
 $isEightPM = $datetime->gt('08:00 PM');
 $new_contact_index = Session::get("new_contact_index");
 $maxCap = App\Settings::getValue('capacity');
+$extensionFee = App\Settings::getValue('extension_fee');
 @endphp
 
 <div class="container-fluid">
@@ -123,7 +124,11 @@ $maxCap = App\Settings::getValue('capacity');
 
 								{{-- EXTENSION --}}
 								<div class="form-group col-12 col-lg-6">
-									<label class="h5" for="extension">Extension</label>
+									<label class="h5 d-flex justify-content-between" for="extension">
+										<span>Extension</span>
+										<span class="small text-muted"><small>({{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . number_format($extensionFee, 2, ".", "") }}/hr)</small></span>
+									</label>
+
 									<div class="input-group">
 										<input class="form-control has-spinner" type="number" name="extension" id="extension" value="{{ old('extension') ? old('extension') : '0' }}" min="0" max="5" step="0.5" required>
 										<div class="input-group-append">
@@ -132,6 +137,14 @@ $maxCap = App\Settings::getValue('capacity');
 									</div>
 									<span class="text-danger text-wrap">{{ $errors->first('extension') }}</span>
 								</div>
+
+								{{-- SPECIAL REQUEST --}}
+								<div class="form-group col-12 text-counter-parent">
+									<label for="special_request" class="form-label">Special Request</label>
+									<textarea name="special_request" id="special_request" class="form-control not-resizable text-counter-input" rows="3" data-max="1000" required>{{ old("special_request") }}</textarea>
+									<span class="text-counter small">1000</span>
+									<span class="text-danger small">{{$errors->first('special_request')}}</span>
+								</div>
 							</div>
 						</div>
 
@@ -139,6 +152,7 @@ $maxCap = App\Settings::getValue('capacity');
 						<div class="card my-2">
 							<h3 class="card-header d-flex flex-row">
 								<span class="mr-auto">Menu Information</span>
+								<button class="btn btn-primary" type="button" id="addMenu" title="Add menu information"><i class="fas fa-plus-circle"></i></button>
 							</h3>
 
 							<div class="row card-body">
@@ -148,30 +162,97 @@ $maxCap = App\Settings::getValue('capacity');
 
 									{{-- Dynamic form fields --}}
 									<div class="row" id="menuField">
-										<div class="col-12 my-2 position-relative" id="origMenuForm">
+										@php ($index = 0)
+										{{-- IF MENU --}}
+										@if ((old('menu') || old('amount')) && $new_menu_index != null)
+											@php($new_contact_index = Session::get('new_contact_index'))
+											@foreach (old('menu') as $om)
+											<div class="col-12 col-md-4 my-2 position-relative" {{ $index == 0 ? 'id=origMenuForm data-min-1=true' : '' }}>
+												<div class="card h-100">
+													<div class="card-body">
+														{{-- MENU --}}
+														<div class="form-group">
+															<label class="form-label" for="menu">Menu Name</label><br>
+
+															<select class="show-tick select-picker w-100 form-control" name="menu[]" required>
+																<option class="d-none" data-subtext="" data-price="0" data-duration="00:00" disabled {{ count(old('menu') ? old('menu') : []) > 0 ? "" : "selected" }}>Select a Menu</option>
+																@foreach ($menus as $m)
+																<optgroup label="{{ $m->name }}">
+																	@foreach ($m->menuVariations as $v)
+																	<option
+																		value="{{ $v->id }}"
+																		data-subtext="{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . "{$v->price} - {$v->getFromDuration("H")} " . Str::plural("hour", $v->getFromDuration("H")) . " and {$v->getFromDuration("i")} " . Str::plural("minute", $v->getFromDuration("i")) }}"
+																		data-price="{{ $v->price }}"
+																		data-duration="{{ $v->getFromDuration() }}"
+																		data-tokens="{{ $m->name }} {{ $v->name }}"
+																		{{ in_array($v->id, (old('menu') ? old('menu') : [])) ? 'selected' : '' }}
+																		>
+																		{{ $v->name }}
+																	</option>
+																	@endforeach
+																</optgroup>
+																@endforeach
+															</select>
+															<br><span class="text-danger text-wrap validation">{{ $errors->first('menu') }}</span>
+														</div>
+
+														{{-- AMOUNT --}}
+														<div class="form-group">
+															<label for="amount" class="form-label">Amount</label>
+															<input type="number" class="form-control" name="amount[]" min="1" max="{{ $maxCap }}" value="{{ old("value") ? old("value") : 1 }}">
+														</div>
+													</div>
+												</div>
+
+												@if ($index++ > 0)
+												<div class="position-absolute d-flex flex-row" style="top: calc(0rem); right: calc(1rem - 1px);">
+													<button type="button" class="rounded btn btn-white border-secondary-light" onclick="$(this).parent().parent().remove(); $(`[name='menu[]']`).trigger('change.bs.select')">
+														<i class="fas fa-trash fa-sm text-danger"></i>
+													</button>
+												</div>
+												@endif
+											</div>
+											@endforeach
+										@else
+										{{-- ELSE MENU --}}
+										<div class="col-12 col-md-4 my-2 position-relative" id="origMenuForm" data-min-1="true">
 											<div class="card h-100">
 												<div class="card-body">
+													{{-- MENU --}}
 													<div class="form-group">
 														<label class="form-label" for="menu">Menu Name</label><br>
 
-														<select class="show-tick select-picker w-100 form-control" name="menu[]" id="menu" multiple required>
+														<select class="show-tick select-picker w-100 form-control" name="menu[]" required>
+															<option class="d-none" data-subtext="" data-price="0" data-duration="00:00" disabled {{ count(old('menu') ? old('menu') : []) > 0 ? "" : "selected" }}>Select a Menu</option>
 															@foreach ($menus as $m)
-															<option
-																value="{{ $m->id }}"
-																data-subtext="{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . "{$m->price} - {$m->getFromDuration("H")} " . Str::plural("hour", $m->getFromDuration("H")) . " and {$m->getFromDuration("i")} " . Str::plural("minute", $m->getFromDuration("i")) }}"
-																data-price="{{ $m->price }}"
-																data-duration="{{ $m->getFromDuration() }}"
-																{{ in_array($m->id, (old('menu') ? old('menu') : [])) ? 'selected' : '' }}
-																>
-																{{ $m->name }}
-															</option>
+															<optgroup label="{{ $m->name }}">
+																@foreach ($m->menuVariations as $v)
+																<option
+																	value="{{ $v->id }}"
+																	data-subtext="{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . "{$v->price} - {$v->getFromDuration("H")} " . Str::plural("hour", $v->getFromDuration("H")) . " and {$v->getFromDuration("i")} " . Str::plural("minute", $v->getFromDuration("i")) }}"
+																	data-price="{{ $v->price }}"
+																	data-duration="{{ $v->getFromDuration() }}"
+																	data-tokens="{{ $m->name }} {{ $v->name }}"
+																	{{ in_array($v->id, (old('menu') ? old('menu') : [])) ? 'selected' : '' }}
+																	>
+																	{{ $v->name }}
+																</option>
+																@endforeach
+															</optgroup>
 															@endforeach
 														</select>
 														<br><span class="text-danger text-wrap validation">{{ $errors->first('menu') }}</span>
 													</div>
+
+													{{-- AMOUNT --}}
+													<div class="form-group">
+														<label for="amount" class="form-label">Amount</label>
+														<input type="number" class="form-control" name="amount[]" min="1" max="{{ $maxCap }}" value="{{ old("value") ? old("value") : 1 }}">
+													</div>
 												</div>
 											</div>
 										</div>
+										@endif
 									</div>
 								</div>
 							</div>
@@ -274,11 +355,13 @@ $maxCap = App\Settings::getValue('capacity');
 
 @section('css')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/custom-tagify.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('css/util/text-counter.css') }}" />
 @endsection
 
 @section('scripts')
 <script type="text/javascript" src="{{ asset('js/util/confirm-leave.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/util/disable-on-submit.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/util/text-counter.js') }}"></script>
 <script type="text/javascript">
 	window.swalAlert = function (arr) {
 		Swal.fire({
@@ -304,6 +387,12 @@ $maxCap = App\Settings::getValue('capacity');
 			let orig = $('#origContactForm');
 			let clone = orig.clone();
 
+			// Adding the remove item
+			let removeBtn = $(`<div class="position-absolute d-flex flex-row" style="top: calc(0rem); right: calc(1rem - 1px);"><button type="button" class="rounded btn btn-white border-secondary-light" onclick="$(this).parent().parent().remove();"><i class="fas fa-trash fa-sm text-danger"></i></button></div>`);
+			clone.append(removeBtn);
+
+			field.append(clone);
+
 			// Clone cleaning
 			clone.removeAttr('id');
 			clone.find('.validation').text("");
@@ -314,8 +403,9 @@ $maxCap = App\Settings::getValue('capacity');
 			clone.find('.bootstrap-select').replaceWith(function() { return $('select', this); });
 			clone.find(".select-picker").selectpicker({
 				liveSearch: true,
+				liveSearchStyle: "contains",
 				style: "btn-white border-secondary-light"
-			});
+			}).trigger('change').trigger('change.bs.select');
 
 			let dataMin = orig.attr("data-min-1");
 			if (typeof dataMin == 'undefined')
@@ -329,12 +419,46 @@ $maxCap = App\Settings::getValue('capacity');
 					.find("textarea, input, select")
 					.removeAttr("required");
 			}
+		});
+
+		// Add menu
+		$(document).on('click', '#addMenu', (e) => {
+			let obj = $(e.currentTarget);
+			let field = $("#menuField");
+			let orig = $('#origMenuForm');
+			let clone = orig.clone();
 
 			// Adding the remove item
-			let removeBtn = $(`<div class="position-absolute d-flex flex-row" style="top: calc(0rem); right: calc(1rem - 1px);"><button type="button" class="rounded btn btn-white border-secondary-light" onclick="$(this).parent().parent().remove();"><i class="fas fa-trash fa-sm text-danger"></i></button></div>`);
+			let removeBtn = $(`<div class="position-absolute d-flex flex-row" style="top: calc(0rem); right: calc(1rem - 1px);"><button type="button" class="rounded btn btn-white border-secondary-light" onclick="$(this).parent().parent().remove(); $(\`[name='menu[]']\`).trigger('change.bs.select')"><i class="fas fa-trash fa-sm text-danger"></i></button></div>`);
 			clone.append(removeBtn);
 
 			field.append(clone);
+
+			// Clone cleaning
+			clone.removeAttr('id');
+			clone.find('.validation').text("");
+			clone.find('textarea, input').val("");
+			clone.find("select").removeAttr('data-last-value');
+			clone.find(".is-invalid, .is-valid").removeClass('is-valid is-invalid');
+			$(clone.find('option').removeAttr('selected').prop('selected', false)[0]).prop('selected', true);
+			clone.find('.bootstrap-select').replaceWith(function() { return $('select', this); });
+			clone.find(".select-picker").selectpicker({
+				liveSearch: true,
+				liveSearchStyle: "contains",
+				style: "btn-white border-secondary-light"
+			}).trigger('change').trigger('change.bs.select');
+
+			let dataMin = orig.attr("data-min-1");
+			if (typeof dataMin == 'undefined')
+				dataMin = false;
+			else if (dataMin.toLowerCase() == 'true') {
+				clone.removeProp("required")
+					.find("textarea, input, select")
+					.removeProp("required");
+				clone.removeAttr("required")
+					.find("textarea, input, select")
+					.removeAttr("required");
+			}
 		});
 
 		// Select Picker
@@ -348,34 +472,36 @@ $maxCap = App\Settings::getValue('capacity');
 		// Pricing related shits
 		{
 			// Select Picker on change
-			$(document).on('changed.bs.select', '#menu', (e) => {
-				let menu = $("#menu");
+			$(document).on('changed.bs.select', `[name="menu[]"]`, (e) => {
+				let menu = $(`[name="menu[]"]`);
+				let amount = $(`[name="amount[]"]`);
 				let price = $("#price");
-				let pax = $("#pax");
 				let extension = $("#extension");
+				let total = 0;
 
-				if (menu.val().length > 0) {
-					for (let index in menu.val()) {
-						let subtotal = parseFloat($($(menu).find(`option[value="${menu.val()[index]}"]`)[0]).attr('data-price'));
-						subtotal *= pax.val();
+				let index = 0;
+				for (let m of menu) {
+					m = $(m);
+					if (m.val() != null && m.val().length > 0) {
+						let subtotal = parseFloat($(m.find(`option[value="${m.val()}"]`)[0]).attr('data-price'));
+						subtotal *= $(amount[index]).val();
 
 						if (index == 0)
-							price.val(subtotal);
+							total = subtotal;
 						else
-							price.val(parseFloat(price.val()) + subtotal);
+							total += subtotal;
+						
+						index++;
 					}
-					
-					let extensionFee = 500;
-					extensionFee *= parseFloat(extension.val());
-
-					price.val((parseFloat(price.val()) + extensionFee).toFixed(2));
 				}
-				else
-					price.val('0.00');
+
+				let extensionFee = {{ $extensionFee }};
+				extensionFee *= parseFloat(extension.val());
+				price.val(parseFloat(total + extensionFee).toFixed(2));
 			}).trigger('changed.bs.select');
 
-			// Pax on change
-			$(document).on('change keyup keypress', '#pax, #extension', (e) => { $("#menu").trigger('changed.bs.select') }).trigger('change');
+			// Extension on change
+			$(document).on('change keyup keypress', '[name="amount[]"] ,#extension', (e) => { $(`[name="menu[]"]`).trigger('changed.bs.select') }).trigger('change');
 		}
 
 		// Time update

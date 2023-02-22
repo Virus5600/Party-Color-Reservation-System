@@ -1,4 +1,4 @@
-\<?php
+<?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -30,6 +30,7 @@ class CreateBookingsTable extends Migration
 			$table->string('status')->default(ApprovalStatus::Pending);
 			$table->tinyInteger('items_returned')->default(1);
 			$table->string('reason')->nullable();
+			$table->mediumText('special_request')->nullable();
 			$table->softDeletes();
 			$table->timestamps();
 		});

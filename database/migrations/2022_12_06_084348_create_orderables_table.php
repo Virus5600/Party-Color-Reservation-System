@@ -15,10 +15,10 @@ class CreateOrderablesTable extends Migration
 	{
 		Schema::create('orderables', function (Blueprint $table) {
 			$table->morphs('orderable');
-			$table->bigInteger('menu_id')->unsigned();
+			$table->bigInteger('menu_variation_id')->unsigned();
 			$table->integer('count')->unsigned();
 
-			$table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
+			$table->foreign('menu_variation_id')->references('id')->on('menu_variations')->onDelete('cascade');
 		});
 	}
 

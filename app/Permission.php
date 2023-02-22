@@ -22,7 +22,7 @@ class Permission extends Model
 	}
 
 	public function parentPermission() {
-		return Permission::where('id', '=', $this->parent_permission)->get();
+		return Permission::where('id', '=', $this->parent_permission)->first();
 	}
 
 	public function allUsers() {

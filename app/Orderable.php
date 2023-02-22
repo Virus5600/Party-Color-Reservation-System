@@ -10,12 +10,12 @@ class Orderable extends Model
 	use HasFactory;
 
 	protected $fillable = [
-		'menu_id',
+		'menu_variation_id',
 		'count'
 	];
 
 	// Relationships
-	public function menu() { return $this->belongsTo('App\Menu', 'menu_id', 'id'); }
+	public function menuVariation() { return $this->belongsTo('App\MenuVariation', 'menu_variation_id', 'id'); }
 	public function booking() { return $this->morphTo(); }
 	public function additionalOrder() { return $this->morphTo(); }
 }

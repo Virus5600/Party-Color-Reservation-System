@@ -395,6 +395,7 @@ class ApiController extends Controller
 			false
 		);
 
+		session()->forget("confirmPassPrev");
 		return redirect()
 			->intended();
 	}

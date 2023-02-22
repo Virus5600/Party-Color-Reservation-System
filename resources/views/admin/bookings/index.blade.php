@@ -3,6 +3,11 @@
 @section('title', 'Bookings')
 
 @section('content')
+
+@php
+$extensionFee = App\Settings::getValue('extension_fee');
+@endphp
+
 <div class="container-fluid d-flex flex-column min-h-100">
 	<div class="row">
 		<div class="col-12 col-md my-3">
@@ -126,6 +131,7 @@
 <script type="text/javascript" src="{{ asset('js/util/confirm-leave.js') }}"></script>
 {{-- Calendar Actions --}}
 <script type="text/javascript">
+	const extensionFee = {{ $extensionFee }};
 	var calendar, calendarWrapper;
 
 	$(document).ready(() => {

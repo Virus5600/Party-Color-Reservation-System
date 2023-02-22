@@ -259,7 +259,7 @@ $(document).ready(() => {
 										
 										<p class="d-flex justify-content-between">
 											<span><b>Extension:</b> ${booking.extension * 60} min (${booking.extension} hrs)</span>
-											<span>${currencySymbol} ${parseFloat(booking.extension * 500).toFixed(2)}</span>
+											<span>${currencySymbol} ${parseFloat(booking.extension * extensionFee).toFixed(2)}</span>
 										</p>
 										
 										<p><b>Phone Numbers:</b> ${phoneNumbers}</p>
@@ -272,7 +272,7 @@ $(document).ready(() => {
 									<div class="col-12 col-lg-6">
 										<div class="d-flex flex-wrap justify-content-between">
 											<span class="h3 text-center text-lg-left">Menus</span>
-											<span class="my-auto">${currencySymbol}${booking.price}</span>
+											<span class="my-auto">${currencySymbol}${booking.price - (booking.extension * extensionFee)}</span>
 										</div>
 
 										<ul class="pl-0 pl-lg-4" style="list-style-type: none;">`;
@@ -280,7 +280,7 @@ $(document).ready(() => {
 					for (let m of booking.menus) {
 						htmlContent += `
 											<li class="d-flex flex-wrap justify-content-center justify-content-sm-between">
-												<span class="mt-2 my-sm-auto">${m.name} (&times;${m.pivot.count})</span>
+												<span class="mt-2 my-sm-auto">${m.menu.name} <small><span class="badge badge-pill badge-secondary small">${m.name}</span></small></span>
 												<span class="mb-2 my-sm-auto">${currencySymbol} ${m.price} (&times;${m.pivot.count})</span>
 											</li>`;
 					}
@@ -297,6 +297,18 @@ $(document).ready(() => {
 						htmlContent += `	<li class="text-center text-lg-left">${c.contact_name} [<a href="mailto:${c.email}">${c.email}</a>]</li>`;
 					htmlContent += 	`
 										</ul>
+									</div>
+								</div>
+							</div>
+
+							<div class="card-body text-left">
+								<div class="row">
+									<div class="col-12">
+										<h3 class="text-left">Special Request</h3>
+
+										<div class="card">
+											<div class="card-body ${booking.special_request == null ? "text-center" : ""}">${booking.special_request == null ? "[No Special Request]" : booking.special_request}</div>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -330,11 +342,11 @@ $(document).ready(() => {
 													<hr class="hr-thick">
 
 													<p>Menu: </p>
-													<ul class="pl-0 pl-lg-4">`;
+													<ul class="list-group">`;
 								for (let m of a.orderable) {
-										htmlContent += `<li class="d-flex flex-wrap justify-content-between my-3 my-lg-auto">
-															<span>${m.menu.name} (&times;${m.count})</span>
-															<span>${currencySymbol} ${m.menu.price} (&times;${m.count})</span>
+										htmlContent += `<li class="list-group-item d-flex flex-wrap justify-content-between my-3 my-lg-auto ${a.deleted_at == null ? '' : 'bg-danger border-white text-white'}">
+															<span class="small align-middle"><small>${m.menu_variation.menu.name} <small><span class="badge badge-pill badge-${a.deleted_at == null ? 'secondary' : 'light'} small">${m.menu_variation.name}</span></small> (&times;${m.count})</small></span>
+															<span class="small my-auto"><small>${currencySymbol} ${m.menu_variation.price}</small></span>
 														</li>`;
 								}
 							htmlContent +=
@@ -343,7 +355,7 @@ $(document).ready(() => {
 
 												<p class="d-flex justify-content-between">
 													<span>Extension: ${a.extension * 60} min (${a.extension} hrs)</span>
-													<span>${currencySymbol} ${parseFloat(a.extension * 500).toFixed(2)}</span>
+													<span>${currencySymbol} ${parseFloat(a.extension * extensionFee).toFixed(2)}</span>
 												</p>
 											</div>
 										</div>`;
@@ -393,7 +405,7 @@ $(document).ready(() => {
 					else
 						htmlContent += `<a href="${editBooking.replace('%241', data.data_id)}" class="btn btn-primary">Edit</a>`;
 					htmlContent += `
-									<button onclick="confirmLeave('${deleteBooking.replace('%241', data.data_id)}', undefined, 'This cannot action cannot be undone once you\'ve decided to proceed.')" class="btn btn-danger">Remove</button>
+									<button onclick="confirmLeave('${deleteBooking.replace('%241', data.data_id)}', undefined, 'This cannot action cannot be undone once you\\\'ve decided to proceed.')" class="btn btn-danger">Remove</button>
 								</div>`;
 					// Displaying athe additional orders button
 					htmlContent += `

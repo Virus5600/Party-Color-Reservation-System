@@ -1,7 +1,8 @@
 $(document).ready(() => {
 	let forSCFSwalFire = window.localStorage.getItem('forSCFSwalFire');
 	if (forSCFSwalFire != null && forSCFSwalFire != 'null') {
-		Swal.fire(forSCFSwalFire);
+		window.localStorage.removeItem('forSCFSwalFire');
+		Swal.fire(JSON.parse(forSCFSwalFire));
 	}
 
 	$(document).on('click', '[data-scf], .swal-change-field', (e) => {
@@ -82,10 +83,10 @@ $(document).ready(() => {
 					targetURI,
 					dataPacket
 				).done((data) => {
+					let forSCFSwalFire;
+
 					if (data.success) {
-						let forSCFSwalFire = {
-							title: `${data.title}`,
-							html: `${data.message}`,
+						forSCFSwalFire = {
 							position: `top`,
 							showConfirmButton: false,
 							toast: true,
@@ -97,13 +98,18 @@ $(document).ready(() => {
 								popup: `px-3`
 							},
 						};
+						
+						if (typeof data.title != 'undefined') {
+							forSCFSwalFire.title = `${data.title}`;
+							forSCFSwalFire.html = `${data.message}`;
+						}
+						else
+							forSCFSwalFire.title = `${data.message}`;
 
 						Swal.fire(forSCFSwalFire);
 					}
 					else {
-						let forSCFSwalFire = {
-							title: `${data.title}`,
-							html: `${data.message}`,
+						forSCFSwalFire = {
 							position: `top`,
 							showConfirmButton: false,
 							toast: true,
@@ -115,18 +121,25 @@ $(document).ready(() => {
 								popup: `px-3`
 							},
 						};
+
+						if (typeof data.title != 'undefined') {
+							forSCFSwalFire.title = `${data.title}`;
+							forSCFSwalFire.html = `${data.message}`;
+						}
+						else
+							forSCFSwalFire.title = `${data.message}`;
 						
 						Swal.fire(forSCFSwalFire);
 					}
 
-					if (reloadPage) {
+					if (reloadPage && data.success) {
 						setTimeout(() => {
-							window.localStorage.setItem("forSCFSwalFire", forSCFSwalFire);
+							window.localStorage.setItem("forSCFSwalFire", JSON.stringify(forSCFSwalFire));
 							window.location.reload();
 						}, 2500);
 					}
 
-					if (typeof callback == 'string' && callback.length > 0) {
+					if (typeof callback == 'string' && callback.length > 0 && data.success) {
 						setTimeout(callback, 0);
 					}
 				}).fail((data) => {

@@ -35,6 +35,7 @@ class Booking extends Model
 		'status',
 		'reason',
 		'items_returned',
+		'special_request',
 	];
 
 	protected $casts = [
@@ -62,7 +63,7 @@ class Booking extends Model
 
 	// Relationships
 	public function additionalOrders() { return $this->hasMany('App\AdditionalOrder'); }
-	public function menus() { return $this->morphToMany('App\Menu', 'orderable', 'orderables')->withPivot('count'); }
+	public function menus() { return $this->morphToMany('App\MenuVariation', 'orderable', 'orderables')->withPivot('count'); }
 	public function contactInformation() { return $this->hasMany('App\ContactInformation'); }
 
 	// Public Function
@@ -213,11 +214,12 @@ class Booking extends Model
 			'booking_time' => "required",
 			'extension' => "nullable|numeric|between:0,5",
 			'menu' => "required|array|min:1",
-			'menu.*' => "required|numeric|exists:menus,id",
+			'amount' => "required|array|min:1",
 			'phone_numbers' => "required|array|min:1",
 			'contact_name' => "required_unless:contact_email,null|array|min:1",
 			'contact_email' => "required_unless:contact_name,null|array|min:1",
 			'contact_email.*' => "distinct:ignore_case",
+			'special_request' => "nullable|string|max:1000",
 		];
 
 		$validationMsg = [
@@ -241,20 +243,36 @@ class Booking extends Model
 			"extension.between" => "Extension should be between 0 and 5",
 			"menu.required" => "A menu is required",
 			"menu.array" => "Malformed menu data, please resubmit",
-			"menu.min" => "At least 1 menu should be selected",
-			"menu.*.required" => "Menu is required",
+			"menu.min" => "At least 1 menu should be selected along with an amount",
+			"amount.required" => "An amount is required",
+			"amount.array" => "Malformed amount data, please resubmit",
+			"amount.min" => "At least 1 amount should be provided along with a menu",
+			"menu.*.required_unless" => "Menu is required",
 			"menu.*.numeric" => "Please refrain from modifying the form",
 			"menu.*.exists" => "Please refrain from modifying the form",
+			"amount.*.required_unless" => "An amount is needed",
+			"amount.*.numeric" => "An amount should be a number",
+			"amount.*.between" => "Amount should be from 1 to {$storeCap}",
 			"phone_numbers.required" => "A phone number is required",
 			"phone_numbers.array" => "Malformed contact data, please resubmit",
 			"phone_numbers.min" => "At least 1 phone number is required",
 			"contact_name.required_unless" => "Contact name is required",
 			"contact_name.array" => "Malformed contact name, please resubmit",
 			"contact_name.min" => "At least 1 contact is required",
+			"contact_name.*.required_unless" => "Contact name is required",
+			"contact_name.*.string" => "Contact name should be a string",
+			"contact_name.*.max" => "Contact name is capped at 255",
 			"contact_email.required_unless" => "Contact email is required",
 			"contact_email.array" => "Malformed contact email, please resubmit",
 			"contact_email.min" => "At least 1 contact is required",
 			"contact_email.*.distinct" => "Contact email already provided",
+			"contact_email.*.required_unless" => "Contact email is required",
+			"contact_email.*.email" => "Contact email should be a valid email",
+			"contact_email.*.distinct" => "Contact email already provided",
+			"contact_email.*.max" => "Contact email is capped at 255",
+			"special_request..nullable" => "",
+			"special_request.string" => "Malformed content...",
+			"special_request.max" => "A maximum of 100 characters is the allowed limit"
 		];
 
 		$req->merge([
@@ -271,18 +289,27 @@ class Booking extends Model
 			$validationMsg["phone_numbers.*.max"] = "Phone numbers is capped at 15 characters only";
 		}
 
+		$iterations = max(count($req->menu), count($req->amount));
+		for ($i = 0; $i < $iterations; $i++) {
+			$validationRules["menu.{$i}"] = "required_unless:amount.{$i},null|numeric|exists:menu_variations,id";
+			$validationRules["amount.{$i}"] = "required_unless:menu.{$i},null|numeric|between:1,{$storeCap}";
+		}
+
 		$iterations = max(count($req->contact_name), count($req->contact_email));
 		for ($i = 0; $i < $iterations; $i++) {
 			$validationRules["contact_name.{$i}"] = "required_unless:contact_email.{$i},null|nullable|string|max:255";
 			$validationRules["contact_email.{$i}"] = "required_unless:contact_name.{$i},null|nullable|email|distinct:ignore_case|max:255";
-			
-			$validationMsg["contact_name.{$i}.required_unless"] = "Contact name is required";
-			$validationMsg["contact_name.{$i}.string"] = "Contact name should be a string";
-			$validationMsg["contact_name.{$i}.max"] = "Contact name is capped at 255";
-			$validationMsg["contact_email.{$i}.required_unless"] = "Contact email is required";
-			$validationMsg["contact_email.{$i}.email"] = "Contact email should be a valid email";
-			$validationMsg["contact_email.{$i}.distinct"] = "Contact email already provided";
-			$validationMsg["contact_email.{$i}.max"] = "Contact email is capped at 255";
+		}
+
+		$newMenu = [];
+		$newAmount = [];
+		$newMenuIndex = [];
+		for ($i = 0; $i < max(count($req->menu), count($req->amount)); $i++) {
+			if ($req->menu[$i] || $req->amount[$i]) {
+				array_push($newMenu, $req->menu[$i]);
+				array_push($newAmount, $req->amount[$i]);
+				array_push($newMenuIndex, $i);
+			}
 		}
 
 		$contactNames = [];
@@ -303,7 +330,7 @@ class Booking extends Model
 		$hoursToAdd = 0;
 		$minutesToAdd = 0;
 		foreach ($req->menu as $mi) {
-			$menu["{$mi}"] = Menu::find($mi);
+			$menu["{$mi}"] = MenuVariation::find($mi);
 			
 			// Compares what hour has the highest among the menus selected
 			$hoursComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("H");
@@ -361,7 +388,7 @@ class Booking extends Model
 		return [
 			'validator' => $validator,
 			'newContactIndex' => $newContactIndex,
-			'menu' => $menu,
+			'newMenuIndex' => $newMenuIndex,
 			'start_at' => $start_at,
 			'end_at' => $end_at
 		];

@@ -9,6 +9,7 @@ $datetime = now()->timezone('Asia/Tokyo');
 $isEightPM = $datetime->gt('08:00 PM');
 $new_contact_index = Session::get("new_contact_index");
 $maxCap = App\Settings::getValue('capacity');
+$extensionFee = App\Settings::getValue('extension_fee');
 @endphp
 
 <div class="container-fluid">
@@ -97,7 +98,7 @@ $maxCap = App\Settings::getValue('capacity');
 									<div class="row" id="menuField">
 										{{-- IF THERE ARE MULTIPLE OR OLD VALUES --}}
 										@php ($index = 0)
-										@foreach ($additionalOrder->orderable as $o)
+										@foreach ($additionalOrder->orderable as $om)
 										{{-- ORIGINAL --}}
 										<div class="col-12 col-lg-4 my-2 position-relative" {{ $index == 0 ? 'id=origMenuForm' : '' }}>
 											<div class="card h-100">
@@ -106,16 +107,22 @@ $maxCap = App\Settings::getValue('capacity');
 														<label class="form-label" for="menu">Menu Name</label><br>
 
 														<select class="show-tick select-picker w-100 form-control" name="menu[]" required>
+															<option class="d-none" data-subtext="" data-price="0" data-duration="00:00" disabled {{ count(old('menu') ? old('menu') : []) > 0 ? "" : "selected" }}>Select a Menu</option>
 															@foreach ($menus as $m)
-															<option
-																value="{{ $m->id }}"
-																data-subtext="{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . "{$m->price} - {$m->getFromDuration("H")} " . Str::plural("hour", $m->getFromDuration("H")) . " and {$m->getFromDuration("i")} " . Str::plural("minute", $m->getFromDuration("i")) }}"
-																data-price="{{ $m->price }}"
-																data-duration="{{ $m->getFromDuration() }}"
-																{{ $o->menu->name == $m->name ? 'selected' : '' }}
-																>
-																{{ $m->name }}
-															</option>
+															<optgroup label="{{ $m->name }}">
+																@foreach ($m->menuVariations as $v)
+																<option
+																	value="{{ $v->id }}"
+																	data-subtext="{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . "{$v->price} - {$v->getFromDuration("H")} " . Str::plural("hour", $v->getFromDuration("H")) . " and {$v->getFromDuration("i")} " . Str::plural("minute", $v->getFromDuration("i")) }}"
+																	data-price="{{ $v->price }}"
+																	data-duration="{{ $v->getFromDuration() }}"
+																	data-tokens="{{ $m->name }} {{ $v->name }}"
+																	{{ $v->id == $om->menu_variation_id ? 'selected' : '' }}
+																	>
+																	{{ $v->name }}
+																</option>
+																@endforeach
+															</optgroup>
 															@endforeach
 														</select>
 														<br><span class="text-danger text-wrap validation">{{ $errors->first("menu.{$index}") }}</span>
@@ -123,7 +130,7 @@ $maxCap = App\Settings::getValue('capacity');
 
 													<div class="form-group">
 														<label for="count" class="form-label">Count</label>
-														<input type="number" min="1" class="form-control" name="count[]" value="{{ $o->count }}" required>
+														<input type="number" min="1" class="form-control" name="count[]" value="{{ $om->count }}" required>
 														<span class="text-danger text-wrap validation">{{ $errors->first("count.{$index}") }}</span>
 													</div>
 												</div>
@@ -148,16 +155,22 @@ $maxCap = App\Settings::getValue('capacity');
 														<label class="form-label" for="menu">Menu Name</label><br>
 
 														<select class="show-tick select-picker w-100 form-control" name="menu[]" required>
+															<option class="d-none" data-subtext="" data-price="0" data-duration="00:00" disabled {{ count(old('menu') ? old('menu') : []) > 0 ? "" : "selected" }}>Select a Menu</option>
 															@foreach ($menus as $m)
-															<option
-																value="{{ $m->id }}"
-																data-subtext="{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . "{$m->price} - {$m->getFromDuration("H")} " . Str::plural("hour", $m->getFromDuration("H")) . " and {$m->getFromDuration("i")} " . Str::plural("minute", $m->getFromDuration("i")) }}"
-																data-price="{{ $m->price }}"
-																data-duration="{{ $m->getFromDuration() }}"
-																{{ old("menu.{$index}") == $m->name ? 'selected' : '' }}
-																>
-																{{ $m->name }}
-															</option>
+															<optgroup label="{{ $m->name }}">
+																@foreach ($m->menuVariations as $v)
+																<option
+																	value="{{ $v->id }}"
+																	data-subtext="{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . "{$v->price} - {$v->getFromDuration("H")} " . Str::plural("hour", $v->getFromDuration("H")) . " and {$v->getFromDuration("i")} " . Str::plural("minute", $v->getFromDuration("i")) }}"
+																	data-price="{{ $v->price }}"
+																	data-duration="{{ $v->getFromDuration() }}"
+																	data-tokens="{{ $m->name }} {{ $v->name }}"
+																	{{ in_array($v->id, (old('menu') ? old('menu') : [])) ? 'selected' : '' }}
+																	>
+																	{{ $v->name }}
+																</option>
+																@endforeach
+															</optgroup>
 															@endforeach
 														</select>
 														<br><span class="text-danger text-wrap validation">{{ $errors->first("menu.{$index}") }}</span>
@@ -271,7 +284,7 @@ $maxCap = App\Settings::getValue('capacity');
 							price.val(parseFloat(price.val()) + subtotal);
 					}
 					
-					let extensionFee = 500;
+					let extensionFee = {{ $extensionFee }};
 					extensionFee *= parseFloat(extension.val());
 
 					price.val((parseFloat(price.val()) + extensionFee).toFixed(2));

@@ -48,6 +48,14 @@ class TypePermissionsTableSeeder extends Seeder
 				'permission_id' => $m->id
 			]);
 
+		$menuVarAcc = Permission::where('slug', '=', 'menu_var_tab_access')->first();
+		$menuVarPerm = Permission::where('parent_permission', '=', $menuVarAcc->id)->orWhere('slug', '=', $menuVarAcc->slug)->get();
+		foreach ($menuVarPerm as $mv)
+			TypePermission::insert([
+				'type_id' => 2,
+				'permission_id' => $mv->id
+			]);
+
 		$announcementsAcc = Permission::where('slug', '=', 'announcements_tab_access')->first();
 		$announcementsPerm = Permission::where('parent_permission', '=', $announcementsAcc->id)->orWhere('slug', '=', $announcementsAcc->slug)->get();
 		foreach ($announcementsPerm as $a)

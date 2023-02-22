@@ -71,7 +71,7 @@ class UserController extends Controller
 					Log::error($e);
 				}
 			}
-
+			$user->tokens()->delete();
 			$token = $user->createToken('authenticated');
 			session(["bearer" => $token->plainTextToken]);
 
@@ -456,6 +456,13 @@ class UserController extends Controller
 
 			$user->save();
 
+			ActivityLog::log(
+				"User '{$user->email}' changed password.",
+				$user->id,
+				"User",
+				auth()->user()->id
+			);
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -467,13 +474,6 @@ class UserController extends Controller
 					'message' => 'Something went wrong, please try again later.',
 				]);
 		}
-
-		ActivityLog::log(
-			"User '{$user->email}' changed password.",
-			$user->id,
-			"User",
-			auth()->user()->id
-		);
 
 		return response()
 			->json([

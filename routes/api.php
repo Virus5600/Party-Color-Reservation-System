@@ -29,35 +29,18 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 
 // REACT API ENDPOINTS //
-
-/*
-api connection 
-- add reservations
-- view reservation
-- cancel request reservation
-- view announcements ..ok
-- view individual announcement ..ok
-*/
-
-
 Route::group(['prefix' => 'react'], function () {
 	// Announcements
-	Route::group(
-		['prefix' => 'announcements'],
-		function () {
-			// All
-			Route::get('/fetch', 'ReactApiController@fetchAnnouncements')->name('api.react.announcements.fetch');
+	Route::group(['prefix' => 'announcements'], function () {
+		// All
+		Route::get('/fetch', 'ReactApiController@fetchAnnouncements')->name('api.react.announcements.fetch');
 
-			// Show (1 Item)
-			Route::get('/{id}', 'ReactApiController@fetchSingleAnnouncement')->name('api.react.announcements.show');
-		}
-	);
+		// Show (1 Item)
+		Route::get('/{id}', 'ReactApiController@fetchSingleAnnouncement')->name('api.react.announcements.show');
+	});
 
 	// Booking
-	Route::group(
-		['prefix' => 'bookings'],
-		function () {
-			Route::post('/create', 'ReactApiController@bookingsCreate')->name('api.react.bookings.create');
-		}
-	);
+	Route::group(['prefix' => 'bookings'], function () {
+		Route::post('/create', 'ReactApiController@bookingsCreate')->name('api.react.bookings.create');
+	});
 });

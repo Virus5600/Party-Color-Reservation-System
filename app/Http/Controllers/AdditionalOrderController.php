@@ -11,7 +11,6 @@ use App\Inventory;
 use App\Menu;
 use App\Settings;
 
-use Auth;
 use DB;
 use Exception;
 use Log;
@@ -73,6 +72,8 @@ class AdditionalOrderController extends Controller
 		try {
 			DB::beginTransaction();
 
+			app(BookingController::class)->pending($booking->id, true);
+
 			// Create the additional order entry
 			$additionalOrder = AdditionalOrder::create([
 				'booking_id' => $booking->id,
@@ -91,6 +92,16 @@ class AdditionalOrderController extends Controller
 			$additionalOrder->menus()
 				->attach($menus);
 
+			
+			// LOGGER
+			ActivityLog::log(
+				"Created additional order for order #{$booking->control_no}",
+				$additionalOrder->id,
+				"AdditionalOrder",
+				auth()->user()->id,
+				false
+			);
+			
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -101,17 +112,14 @@ class AdditionalOrderController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
-		ActivityLog::log(
-			"Created additional order for order #{$booking->control_no}",
-			$additionalOrder->id,
-			"AdditionalOrder",
-			Auth::user()->id,
-			false
-		);
+		
 
 		return redirect()
 			->route('admin.bookings.additional-orders.index', [$booking->id])
-			->with('flash_success', 'Successfully added additional order');
+			->with('flash_success', 'Successfully added additional order')
+			->with('has_icon', "true")
+			->with('message', "Please re-evaluate the booking if it should still be accepted or not.")
+			->with('has_timer', "false");
 	}
 
 	protected function show($booking_id, $order_id) {
@@ -127,7 +135,7 @@ class AdditionalOrderController extends Controller
 		$additionalOrder = AdditionalOrder::withTrashed()
 			->with([
 				"orderable",
-				"orderable.menu"
+				"orderable.menuVariation"
 			])
 			->find($order_id);
 
@@ -177,8 +185,9 @@ class AdditionalOrderController extends Controller
 				->with('flash_info', "Booking either does not exists or is already deleted");
 		}
 
-		$additionalOrder = AdditionalOrder::with(["orderable", "orderable.menu"])
+		$additionalOrder = AdditionalOrder::with(["orderable", "orderable.menuVariation"])
 			->find($order_id);
+
 		if ($additionalOrder == null) {
 			return redirect()
 				->route('admin.bookings.additional-orders.index', [$booking_id])
@@ -197,6 +206,8 @@ class AdditionalOrderController extends Controller
 		try {
 			DB::beginTransaction();
 
+			app(BookingController::class)->pending($booking->id, true);
+
 			// Create the additional order entry
 			$additionalOrder->extension = $req->extension;
 			$additionalOrder->price = $req->price;
@@ -213,6 +224,15 @@ class AdditionalOrderController extends Controller
 			$additionalOrder->menus()
 				->sync($menus);
 
+			// Logger
+			ActivityLog::log(
+				"Updated additional order for order #{$booking->control_no}",
+				$additionalOrder->id,
+				"AdditionalOrder",
+				auth()->user()->id,
+				false
+			);
+			
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -223,17 +243,12 @@ class AdditionalOrderController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
-		ActivityLog::log(
-			"Updated additional order for order #{$booking->control_no}",
-			$additionalOrder->id,
-			"AdditionalOrder",
-			Auth::user()->id,
-			false
-		);
-
 		return redirect()
 			->route('admin.bookings.additional-orders.index', [$booking->id])
-			->with('flash_success', 'Successfully added additional order');
+			->with('flash_success', 'Successfully added additional order')
+			->with('has_icon', "true")
+			->with('message', "Please re-evaluate the booking if it should still be accepted or not.")
+			->with('has_timer', "false");
 	}
 
 	protected function delete($booking_id, $order_id) {
@@ -254,8 +269,20 @@ class AdditionalOrderController extends Controller
 		try {
 			DB::beginTransaction();
 
+			app(BookingController::class)->pending($booking->id, true);
+
 			$additionalOrder->delete();
 			$additionalOrder->save();
+
+			// Logger
+			ActivityLog::log(
+				"Voided an additional order for order #{$booking->control_no}",
+				null,
+				"AdditionalOrder",
+				auth()->user()->id,
+				false
+			);
+
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -269,6 +296,9 @@ class AdditionalOrderController extends Controller
 
 		return redirect()
 			->route('admin.bookings.additional-orders.index', [$booking_id])
-			->with("flash_success", "Successfully voided the order");
+			->with("flash_success", "Successfully voided the order")
+			->with('has_icon', "true")
+			->with('message', "Please re-evaluate the booking if it should still be accepted or not.")
+			->with('has_timer', "false");
 	}
 }
