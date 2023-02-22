@@ -134,24 +134,34 @@ const handleReserveClick = async ({
     const API_TO_SEND_RESERVATION = '/api/react/bookings/create';
 
 
+    const prices = {
+        'adult': 3500,
+        'junior': 2000,
+        'elementary': 1000,
+    };
+
+
+    function compute_price(no_adult, no_junior, no_elementary) {
+
+        return no_adult * prices['adult'] + no_junior * prices['junior'] + no_elementary * prices['elementary'];
+    }
+
+
     const result = await axios.post(API_TO_SEND_RESERVATION, {
-        _token: token,
-        contact_name: [first_name + ' ' + last_name],
-        contact_email: [email],
-        phone_numbers: phone,
-        pax: Number(adult_senior) + Number(junior) + Number(elementary),
+        _token: token, //cross site forgery (security concepts) csrf attacks
         booking_date: date,
+        pax: Number(adult_senior) + Number(junior) + Number(elementary),
+        price: compute_price(Number(adult_senior), Number(junior), Number(elementary)),
         time_hour: Number(starting_time.split(':')[0]),
         time_min: Number(starting_time.split(':')[1]),
-        booking_time: Number(starting_time.split(':')[0]),
-        extension: time_extension == '' ? 0 : Number(time_extension),
+        booking_time: starting_time,
+        extension: time_extension == '' ? 0 : Number(time_extension), // it can be 0.5
+        menu: [1, 2, 3], // static
+        amount: [Number(adult_senior), Number(junior), Number(elementary)],
+        phone_numbers: phone,
+        contact_name: [last_name + ' ' + first_name],
+        contact_email: [email],
         specialRequest: special_request,
-
-
-        // static as of now
-        price: 3000,
-        menu: [1],
-        subscribed: '',
     }).then(response => {
         // do something after send the data to backend
         console.log(response);

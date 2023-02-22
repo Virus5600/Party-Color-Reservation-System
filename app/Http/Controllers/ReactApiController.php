@@ -16,7 +16,8 @@ use Log;
 class ReactApiController extends Controller
 {
 	// ANNOUNCEMENTS
-	protected function fetchSingleAnnouncement(Request $req, $id) {
+	protected function fetchSingleAnnouncement(Request $req, $id)
+	{
 		$announcement = Announcement::find($id);
 
 		if ($announcement == null) {
@@ -38,7 +39,8 @@ class ReactApiController extends Controller
 			]);
 	}
 
-	protected function fetchAnnouncements(Request $req) {
+	protected function fetchAnnouncements(Request $req)
+	{
 		$announcements = Announcement::select(
 			DB::raw("
 				`id`,
@@ -48,7 +50,8 @@ class ReactApiController extends Controller
 				`title`,
 				`created_at`,
 				`content`
-			"))
+			")
+		)
 			->where('is_draft', '!=', '1')
 			->get();
 
@@ -58,7 +61,8 @@ class ReactApiController extends Controller
 	}
 
 	// RESERVATIONS
-	protected function bookingsCreate(Request $req) {
+	protected function bookingsCreate(Request $req)
+	{
 		extract(Booking::validate($req));
 
 		if ($validator->fails()) {
@@ -69,6 +73,18 @@ class ReactApiController extends Controller
 					'errors' => $validator->messages()
 				]);
 		}
+
+
+
+		// for testing ////////////////////////////////////////////
+		return response()->json([
+			'success' => true,
+			'flash_success' => 'Successfully added a new booking'
+		]);
+		// about sa email ////////////////////////////////////////////
+
+
+
 
 		try {
 			DB::beginTransaction();
@@ -90,9 +106,7 @@ class ReactApiController extends Controller
 				'pax' => $req->pax,
 				'phone_numbers' => implode("|", $req->phone_numbers),
 				'special_request' => $req->special_request
-			]);
-
-			foreach ($req->menu as $k => $v)
+			]); foreach ($req->menu as $k => $v)
 				$booking->menus()
 					->attach([
 						$v => [
