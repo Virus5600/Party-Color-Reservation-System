@@ -54,7 +54,7 @@ export default function AnnouncementContent() {
             </div>
 
             <div className=' d-flex justify-content-center mt-2'>
-                <Link to='/announcements' className="btn btn-primary">Back</Link>
+                <Link to='..' relative='path' className="btn btn-primary">Back</Link>
             </div>
         </>
 
