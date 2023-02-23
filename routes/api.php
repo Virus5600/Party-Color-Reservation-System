@@ -30,7 +30,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 // REACT API ENDPOINTS //
 Route::group(['prefix' => 'react'], function () {
-	// Announcements
+	// Announcements (/api/react/announcements)
 	Route::group(['prefix' => 'announcements'], function () {
 		// All
 		Route::get('/fetch', 'ReactApiController@fetchAnnouncements')->name('api.react.announcements.fetch');
@@ -39,7 +39,7 @@ Route::group(['prefix' => 'react'], function () {
 		Route::get('/{id}', 'ReactApiController@fetchSingleAnnouncement')->name('api.react.announcements.show');
 	});
 
-	// Booking
+	// Booking (/api/react/bookings)
 	Route::group(['prefix' => 'bookings'], function () {
 		// Create
 		Route::post('/create', 'ReactApiController@bookingsCreate')->name('api.react.bookings.create');
