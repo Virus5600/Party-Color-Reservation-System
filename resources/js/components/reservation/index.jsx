@@ -17,7 +17,7 @@ export async function action({ request }) {
 
 // LOADER
 export function loader() {
-	const session_data = sessionStorage.getItem('reservationInfo')
+	const session_data = sessionStorage.getItem('reservationInfo'); sessionStorage.removeItem('reservationInfo');
 	
 	if (session_data == null)
 		return {};
@@ -95,11 +95,11 @@ const ReservationDetails = () => {
 
 			<InputRow inputs={[
 				// Adult / Senior
-				{ type: 'number', name: 'adult_senior', label: 'adult/senior', placeholder: 'pax', min_value: 0, isRequired: true, reservationInfo, },
+				{ type: 'number', name: 'adult_senior', label: 'Adult/Senior', placeholder: 'pax', min_value: 0, isRequired: false, reservationInfo, },
 				// Junior
-				{ type: 'number', name: 'junior', label: 'junior', placeholder: 'pax', min_value: 0, isRequired: true, reservationInfo, },
+				{ type: 'number', name: 'junior', label: 'Junior', placeholder: 'pax', min_value: 0, isRequired: false, reservationInfo, },
 				// Elementary
-				{ type: 'number', name: 'elementary', label: 'elementary', placeholder: 'pax', min_value: 0, isRequired: true, reservationInfo, },
+				{ type: 'number', name: 'elementary', label: 'Elementary', placeholder: 'pax', min_value: 0, isRequired: false, reservationInfo, },
 			]} />
 
 			<InputRow inputs={[
@@ -162,7 +162,7 @@ const InputField = ({ type, name, label, placeholder, min, max, isRequired, rese
 		<div className="col-md">
 			<label htmlFor={name} className="form-label text-white">{label}</label>
 			
-			{isRequired ? '' : <a className='text-white text-opacity-50 fw-light'> (Optional)</a>}
+			{isRequired ? '' : <span className='text-white text-opacity-50 fw-light'> (Optional)</span>}
 			
 			{field}
 		</div>

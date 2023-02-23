@@ -70,7 +70,7 @@ class PageController extends Controller
 			'pending_bookings' => [
 				'clazz' => Booking::class,
 				'name' => 'Pending Bookings',
-				'conditions' => ['status = ' . ApprovalStatus::Pending],
+				'conditions' => ['status = ' . ApprovalStatus::Pending->value],
 				'hiddenColumns' => ['price'],
 				'columns' => ['pax'],
 				'columnsFn' => ['booking_for', 'price'],

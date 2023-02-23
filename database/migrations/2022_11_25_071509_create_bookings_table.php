@@ -27,10 +27,12 @@ class CreateBookingsTable extends Migration
 			$table->integer('pax')->unsigned();
 			$table->string('phone_numbers');
 			$table->tinyInteger('archived')->default(0);
-			$table->string('status')->default(ApprovalStatus::Pending);
+			$table->string('status')->default(ApprovalStatus::Pending->value);
 			$table->tinyInteger('items_returned')->default(1);
 			$table->string('reason')->nullable();
 			$table->mediumText('special_request')->nullable();
+			$table->tinyInteger('cancel_requested')->default(0);
+			$table->string('cancel_request_reason')->nullable();
 			$table->softDeletes();
 			$table->timestamps();
 		});

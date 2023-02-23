@@ -272,7 +272,7 @@ $(document).ready(() => {
 									<div class="col-12 col-lg-6">
 										<div class="d-flex flex-wrap justify-content-between">
 											<span class="h3 text-center text-lg-left">Menus</span>
-											<span class="my-auto">${currencySymbol}${booking.price - (booking.extension * extensionFee)}</span>
+											<span class="my-auto">${currencySymbol}${(booking.price - (booking.extension * extensionFee)).toFixed(2)}</span>
 										</div>
 
 										<ul class="pl-0 pl-lg-4" style="list-style-type: none;">`;
