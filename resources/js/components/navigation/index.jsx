@@ -30,7 +30,7 @@ export default function Navigation() {
 			{/* Navbar start */}
 
 
-			<nav className='navbar navbar-expand-lg nav-bg sticky-top shadow'>
+			<nav className='navbar navbar-expand-xl nav-bg sticky-top shadow'>
 				<div className="container">
 					<img src={logo} alt='logo' height='90' />
 					<button className="navbar-toggler collapsed"
