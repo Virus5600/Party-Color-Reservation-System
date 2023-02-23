@@ -36,6 +36,8 @@ class Booking extends Model
 		'reason',
 		'items_returned',
 		'special_request',
+		'cancel_requested',
+		'cancel_request_reason'
 	];
 
 	protected $casts = [

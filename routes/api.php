@@ -46,5 +46,11 @@ Route::group(['prefix' => 'react'], function () {
 
 		// Show
 		Route::post('/view', 'ReactApiController@bookingsShow')->name('api.react.bookings.show');
+
+		// Cancel Request
+		Route::post('/cancel-request', 'ReactApiController@bookingCancellationRequest')->name('api.react.bookings.cancel-request');
+
+		// Retract Cancel Request (Undo Cancel Request)
+		Route::post('/cancel-request/retract', 'ReactApiController@bookingRetractCancellationRequest')->name('api.react.bookings.cancel-request.retract');
 	});
 });

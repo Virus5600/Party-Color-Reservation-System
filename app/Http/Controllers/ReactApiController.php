@@ -184,20 +184,9 @@ class ReactApiController extends Controller
 					"deleted_at"
 				]);
 
-			$start = Carbon::parse("{$booking->reserved_at} {$booking->start_at}");
-			$end = Carbon::parse("{$booking->reserved_at} {$booking->end_at}");
-
-			$doNotReturn = false;
-			$status = "finished";
-			if (now()->gt($start) && now()->lt($end)) {
-				$doNotReturn = true;
-				$status = "ongoing";
-			}
-			else if (now()->gt($start) && now()->gt($end)) {
-				$doNotReturn = true;
-			}
+			extract($this->isValidForFetch($booking));
 			
-			if ($doNotReturn) {
+			if ($isValidForFetch) {
 				return response()
 					->json([
 						'success' => false,
@@ -234,5 +223,175 @@ class ReactApiController extends Controller
 				'booking' => $booking,
 				'status_types' => $status_types
 			]);
+	}
+
+	protected function bookingCancellationRequest(Request $req) {
+		$validator = Validator::make($req->all(), [
+			'control_no' => 'required|numeric|between:0,9999999999',
+			'reason' => 'required|string|max:255'
+		], [
+			'control_no.required' => 'Control number is required',
+			'control_no.numeric' => 'Control number is only composed of numbers',
+			'control_no.between' => 'Control number is only 10 characters long',
+			'reason.required' => 'A reason is required',
+			'reason.string' => 'Malformed data',
+			'reason.max' => 'Character limit reached (255)',
+		]);
+
+		if ($validator->fails()) {
+			return response()
+				->json([
+					'success' => false,
+					'type' => 'validation',
+					'errors' => $validator->messages()
+				]);
+		}
+
+		try {
+			DB::beginTransaction();
+
+			extract($this->isValidForFetch($booking));
+			
+			if (!$isValidForFetch) {
+				return response()
+					->json([
+						'success' => false,
+						'type' => 'finished',
+						'errors' => "Reservation is already {$status}"
+					]);
+			}
+
+			$booking->cancel_requested = 1;
+			$booking->cancel_request_reason = $req->reason;
+			$booking->save();
+
+			// CREATE MAILER HERE TO NOTIFY CLIENT OF THEIR CANCELLATION
+
+			ActivityLog::log(
+				"Booking #{$req->control_no} received a cancellation request from the customer",
+				$booking->id,
+				"Booking",
+				null,
+				true
+			);
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return response()
+				->json([
+					'success' => false,
+					'type' => 'fatal_error',
+					'errors' => "Something went wrong, please try again later"
+				]);
+		}
+
+		return response()
+			->json([
+				'success' => true,
+				'type' => 'success',
+				'message' => 'Booking fetched Successfully',
+				'booking' => $booking,
+				'status_types' => $status_types
+			]);
+	}
+
+	protected function bookingRetractCancellationRequest(Request $req) {
+		$validator = Validator::make($req->all(), [
+			'control_no' => 'required|numeric|between:0,9999999999'
+		], [
+			'control_no.required' => 'Control number is required',
+			'control_no.numeric' => 'Control number is only composed of numbers',
+			'control_no.between' => 'Control number is only 10 characters long',
+		]);
+
+		if ($validator->fails()) {
+			return response()
+				->json([
+					'success' => false,
+					'type' => 'validation',
+					'errors' => $validator->messages()
+				]);
+		}
+
+		try {
+			DB::beginTransaction();
+
+			extract($this->isValidForFetch($booking));
+			
+			if (!$isValidForFetch) {
+				return response()
+					->json([
+						'success' => false,
+						'type' => 'finished',
+						'errors' => "Reservation is already {$status}"
+					]);
+			}
+
+			$booking->cancel_requested = 0;
+			$booking->cancel_request_reason = null;
+			$booking->save();
+
+			// CREATE MAILER HERE TO NOTIFY CLIENT OF THE RETRACTION OF CANCELLATION
+
+			ActivityLog::log(
+				"Booking #{$req->control_no}'s cancellation request from the customer was retracted",
+				$booking->id,
+				"Booking",
+				null,
+				true
+			);
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return response()
+				->json([
+					'success' => false,
+					'type' => 'fatal_error',
+					'errors' => "Something went wrong, please try again later"
+				]);
+		}
+
+		return response()
+			->json([
+				'success' => true,
+				'type' => 'success',
+				'message' => 'Booking fetched Successfully',
+				'booking' => $booking,
+				'status_types' => $status_types
+			]);
+	}
+
+	// PRIVATE FUNCTIONS //
+	// RESERVATIONS
+	private function isValidForFetch(Booking $booking) {
+		$start = Carbon::parse("{$booking->reserved_at} {$booking->start_at}");
+		$end = Carbon::parse("{$booking->reserved_at} {$booking->end_at}");
+
+		$doNotReturn = false;
+		$status = "finished";
+
+		if ($booking == null) {
+			$doNotReturn = true;
+			$status = "No such booking existed";
+		}
+
+		if (now()->gt($start) && now()->lt($end)) {
+			$doNotReturn = true;
+			$status = "ongoing";
+		}
+		else if (now()->gt($start) && now()->gt($end)) {
+			$doNotReturn = true;
+		}
+
+		return [
+			"isValidForFetch" => !$doNotReturn,
+			"status" => $status
+		];
 	}
 }

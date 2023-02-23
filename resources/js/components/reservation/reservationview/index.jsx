@@ -9,8 +9,19 @@ import ReservationConfirmation from '../reservationconfirmation/index';
 
 // Under Development
 export async function action() {
-	const API = '';
-	const result = await axios.post(`${API}`).then(res => console.log(res)).catch(res => console.log(res));
+	const API = '/api/react/bookings/cancel-request';
+	const token = document.querySelector('meta[name=csrf-token]').content;
+
+	const result = await axios.post(`${API}`, {
+		_token: token,
+		control_no: "control number here",
+		reason: "Cancellation reason. This is required."
+	}).then(res => {
+		console.log(res)
+	}).catch(res => {
+		console.log(res)
+	});
+	
 	return redirect('/reservation/cancel');
 }
 

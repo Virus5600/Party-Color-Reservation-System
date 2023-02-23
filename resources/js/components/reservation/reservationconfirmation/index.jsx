@@ -32,7 +32,6 @@ export default function ReservationConfirmation(other) {
 		reservationInfo = useLoaderData();
 	}
 
-
 	const {
 		first_name,
 		last_name,
@@ -49,7 +48,6 @@ export default function ReservationConfirmation(other) {
 
 
 	return (
-
 		<div className='container container-small'>
 			<div className='background m-5'>
 				<h1 className='text-center text-white'>Reservation Details</h1>
@@ -71,7 +69,6 @@ export default function ReservationConfirmation(other) {
 					}
 				</Form>
 			</div>
-
 		</div>
 	);
 }
@@ -90,7 +87,7 @@ const ReservationButtons = () => {
 const ReservationButtonsForView = () => {
 	return (
 		<div className='text-right mt-4'>
-			<button className='btn btn-danger' type='submit'>Cancel request</button>
+			<button className='btn btn-danger' type='submit'>Cancel Request</button>
 		</div>
 	);
 }
