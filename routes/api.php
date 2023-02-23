@@ -39,6 +39,9 @@ Route::group(['prefix' => 'react'], function () {
 		Route::get('/{id}', 'ReactApiController@fetchSingleAnnouncement')->name('api.react.announcements.show');
 	});
 
+	// Settings
+	Route::get('/settings/fetch', 'ReactApiController@fetchSettings')->name('api.react.settings.fetch');
+
 	// Booking (/api/react/bookings)
 	Route::group(['prefix' => 'bookings'], function () {
 		// Create
