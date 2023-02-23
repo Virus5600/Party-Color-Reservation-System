@@ -186,7 +186,7 @@ class ReactApiController extends Controller
 
 			extract($this->isValidForFetch($booking));
 			
-			if ($isValidForFetch) {
+			if ($doNotReturn) {
 				return response()
 					->json([
 						'success' => false,
@@ -252,7 +252,7 @@ class ReactApiController extends Controller
 
 			extract($this->isValidForFetch($booking));
 			
-			if (!$isValidForFetch) {
+			if ($doNotReturn) {
 				return response()
 					->json([
 						'success' => false,
@@ -272,7 +272,8 @@ class ReactApiController extends Controller
 				$booking->id,
 				"Booking",
 				null,
-				true
+				false,
+				false,
 			);
 
 			DB::commit();
@@ -321,7 +322,7 @@ class ReactApiController extends Controller
 
 			extract($this->isValidForFetch($booking));
 			
-			if (!$isValidForFetch) {
+			if ($doNotReturn) {
 				return response()
 					->json([
 						'success' => false,
@@ -341,7 +342,8 @@ class ReactApiController extends Controller
 				$booking->id,
 				"Booking",
 				null,
-				true
+				false,
+				false
 			);
 
 			DB::commit();
@@ -390,7 +392,7 @@ class ReactApiController extends Controller
 		}
 
 		return [
-			"isValidForFetch" => !$doNotReturn,
+			"doNotReturn" => $doNotReturn,
 			"status" => $status
 		];
 	}
