@@ -906,7 +906,7 @@ class BookingController extends Controller
 
 			// Mailer to customer that his cancellation is approved
 
-			// Logger
+			// LOGGER
 			activity('booking')
 				->by(auth()->user())
 				->on($booking)
