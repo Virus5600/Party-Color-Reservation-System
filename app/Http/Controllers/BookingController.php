@@ -669,7 +669,7 @@ class BookingController extends Controller
 			]);
 	}
 
-	public function acceptCancel($id) {
+	public function acceptCancel(Request $req, $id) {
 		$booking = Booking::with(['menus'])->find($id);
 
 		if ($booking == null) {
@@ -678,6 +678,23 @@ class BookingController extends Controller
 					'success' => false,
 					'title' => 'Booking not found',
 					'message' => 'The booking either does not exists or is already deleted'
+				]);
+		}
+
+		$validator = Validator::make($req->all(), [
+			'reason' => 'required|string|max:255'
+		], [
+			'reason.required' => 'A reason is required',
+			'reason.string' => 'Malformed data',
+			'reason.max' => 'Character limit reached (255)',
+		]);
+
+		if ($validator->fails()) {
+			return response()
+				->json([
+					'success' => false,
+					'title' => 'Validation error',
+					'message' => $validator->messages()->first()
 				]);
 		}
 
@@ -708,6 +725,7 @@ class BookingController extends Controller
 
 			$booking->cancel_requested = 0;
 			$booking->status = Status::Cancelled;
+			$booking->reason = $req->reason;
 			$booking->save();
 
 			// Mailer to customer that his cancellation is approved
@@ -772,28 +790,6 @@ class BookingController extends Controller
 
 		try {
 			DB::beginTransaction();
-
-			if ($booking->items_returned == 0) {
-				// Return the inventory for realtime update
-				foreach ($booking->menus as $m) {
-					$response = $m->returnInventory($m->pivot->count);
-
-					if (!$response->success) {
-						throw new Exception($response->message);
-					}
-				}
-
-				foreach ($booking->additionalOrders as $o) {
-					foreach ($o->menus as $m) {
-						$response = $m->returnInventory($m->pivot->count);
-
-						if (!$response->success)
-							throw new Exception($response->message);
-					}
-				}
-
-				$booking->items_returned = 1;
-			}
 
 			$booking->cancel_requested = 0;
 			$booking->reason = $req->reason;
