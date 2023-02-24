@@ -225,6 +225,9 @@ $(document).ready(() => {
 					let rejectedButtons = `<button onclick="updateCalendar(${booking.id}, '${approveBooking.replace('%241', booking.id)}', undefined, true, 'Are you sure you want to approve this booking?')" class="btn btn-success"><i class="fas fa-circle-check mr-0 mr-sm-2"></i><span class="d-none d-sm-inline-block">Approve</span></button>
 						<button onclick="updateCalendar(${booking.id}, '${pendingBooking.replace('%241', booking.id)}', undefined, true, 'Are you sure you want to move this to pending?')" class="btn btn-warning"><i class="fas fa-clock mr-0 mr-sm-2"></i><span class="d-none d-sm-inline-block">Pending</span></a>`;
 
+					let cancelReqButtons = `<button class="btn btn-secondary" data-scf="Reason" data-scf-name="reason" data-scf-custom-title="Reason for approving the cancellation" data-scf-target-uri="${acceptCancelBooking.replace('%241', booking.id)}" data-scf-use-textarea='true' data-scf-callback='${callback}'><i class="fas fa-circle-check mr-0 mr-sm-2"></i><span class="d-none d-sm-inline-block">Approve</span></button>
+						<button class="btn btn-secondary" data-scf="Reason" data-scf-name="reason" data-scf-custom-title="Reason for rejecting the cancellation" data-scf-target-uri="${rejectCancelBooking.replace('%241', booking.id)}" data-scf-use-textarea='true' data-scf-callback='${callback}'><i class="fas fa-circle-xmark mr-0 mr-sm-2"></i><span class="d-none d-sm-inline-block">Reject</span></a>`;
+
 					// ADDITIONAL ORDER BUTTONS
 					let additionalOrderButtons = `<a href="${additionalOrdersIndex.replace('%241', booking.id)}" class="btn btn-primary">Additional Orders</a>`;
 
@@ -393,6 +396,13 @@ $(document).ready(() => {
 										<p>${booking.reason}</p>
 									</div>`;
 					}
+					else if (response.colorCode == "#fd7e14") {
+						htmlContent += `
+									<div class="card-body">
+										<h4>Cancel Reason:</h4>
+										<p>${booking.cancel_request_reason}</p>
+									</div>`;
+					}
 					htmlContent += `
 								</div>
 							</div>
@@ -421,6 +431,8 @@ $(document).ready(() => {
 						htmlContent += approvedButtons;
 					else if (response.status == 'Rejected')
 						htmlContent += rejectedButtons;
+					else if (response.status == "Cancellation Requested")
+						htmlContent += cancelReqButtons;
 					htmlContent += `
 								</div>
 							</div>

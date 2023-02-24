@@ -174,15 +174,16 @@ class ReactApiController extends Controller
 					'menus:duration,menu_id,name,price'
 				])
 				->where('control_no', '=', $req->control_no)
-				->first()
-				->makeHidden([
-					"id",
-					"booking_type",
-					"control_no",
-					"created_at",
-					"updated_at",
-					"deleted_at"
-				]);
+				->first();
+
+			if ($booking == null) {
+				return response()
+					->json([
+						'success' => false,
+						'type' => 'non-existent',
+						'errors' => "Reservation either does not exists or is already deleted"
+					]);
+			}
 
 			extract($this->isValidForFetch($booking));
 			
@@ -194,6 +195,15 @@ class ReactApiController extends Controller
 						'errors' => "Reservation is already {$status}"
 					]);
 			}
+
+			$booking->makeHidden([
+					"id",
+					"booking_type",
+					"control_no",
+					"created_at",
+					"updated_at",
+					"deleted_at"
+				]);
 
 			$status_types = [];
 			$sn = array_merge(array_column(Status::cases(), "name"), array_column(ApprovalStatus::cases(), "name"));
@@ -251,6 +261,15 @@ class ReactApiController extends Controller
 			DB::beginTransaction();
 
 			$booking = Booking::where('control_no', '=', $req->control_no)->first();
+
+			if ($booking == null) {
+				return response()
+					->json([
+						'success' => false,
+						'type' => 'non-existent',
+						'errors' => "Reservation either does not exists or is already deleted"
+					]);
+			}
 
 			extract($this->isValidForFetch($booking));
 			
@@ -328,6 +347,17 @@ class ReactApiController extends Controller
 
 		try {
 			DB::beginTransaction();
+
+			if ($booking == null) {
+				return response()
+					->json([
+						'success' => false,
+						'type' => 'non-existent',
+						'errors' => "Reservation either does not exists or is already deleted"
+					]);
+			}
+
+			$booking = Booking::where('control_no', '=', $req->control_no)->first();
 
 			extract($this->isValidForFetch($booking));
 			

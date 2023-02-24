@@ -72,6 +72,10 @@ Route::group(['prefix' => 'admin'], function() {
 
 				// Status
 				Route::group(['prefix' => 'status', 'middleware' => 'permissions:bookings_tab_respond'], function() {
+					// Accept Cancellation
+					Route::post('/accept-cancellation', 'BookingController@acceptCancel')->name('admin.bookings.status.accept-cancel');
+					Route::post('/reject-cancellation', 'BookingController@rejectCancel')->name('admin.bookings.status.reject-cancel');
+					
 					// Reject
 					Route::post('/reject', 'BookingController@reject')->name('admin.bookings.status.reject');
 
@@ -80,6 +84,7 @@ Route::group(['prefix' => 'admin'], function() {
 
 					// Pending
 					Route::get('/pending', 'BookingController@pending')->name('admin.bookings.status.pending');
+
 				});
 
 				// Delete/Archive

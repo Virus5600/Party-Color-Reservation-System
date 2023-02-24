@@ -196,6 +196,9 @@ $extensionFee = App\Settings::getValue('extension_fee');
 	const rejectBooking = '{{ route('admin.bookings.status.reject', ['$1']) }}';
 	const pendingBooking = '{{ route('admin.bookings.status.pending', ['$1']) }}';
 	
+	const acceptCancelBooking = '{{ route('admin.bookings.status.accept-cancel', ['$1']) }}';
+	const rejectCancelBooking = '{{ route('admin.bookings.status.reject-cancel', ['$1']) }}';
+	
 	const archiveBooking = '{{ route('admin.bookings.archive', ['$1']) }}';
 	const restoreBooking = '{{ route('admin.bookings.restore', ['$1']) }}';
 

@@ -76,9 +76,9 @@ export default function ReservationConfirmation(other) {
 						<FieldValue label={'Full Name'} data={first_name + ' ' + last_name} />
 						<FieldValue label={'Email'} data={email} />
 						<FieldValue label={'Phone'} data={phone} />
-						<FieldValue label={'adult/senior'} data={adult_senior} />
-						<FieldValue label={'junior'} data={junior} />
-						<FieldValue label={'elementary'} data={elementary} />
+						<FieldValue label={'Adult/Senior'} data={adult_senior} />
+						<FieldValue label={'Junior'} data={junior} />
+						<FieldValue label={'Elementary'} data={elementary} />
 						<FieldValue label={'Reservation'} data={date + ' ' + starting_time} />
 						<FieldValue label={'Time Extension'} data={extension} />
 						<FieldValue label={'Special Requests'} data={special_request} />
@@ -96,7 +96,7 @@ export default function ReservationConfirmation(other) {
 
 const ReservationButtons = () => {
 	return (
-		<div className='text-right mt-4'>
+		<div className='text-end mt-4'>
 			<Link to='/reservation'><button className='btn btn-danger mx-2'>Edit</button></Link>
 			<button className='btn btn-success mx-2' type='submit'>Reserve</button>
 		</div>
@@ -109,15 +109,14 @@ const ReservationButtonsForView = () => {
 	}
 	return (
 		<>
-			<div className='row mb-3'>
-				<div className='col-5 text-right text-white' style={{ fontWeight: '900' }}>
-					Cancellation reason:
+			<div className='row mt-sm-4 my-3'>
+				<label for="cancellation-reason" className='col-5 text-white form-label' style={{ fontWeight: '900' }}>Cancellation Reason:</label>
+				<div className='col-12'>
+					<textarea className="form-control" id="cancellation-reason" rows='4' onChange={handleTextAreaInput} style={{resize:'none'}}></textarea>
 				</div>
-				<textarea rows='4' cols='50' onChange={handleTextAreaInput}></textarea>
 			</div>
 
-			<div className='text-right mt-4'>
-
+			<div className='text-end mt-4'>
 				<button className='btn btn-danger' type='submit'>Cancel Request</button>
 			</div>
 		</>
@@ -127,8 +126,8 @@ const ReservationButtonsForView = () => {
 
 const FieldValue = ({ label, data }) => {
 	return (
-		<div className='row mb-3'>
-			<div className='col-5 text-right' style={{ fontWeight: '900' }}>
+		<div className='row mb-3 gx-sm-3'>
+			<div className='col-5 text-end' style={{ fontWeight: '900' }}>
 				{label}:
 			</div>
 			<div className='col'>
