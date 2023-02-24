@@ -369,6 +369,37 @@ class ReactApiController extends Controller
 			]);
 	}
 
+	// SETTINGS (ABOUT US)
+	protected function fetchSettings(Request $req) {
+		$aboutUs = [
+			'web-logo',
+			'web-name',
+			'web-desc',
+			'address',
+			'contacts',
+			'emails',
+			'opening',
+			'closing',
+			'day-schedule'
+		];
+
+		$days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+		$settings = Settings::select([
+				'name',
+				'value',
+				'is_file'
+			])
+			->whereIn('name', $aboutUs)
+			->get();
+
+		return response()
+			->json([
+				'settings' => $settings,
+				'days' => $days
+			]);
+	}
+
 	// PRIVATE FUNCTIONS //
 	// RESERVATIONS
 	private function isValidForFetch(Booking $booking) {
