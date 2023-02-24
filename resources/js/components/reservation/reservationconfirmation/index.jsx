@@ -8,18 +8,37 @@ export function loader() {
 	return JSON.parse(rawdata);
 }
 
-export async function action() {
-	const raw_session_data = sessionStorage.getItem('reservationInfo');
-	const reservationInfo = JSON.parse(raw_session_data);
-	const isSuccess = await handleReserveClick(reservationInfo);
 
+// this is the action for confirm button in create reservation page
+export async function action() {
+
+	/**
+	 * flow
+	 * 1. get the reservation info made in create reservation page
+	 * 2. send the reservation info to backend
+	 * 3. if success go to success page
+	 * 4. if not success go back to create reservation page
+	 */
+
+	// 1.
+	const raw_session_data = sessionStorage.getItem('reservationInfo');
+
+	// 2.
+	const isSuccess = await handleReserveClick(JSON.parse(raw_session_data));
+
+	// 3.
 	if (isSuccess == true) {
 		const reservationsuccess = true;
+
+
+		// this is the way to access the success page (current solution)
 		sessionStorage.setItem('reservationsuccess', JSON.stringify(reservationsuccess));
+
+
 		return redirect('/reservation/success');
 	}
 
-
+	// 4.
 	return redirect('/reservation');
 }
 
