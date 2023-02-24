@@ -4,22 +4,53 @@ import './style.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // react router
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLoaderData } from 'react-router-dom';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+
+export function loader() {
+    let reservationstatus = sessionStorage.getItem('reservationsuccess') || sessionStorage.getItem('reservationcancel');
+    reservationstatus = JSON.parse(reservationstatus);
+    console.log('reservationstatus:', reservationstatus);
+    if (reservationstatus == null) {
+        // console.log('inside of if statement');
+        // navigate(-1);
+        // console.log('after navigate function');
+        throw Error();
+    }
+
+    return reservationstatus;
+
+}
+
 
 export default function ReservationSuccess({ title, description, linkLabel, link, backgroundStyle, iconStyle, isSuccess }) {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
+    const _ = useLoaderData();
+    const isMounted = useRef(false);
+
 
     useEffect(() => {
-        let reservationstatus = isSuccess ? sessionStorage.getItem('reservationsuccess') : sessionStorage.getItem('reservationcancel');
-        reservationstatus = JSON.parse(reservationstatus);
-        console.log(reservationstatus);
-        if (reservationstatus == null) {
-            navigate('/', { replace: true });
+        if (!isMounted.current) {
+            isMounted.current = true;
+        } else {
+            sessionStorage.removeItem('reservationsuccess');
+            sessionStorage.removeItem('reservationcancel');
         }
-        sessionStorage.removeItem('reservationstatus');
+
     }, []);
+
+    // useEffect(() => {
+    //     let reservationstatus = isSuccess ? sessionStorage.getItem('reservationsuccess') : sessionStorage.getItem('reservationcancel');
+    //     reservationstatus = JSON.parse(reservationstatus);
+    //     console.log('reservationstatus:', reservationstatus);
+    //     if (reservationstatus == null) {
+    //         console.log('inside of if statement');
+    //         navigate(-1);
+    //         console.log('after navigate function');
+    //     }
+    //     sessionStorage.removeItem('reservationstatus');
+    // }, []);
 
     return (
         <div className='container container-small'>
