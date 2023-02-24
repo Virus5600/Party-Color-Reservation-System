@@ -105,7 +105,7 @@ const TimeLocation = (props) => {
     }
     return (
         <div className='time-location'>
-            <div className='row align-items-center'>
+            <div className='row align-items-center my-2'>
                 <div className='col-auto'>
                     <FontAwesomeIcon icon={faClock} className='h5 my-0' />
                 </div>
@@ -115,7 +115,7 @@ const TimeLocation = (props) => {
                 </div>
             </div>
             <hr />
-            <div className='row align-items-center'>
+            <div className='row align-items-center my-2'>
                 <div className='col-auto'>
                     <FontAwesomeIcon icon={faPhone} className='h5 my-0' />
                 </div>
@@ -124,7 +124,7 @@ const TimeLocation = (props) => {
                 </div>
             </div>
             <hr />
-            <div className='row align-items-center'>
+            <div className='row align-items-center my-2'>
                 <div className='col-auto'>
                     <FontAwesomeIcon icon={faLocationArrow} className='h5 my-0' />
                 </div>
@@ -132,7 +132,7 @@ const TimeLocation = (props) => {
                     {props.address}
                 </div>
             </div>
-            <hr />
+            <hr className='my-2'/>
             <div>
                 <img className='img-fluid' src={locationImage} alt='location map of party color' />
             </div>
