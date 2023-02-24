@@ -9,7 +9,7 @@ export function loader() {
 }
 
 export async function action() {
-	const raw_session_data = sessionStorage.getItem('reservationInfo'); sessionStorage.removeItem('reservationInfo');
+	const raw_session_data = sessionStorage.getItem('reservationInfo');
 	const reservationInfo = JSON.parse(raw_session_data);
 	const isSuccess = await handleReserveClick(reservationInfo);
 
@@ -42,7 +42,7 @@ export default function ReservationConfirmation(other) {
 		elementary,
 		date,
 		starting_time,
-		extension,
+		time_extension,
 		special_request,
 	} = reservationInfo;
 
@@ -61,7 +61,7 @@ export default function ReservationConfirmation(other) {
 						<FieldValue label={'junior'} data={junior} />
 						<FieldValue label={'elementary'} data={elementary} />
 						<FieldValue label={'Reservation'} data={date + ' ' + starting_time} />
-						<FieldValue label={'Time Extension'} data={extension} />
+						<FieldValue label={'Time Extension'} data={time_extension} />
 						<FieldValue label={'Special Requests'} data={special_request} />
 					</div>
 					{
