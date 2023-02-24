@@ -18,18 +18,21 @@ import Announcement from './announcement';
 import AnnouncementContent from './announcement/announcementcontent/index';
 import AboutUs from './aboutus';
 
-import {
-    loaderLatest as loaderQuickAnnouncement,
-    loader as loaderAnnouncement,
-} from './announcement/index';
 
 import {
     loader as loaderAnnouncementContent
 } from './announcement/announcementcontent/index';
 
+
+
+
 import {
     loader as reservationLoader
 } from './reservation/index';
+
+import {
+    loader as successCancelLoader,
+} from './reservation/reservationsuccess/index';
 
 import {
     action as confirmAction,
@@ -60,7 +63,6 @@ const router = createBrowserRouter([
             {
                 path: '/',
                 element: <Home />,
-                loader: loaderQuickAnnouncement,
 
             },
             {
@@ -96,6 +98,7 @@ const router = createBrowserRouter([
                     isSuccess={true}
 
                 />,
+                loader: successCancelLoader,
             },
             {
                 path: 'reservation/cancel',
@@ -108,12 +111,12 @@ const router = createBrowserRouter([
                     iconStyle={{ color: '#871A1A' }}
                     isSuccess={false}
                 />,
+                loader: successCancelLoader,
 
             },
             {
                 path: 'announcements',
                 element: <Announcement />,
-                loader: loaderAnnouncement,
             },
             {
                 path: 'announcements/:announcementId',
