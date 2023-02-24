@@ -42,7 +42,7 @@ export default function ReservationConfirmation(other) {
 		elementary,
 		date,
 		starting_time,
-		time_extension,
+		extension,
 		special_request,
 	} = reservationInfo;
 
@@ -61,7 +61,7 @@ export default function ReservationConfirmation(other) {
 						<FieldValue label={'junior'} data={junior} />
 						<FieldValue label={'elementary'} data={elementary} />
 						<FieldValue label={'Reservation'} data={date + ' ' + starting_time} />
-						<FieldValue label={'Time Extension'} data={time_extension} />
+						<FieldValue label={'Time Extension'} data={extension} />
 						<FieldValue label={'Special Requests'} data={special_request} />
 					</div>
 					{
@@ -146,18 +146,21 @@ const handleReserveClick = async ({
 		return no_adult * prices['adult'] + no_junior * prices['junior'] + no_elementary * prices['elementary'];
 	}
 
-	let menu = [], amount = [], pax = 0, index = -1;
-	for (let p in [Number(adult_senior), Number(junior), Number(elementary)]) {
+	let menu = [], amount = [], pax = 0, index = 0;
+	for (let p of [Number(adult_senior), Number(junior), Number(elementary)]) {
 		index++;
 
+		console.log(p);
 		if (p <= 0)
 			continue;
 
-		menu.push(index + 1);
+		menu.push(index);
 		amount.push(p);
 		pax += Number(p);
 	}
 
+	console.log("Menus:", menu);
+	console.log("Amount:", amount);
 
 	const result = await axios.post(API_TO_SEND_RESERVATION, {
 		_token: token,																	// Cross site forgery (security concepts) csrf attacks

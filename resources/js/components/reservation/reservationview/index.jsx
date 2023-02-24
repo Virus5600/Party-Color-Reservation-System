@@ -102,7 +102,7 @@ export default function ReservationView() {
 				let elementary_count;
 
 				for (let i = 0; i < menus.length; i++) {
-					if (menus[i].name == 'Senior High') {
+					if (menus[i].name == 'Adult') {
 						senior_high_count = menus[i].pivot.count;
 					}
 					else if (menus[i].name == 'Junior') {
@@ -126,7 +126,7 @@ export default function ReservationView() {
 					elementary: elementary_count == null ? 0 : elementary_count,
 					date: booking.reserved_at,
 					starting_time: booking.start_at,
-					time_extension: booking.extension,
+					extension: booking.extension,
 					special_request: booking.special_request == null ? '' : booking.special_request,
 				};
 

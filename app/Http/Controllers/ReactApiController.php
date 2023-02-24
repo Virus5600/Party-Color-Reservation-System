@@ -250,6 +250,8 @@ class ReactApiController extends Controller
 		try {
 			DB::beginTransaction();
 
+			$booking = Booking::where('control_no', '=', $req->control_no)->first();
+
 			extract($this->isValidForFetch($booking));
 			
 			if ($doNotReturn) {
@@ -414,11 +416,11 @@ class ReactApiController extends Controller
 			$status = "No such booking existed";
 		}
 
-		if (now()->gt($start) && now()->lt($end)) {
+		if (now()->timezone("Asia/Tokyo")->gt($start) && now()->timezone("Asia/Tokyo")->lt($end)) {
 			$doNotReturn = true;
 			$status = "ongoing";
 		}
-		else if (now()->gt($start) && now()->gt($end)) {
+		else if (now()->timezone("Asia/Tokyo")->gt($start) && now()->timezone("Asia/Tokyo")->gt($end)) {
 			$doNotReturn = true;
 		}
 
