@@ -269,6 +269,13 @@ class ReactApiController extends Controller
 
 			// CREATE MAILER HERE TO NOTIFY CLIENT OF THEIR CANCELLATION
 
+			$status_types = [];
+			$sn = array_merge(array_column(Status::cases(), "name"), array_column(ApprovalStatus::cases(), "name"));
+			$sv = array_merge(array_column(Status::cases(), "value"), array_column(ApprovalStatus::cases(), "value"));
+
+			for ($i = 0; $i < count($sn); $i++)
+				$status_types[$sn[$i]] = $sv[$i];
+
 			ActivityLog::log(
 				"Booking #{$req->control_no} received a cancellation request from the customer",
 				$booking->id,
