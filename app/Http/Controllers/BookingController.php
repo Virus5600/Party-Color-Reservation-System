@@ -668,4 +668,165 @@ class BookingController extends Controller
 				'message' => ''
 			]);
 	}
+
+	public function acceptCancel($id) {
+		$booking = Booking::with(['menus'])->find($id);
+
+		if ($booking == null) {
+			return response()
+				->json([
+					'success' => false,
+					'title' => 'Booking not found',
+					'message' => 'The booking either does not exists or is already deleted'
+				]);
+		}
+
+		try {
+			DB::beginTransaction();
+
+			if ($booking->items_returned == 0) {
+				// Return the inventory for realtime update
+				foreach ($booking->menus as $m) {
+					$response = $m->returnInventory($m->pivot->count);
+
+					if (!$response->success) {
+						throw new Exception($response->message);
+					}
+				}
+
+				foreach ($booking->additionalOrders as $o) {
+					foreach ($o->menus as $m) {
+						$response = $m->returnInventory($m->pivot->count);
+
+						if (!$response->success)
+							throw new Exception($response->message);
+					}
+				}
+
+				$booking->items_returned = 1;
+			}
+
+			$booking->cancel_requested = 0;
+			$booking->status = Status::Cancelled;
+			$booking->save();
+
+			// Mailer to customer that his cancellation is approved
+
+			// Logger
+			ActivityLog::log(
+				"Approval for the cancellation of booking #{$booking->control_no}.",
+				$booking->id,
+				"Booking",
+				auth()->user()->id
+			);
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return response()
+				->json([
+					'success' => false,
+					'title' => 'Something went wrong, please try again later',
+					'message' => ''
+				]);
+		}
+
+		return response()
+			->json([
+				'success' => true,
+				'title' => 'Accepted cancellation of booking request',
+				'message' => ''
+			]);
+	}
+	
+	public function rejectCancel(Request $req, $id) {
+		$booking = Booking::with(['menus'])->find($id);
+
+		if ($booking == null) {
+			return response()
+				->json([
+					'success' => false,
+					'title' => 'Booking not found',
+					'message' => 'The booking either does not exists or is already deleted'
+				]);
+		}
+
+		$validator = Validator::make($req->all(), [
+			'reason' => 'required|string|max:255'
+		], [
+			'reason.required' => 'A reason is required',
+			'reason.string' => 'Malformed data',
+			'reason.max' => 'Character limit reached (255)',
+		]);
+
+		if ($validator->fails()) {
+			return response()
+				->json([
+					'success' => false,
+					'title' => 'Validation error',
+					'message' => $validator->messages()->first()
+				]);
+		}
+
+		try {
+			DB::beginTransaction();
+
+			if ($booking->items_returned == 0) {
+				// Return the inventory for realtime update
+				foreach ($booking->menus as $m) {
+					$response = $m->returnInventory($m->pivot->count);
+
+					if (!$response->success) {
+						throw new Exception($response->message);
+					}
+				}
+
+				foreach ($booking->additionalOrders as $o) {
+					foreach ($o->menus as $m) {
+						$response = $m->returnInventory($m->pivot->count);
+
+						if (!$response->success)
+							throw new Exception($response->message);
+					}
+				}
+
+				$booking->items_returned = 1;
+			}
+
+			$booking->cancel_requested = 0;
+			$booking->reason = $req->reason;
+			$booking->save();
+
+			// Mailer to customer that his cancellation is approved
+
+			// Logger
+			ActivityLog::log(
+				"Rejected cancellation request for booking #{$booking->control_no}.",
+				$booking->id,
+				"Booking",
+				auth()->user()->id
+			);
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			Log::error($e);
+
+			return response()
+				->json([
+					'success' => false,
+					'title' => 'Something went wrong, please try again later',
+					'message' => ''
+				]);
+		}
+
+		return response()
+			->json([
+				'success' => true,
+				'title' => 'Rejected cancellation of booking request',
+				'message' => ''
+			]);
+	}
 }

@@ -98,14 +98,17 @@ class Booking extends Model
 
 	public function getOverallStatus($asValue = false) {
 		if ($this->trashed())
-			return "#1e2b37";
+			return $asValue ? Status::Cancelled->asValue : Status::Cancelled;
 
 		$status = $this->status;
 
 		$approvalStatus = Status::tryFrom($status) ?? (ApprovalStatus::tryFrom($status) ?? $status);
 		$bookingStatus = $this->getStatus();
 
-		if ($approvalStatus == ApprovalStatus::Approved) {
+		if ($this->cancel_requested == 1) {
+			return $asValue ? Status::CancelRequest->asValue : Status::CancelRequest;
+		}
+		else if ($approvalStatus == ApprovalStatus::Approved) {
 			return $asValue ? $bookingStatus->value : $bookingStatus;
 		}
 		else {
@@ -124,6 +127,9 @@ class Booking extends Model
 			$status = Status::tryFrom($status) ?? (ApprovalStatus::tryFrom($status) ?? $status);
 
 		switch ($status) {
+			case Status::CancelRequest:
+				return "#fd7e14";
+
 			case Status::Coming:
 				return "#17a2b8";
 
@@ -156,6 +162,9 @@ class Booking extends Model
 			$status = Status::tryFrom($status) ?? (ApprovalStatus::tryFrom($status) ?? $status);
 
 		switch ($status) {
+			case Status::CancelRequest:
+				return "Cancellation Requested";
+
 			case Status::Coming:
 				return "Coming";
 			
