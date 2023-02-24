@@ -72,6 +72,7 @@ const router = createBrowserRouter([
             {
                 path: '/viewreservation',
                 element: <ReservationView />,
+                action: null,
             },
             {
                 path: 'reservation/confirm',

@@ -11,16 +11,18 @@ export async function action({ request }) {
 	const reservationInfo = Object.fromEntries(formData);
 
 	sessionStorage.setItem('reservationInfo', JSON.stringify(reservationInfo));
-	
+
 	return redirect('/reservation/confirm');
 }
 
 // LOADER
 export function loader() {
-	const session_data = sessionStorage.getItem('reservationInfo'); sessionStorage.removeItem('reservationInfo');
-	
-	if (session_data == null)
+	const session_data = sessionStorage.getItem('reservationInfo');
+
+	if (session_data == null) {
 		return {};
+	}
+
 
 	return JSON.parse(session_data);
 }
@@ -161,9 +163,9 @@ const InputField = ({ type, name, label, placeholder, min, max, isRequired, rese
 	return (
 		<div className="col-md">
 			<label htmlFor={name} className="form-label text-white">{label}</label>
-			
+
 			{isRequired ? '' : <span className='text-white text-opacity-50 fw-light'> (Optional)</span>}
-			
+
 			{field}
 		</div>
 	);

@@ -41,10 +41,10 @@ export default function Announcement() {
 	const announcements = useLoaderData();
 
 	return (
-		<div className='Announcement' id='Announcement'>
-			<h1>Announcement</h1>
-			
-			<div className='Announcement-list'>
+		<div className='Announcement p-4' id='Announcement'>
+			<div className="container">
+				<h1 className='text-center'>Announcement</h1>
+				
 				{
 					announcements.map(announcement =>
 						<AnnouncementItem
@@ -82,15 +82,17 @@ const AnnouncementItem = ({ id, poster, created_at, title, summary }) => {
 
 	return (
 		<Link to={`/announcements/${id}`}>
-			<div className='AnnouncementItem'>
-				<div className='AnnouncementItem-image'>
-					<img src={poster.replace("{id}", id)} />
+			<div className='row AnnouncementItem text-black mb-4'>
+				<div className='col-md-5 AnnouncementItem-image d-flex align-items-center'>
+					<div className='ratio ratio-16x9'>
+						<img src={poster.replace("{id}", id)} className=''/>
+					</div>
 				</div>
 
-				<div className='AnnouncementItem-description'>
-					<span className='date'>{changeDateFormat(created_at)}</span><br />
-					<span className='title'>{title}</span><br />
-					<span className='summary'>{summary}</span>
+				<div className='col'>
+					<span className='date fs-4'>{changeDateFormat(created_at)}</span><br />
+					<span className='title fs-2 fw-bold'>{title}</span><br />
+					<span className='summary fs-3'>{summary}</span>
 				</div>
 			</div>
 

@@ -4,15 +4,15 @@ import axios from 'axios';
 import { useLoaderData, Form, Link, redirect, } from 'react-router-dom';
 
 export function loader() {
-	const rawdata = sessionStorage.getItem('reservationInfo'); sessionStorage.removeItem('reservationInfo');
+	const rawdata = sessionStorage.getItem('reservationInfo');
 	return JSON.parse(rawdata);
 }
 
 export async function action() {
-	const raw_session_data = sessionStorage.getItem('reservationInfo'); sessionStorage.removeItem('reservationInfo');
+	const raw_session_data = sessionStorage.getItem('reservationInfo');
 	const reservationInfo = JSON.parse(raw_session_data);
 	const isSuccess = await handleReserveClick(reservationInfo);
-	
+
 	if (isSuccess == true) {
 		const reservationsuccess = true;
 		sessionStorage.setItem('reservationsuccess', JSON.stringify(reservationsuccess));
@@ -42,7 +42,7 @@ export default function ReservationConfirmation(other) {
 		elementary,
 		date,
 		starting_time,
-		extension,
+		time_extension,
 		special_request,
 	} = reservationInfo;
 
@@ -61,7 +61,7 @@ export default function ReservationConfirmation(other) {
 						<FieldValue label={'junior'} data={junior} />
 						<FieldValue label={'elementary'} data={elementary} />
 						<FieldValue label={'Reservation'} data={date + ' ' + starting_time} />
-						<FieldValue label={'Time Extension'} data={extension} />
+						<FieldValue label={'Time Extension'} data={time_extension} />
 						<FieldValue label={'Special Requests'} data={special_request} />
 					</div>
 					{
@@ -164,7 +164,7 @@ const handleReserveClick = async ({
 	}).then(response => {
 		// Do something after send the data to backend
 		console.log(response);
-		
+
 		const data = response.data;
 		if (data.success) {
 			sessionStorage.removeItem('reservationInfo');
@@ -183,7 +183,7 @@ const handleReserveClick = async ({
 	}).catch(response => {
 		console.log(response);
 		alert('internal error');
-		
+
 		// document.write(response.response.data);
 	});
 	return isSuccess;
