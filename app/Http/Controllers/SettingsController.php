@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Settings;
-use App\ActivityLog;
 
 use DB;
 use Exception;
@@ -130,12 +129,13 @@ class SettingsController extends Controller
 				}
 			}
 
-			ActivityLog::log(
-				"Settings updated.",
-				null,
-				"Settings",
-				auth()->user()->id
-			);
+			// LOGGER
+			activity('settings')
+				->by(auth()->user())
+				->on($setting)
+				->event('update')
+				->withProperties($req->except('_token'))
+				->log("Settings updated.");
 
 			DB::commit();
 		} catch (Exception $e) {

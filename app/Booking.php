@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use App\Enum\ApprovalStatus;
 use App\Enum\Status;
 
+use Exception;
 use Log;
 use NumberFormatter;
 use Validator;
@@ -41,9 +42,9 @@ class Booking extends Model
 	];
 
 	protected $casts = [
-		'created_at' => 'datetime',
-		'updated_at' => 'datetime',
-		'reserved_at' => 'datetime',
+		'created_at' => 'datetime:H:i',
+		'updated_at' => 'datetime:H:i',
+		'reserved_at' => 'date:Y-m-d',
 		'deleted_at' => 'datetime',
 	];
 
@@ -52,15 +53,27 @@ class Booking extends Model
 
 	// Accessor
 	protected function getStartAtAttribute($value) {
-		return Carbon::createFromFormat('H:i:s', $value)->format('H:i');
+		try {
+			return Carbon::createFromFormat('H:i:s', $value)->format('H:i');
+		} catch (Exception $e) {
+			return Carbon::createFromFormat('Y-m-d H:i:s', $value)->format('H:i');
+		}
 	}
 
 	protected function getEndAtAttribute($value) {
-		return Carbon::createFromFormat('H:i:s', $value)->format('H:i');
+		try {
+			return Carbon::createFromFormat('H:i:s', $value)->format('H:i');
+		} catch (Exception $e) {
+			return Carbon::createFromFormat('Y-m-d H:i:s', $value)->format('H:i');
+		}
 	}
 
 	protected function getReservedAtAttribute($value) {
-		return Carbon::createFromFormat('Y-m-d', $value)->format('Y-m-d');
+		try {
+			return Carbon::createFromFormat('Y-m-d H:i:s', $value)->format('H:i');
+		} catch (Exception $e) {
+			return Carbon::createFromFormat('Y-m-d', $value)->format('Y-m-d');
+		}
 	}
 
 	// Relationships
@@ -212,6 +225,10 @@ class Booking extends Model
 			$controlNumber = createControlNumber();
 
 		return $controlNumber;
+	}
+
+	public static function showRoute($id) {
+		return route('admin.bookings.index', ['cn' => Booking::select(['id', 'control_no'])->withTrashed()->find($id)->control_no]);
 	}
 
 	// Validation

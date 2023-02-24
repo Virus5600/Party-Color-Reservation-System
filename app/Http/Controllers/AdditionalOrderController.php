@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\ActivityLog;
 use App\AdditionalOrder;
 use App\Booking;
 use App\Inventory;
@@ -94,13 +93,16 @@ class AdditionalOrderController extends Controller
 
 			
 			// LOGGER
-			ActivityLog::log(
-				"Created additional order for order #{$booking->control_no}",
-				$additionalOrder->id,
-				"AdditionalOrder",
-				auth()->user()->id,
-				false
-			);
+			activity('additional-order')
+				->by(auth()->user())
+				->on($additionalOrder)
+				->event('create')
+				->withProperties([
+					'booking_id' => $booking->id,
+					'extension' => $req->extension,
+					'price' => $req->price
+				])
+				->log("Created additional order for order #{$booking->control_no}");
 			
 			DB::commit();
 		} catch (Exception $e) {
@@ -225,13 +227,16 @@ class AdditionalOrderController extends Controller
 				->sync($menus);
 
 			// Logger
-			ActivityLog::log(
-				"Updated additional order for order #{$booking->control_no}",
-				$additionalOrder->id,
-				"AdditionalOrder",
-				auth()->user()->id,
-				false
-			);
+			activity('additional-order')
+				->by(auth()->user())
+				->on($additionalOrder)
+				->event('update')
+				->withProperties([
+					'booking_id' => $booking->id,
+					'extension' => $additionalOrder->extension,
+					'price' => $additionalOrder->price
+				])
+				->log("Updated additional order for booking #'{$additionalOrder->booking->control_no}'.");
 			
 			DB::commit();
 		} catch (Exception $e) {
@@ -275,13 +280,16 @@ class AdditionalOrderController extends Controller
 			$additionalOrder->save();
 
 			// Logger
-			ActivityLog::log(
-				"Voided an additional order for order #{$booking->control_no}",
-				null,
-				"AdditionalOrder",
-				auth()->user()->id,
-				false
-			);
+			activity('additional-order')
+				->by(auth()->user())
+				->on($additionalOrder)
+				->event('void')
+				->withProperties([
+					'booking_id' => $booking->id,
+					'extension' => $additionalOrder->extension,
+					'price' => $additionalOrder->price
+				])
+				->log("Voided an additional order for order #{$booking->control_no}");
 
 
 			DB::commit();

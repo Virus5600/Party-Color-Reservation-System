@@ -9,7 +9,6 @@ use App\Http\Controllers\MenuVariationController;
 use App\Inventory;
 use App\Menu;
 use App\MenuItem;
-use App\ActivityLog;
 
 use DB;
 use Log;
@@ -56,12 +55,15 @@ class MenuController extends Controller
 				'name' => $req->menu_name,
 			]);
 
-			ActivityLog::log(
-				"Menu '{$req->menu_name}' created.",
-				$menu->id,
-				"Menu",
-				auth()->user()->id
-			);
+			// LOGGER
+			activity('menu')
+				->by(auth()->user())
+				->on($menu)
+				->event('create')
+				->withProperties([
+					'name' => $menu->menu_name
+				])
+				->log("Menu '{$req->menu_name}' created.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -85,11 +87,12 @@ class MenuController extends Controller
 	protected function update(Request $req, $id) {
 		$menu = Menu::withTrashed()->find($id);
 		
-		if ($menu == null)
+		if ($menu == null) {
 			return response()
 				->json([
 					'flash_error' => 'Menu either does not exists or is already deleted'
 				]);
+		}
 
 		$validator = Validator::make($req->all(), [
 			'menu_name' => 'required|unique:menus,name|string|max:255'
@@ -118,12 +121,15 @@ class MenuController extends Controller
 			$menu->name = $req->menu_name;
 			$menu->save();
 
-			ActivityLog::log(
-				"Updated menu name from '{$oldName}' to {$req->menu_name}.",
-				$menu->id,
-				"Menu",
-				auth()->user()->id
-			);
+			// LOGGER
+			activity('menu')
+				->by(auth()->user())
+				->on($menu)
+				->event('create')
+				->withProperties([
+					'name' => $menu->menu_name
+				])
+				->log("Updated menu name from '{$oldName}' to {$req->menu_name}.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -158,12 +164,15 @@ class MenuController extends Controller
 			
 			$menu->delete();
 
-			ActivityLog::log(
-				"Menu '{$menu->name}' deactivated.",
-				$menu->id,
-				"Menu",
-				auth()->user()->id
-			);
+			// LOGGER
+			activity('menu')
+				->by(auth()->user())
+				->on($menu)
+				->event('create')
+				->withProperties([
+					'name' => $menu->menu_name
+				])
+				->log("Menu '{$menu->name}' deactivated.");
 			
 			DB::commit();
 		} catch (Exception $e) {
@@ -199,13 +208,16 @@ class MenuController extends Controller
 			
 			$menu->restore();
 			
-			ActivityLog::log(
-				"Menu '{$menu->name}' activated.",
-				$menu->id,
-				"Menu",
-				auth()->user()->id
-			);
-
+			// LOGGER
+			activity('menu')
+				->by(auth()->user())
+				->on($menu)
+				->event('create')
+				->withProperties([
+					'name' => $menu->menu_name
+				])
+				->log("Menu '{$menu->name}' activated.");
+			
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();

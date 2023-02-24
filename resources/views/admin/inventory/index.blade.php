@@ -61,6 +61,9 @@ $deleteAllow = $user->hasPermission('inventory_tab_delete');
 							</button>
 
 							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown{{$i->id}}">
+								{{-- SHOW --}}
+								<a href="{{ route('admin.inventory.show', [$i->id]) }}" class="dropdown-item"><i class="fas fa-eye mr-2"></i>View</a>
+
 								{{-- EDIT --}}
 								@if ($editAllow)
 								<a href="{{ route('admin.inventory.edit', [$i->id]) }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>

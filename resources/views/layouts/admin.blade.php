@@ -40,6 +40,7 @@
 		{{-- CSS --}}
 		<link href="{{ asset('css/lib-styles.css') }}" rel="stylesheet">
 		<link href="{{ asset('css/style.css') }}" rel="stylesheet">
+		<link href="{{ asset('css/components.css') }}" rel="stylesheet">
 		<link href="{{ asset('css/admin.css') }}" rel="stylesheet">
 
 		@yield('css')
@@ -113,6 +114,7 @@
 		<script type="text/javascript">const fiFallbackImage = '{{ asset("uploads/users/default.png") }}';</script>
 		<script type="text/javascript" src="{{ asset('js/admin.js') }}"></script>
 		<script type="text/javascript" src="{{ asset('js/util/fallback-image.js') }}"></script>
+		<script type="text/javascript" src="{{ asset('js/util/swal-flash.js') }}"></script>
 		<script type="text/javascript">
 			@if (Session::has('flash_error'))
 			Swal.fire({

@@ -24,7 +24,7 @@ class MenuVariationsTableSeeder extends Seeder
 
 		MenuVariation::create([
 			'menu_id' => 1,
-			'name' => "Senior High",
+			'name' => "Junior",
 			'price' => 2000,
 			'duration' => '02:00'
 		]);

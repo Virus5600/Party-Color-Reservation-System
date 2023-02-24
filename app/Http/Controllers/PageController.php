@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 
 use Carbon\Carbon;
 
-use App\ActivityLog;
+use Spatie\Activitylog\Models\Activity;
+
 use App\Announcement;
 use App\Inventory;
 use App\Menu;
@@ -53,10 +54,10 @@ class PageController extends Controller
 				'hasActions' => false
 			],
 			'latest_activities' => [
-				'clazz' => ActivityLog::class,
+				'clazz' => Activity::class,
 				'name' => 'Latest Activities',
 				'conditions' => ['*'],
-				'columns' => ['address', 'action'],
+				'columns' => ['ip_address', 'description'],
 				'hasActions' => false
 			],
 			'critical_inventories' => [

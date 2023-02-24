@@ -59,4 +59,9 @@ class Menu extends Model
 
 	// Relationships
 	public function menuVariations() { return $this->hasMany('App\MenuVariation', 'menu_id', 'id'); }
+
+	// STATIC FUNCTIONS
+	public static function showRoute($id) {
+		return route('admin.menu.variation.index', [$id]);
+	}
 }

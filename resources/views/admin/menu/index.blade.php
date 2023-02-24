@@ -18,7 +18,6 @@
 						{{-- ADD --}}
 						@if (Auth::user()->hasPermission('menu_tab_create'))
 						<div class="col-12 col-md text-center text-md-right ml-md-auto">
-							{{-- <a href="{{ route('admin.menu.create') }}" class="btn btn-success m-auto"><i class="fa fa-plus-circle mr-2"></i>Add Item</a> --}}
 							<a href="javascript:void(0);" class="btn btn-success m-auto"
 								data-scf="Menu Name"
 								data-scf-name="menu_name"

@@ -169,7 +169,6 @@ const handleReserveClick = async ({
 	for (let p of [Number(adult_senior), Number(junior), Number(elementary)]) {
 		index++;
 
-		console.log(p);
 		if (p <= 0)
 			continue;
 
@@ -177,9 +176,6 @@ const handleReserveClick = async ({
 		amount.push(p);
 		pax += Number(p);
 	}
-
-	console.log("Menus:", menu);
-	console.log("Amount:", amount);
 
 	const result = await axios.post(API_TO_SEND_RESERVATION, {
 		_token: token,																	// Cross site forgery (security concepts) csrf attacks

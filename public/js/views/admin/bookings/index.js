@@ -195,6 +195,9 @@ $(document).ready(() => {
 		// EVENTS
 		events: events,
 		selectable: false,
+		eventDidMount: function (e) {
+			$(e.el).attr('id', `reservation-${e.event._def.extendedProps.control_no}`);
+		},
 		eventClick: function (e, el) {
 			var data = e.event.extendedProps
 			let htmlContent = `<div class="spinner-border text-dark" role="status"><span class="sr-only">Loading...</span></div>`;

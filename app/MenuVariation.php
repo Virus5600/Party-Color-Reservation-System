@@ -71,13 +71,18 @@ class MenuVariation extends Model
 				$i->save();
 			}
 
-			ActivityLog::log(
-				"Menu Variaton {$this->name} from {$this->menu->name} reduced its items.",
-				$this->id,
-				"MenuVariation",
-				auth()->user()->id,
-				true
-			);
+			// LOGGER
+			activity('menu-variation')
+				->by(auth()->user())
+				->on($this)
+				->event('update')
+				->withProperties([
+					'menu_id' => $this->menu_id,
+					'name' => $this->name,
+					'price' => $this->price,
+					'duration' => $this->duration
+				])
+				->log("Menu Variaton {$this->name} from {$this->menu->name} reduced its items.");
 			
 			DB::commit();
 		} catch (Exception $e) {
@@ -112,23 +117,34 @@ class MenuVariation extends Model
 
 				if ($i->quantity > 0) {
 					$i->restore();
-					ActivityLog::log(
-						"Item {$i->item_name} set to active after stock has been returned.",
-						$i->id,
-						"Inventory",
-						auth()->user()->id,
-						true
-					);
+
+					// LOGGER
+					activity('inventory')
+						->byAnonymous()
+						->on($i)
+						->event('update')
+						->withProperties([
+							'item_name' => $i->item_name,
+							'quantity' => $i->quantity,
+							'measurement_unit' => $i->measurement_unit,
+							'critical_level' => $i->critical_level,
+						])
+						->log("Item {$i->item_name} set to active after stock has been returned.");
 				}
 			}
 
-			ActivityLog::log(
-				"Menu {$this->name} from {$this->menu->name} returned its items.",
-				$this->id,
-				"MenuVariation",
-				auth()->user()->id,
-				true
-			);
+			// LOGGER
+			activity('menu-variation')
+				->byAnonymous()
+				->on($this)
+				->event('update')
+				->withProperties([
+					'menu_id' => $this->menu_id,
+					'name' => $this->name,
+					'price' => $this->price,
+					'duration' => $this->duration
+				])
+				->log("Menu Variaton {$this->name} from {$this->menu->name} returned its items.");
 			
 			DB::commit();
 		} catch (Exception $e) {
@@ -144,6 +160,7 @@ class MenuVariation extends Model
 		return $response;
 	}
 
+	// STATIC FUNCTIONS
 	// VALIDATION
 	public static function validate(Request $req, $vid = null) {
 		$variationItemValidation = [];
@@ -214,5 +231,9 @@ class MenuVariation extends Model
 			"amount" => $amount,
 			"isUnlimited" => $isUnlimited
 		];
+	}
+
+	public static function showRoute($vid) {
+		return route('admin.menu.variation.show', [MenuVariation::find($vid)->menu_id, $vid]);
 	}
 }

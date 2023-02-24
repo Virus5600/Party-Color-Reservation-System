@@ -37,8 +37,20 @@ class AppServiceProvider extends ServiceProvider
 
 		// Uses alias instead of their path names
 		Relation::morphMap([
-			'booking' => 'App\Booking',
+			'activity' => 'Spatie\Activitylog\Models\Activity',
 			'additional_order' => 'App\AdditionalOrder',
+			'announcement' => 'App\Announcement',
+			'announcement-content-image' => 'App\AnnouncementContentImage',
+			'booking' => 'App\Booking',
+			'contact-information' => 'App\ContactInformation',
+			'inventory' => 'App\Inventory',
+			'menu' => 'App\Menu',
+			'menu-variation' => 'App\MenuVariation',
+			'password-reset' => 'App\PasswordReset',
+			'permission' => 'App\Permission',
+			'settings' => 'App\Settings',
+			'type' => 'App\Type',
+			'user' => 'App\User',
 		]);
 	}
 }
