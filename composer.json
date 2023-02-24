@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.1",
         "ext-intl": "*",
+        "doctrine/dbal": "^3.6",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
@@ -15,6 +16,8 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.0",
         "livewire/livewire": "^2.10",
+        "maatwebsite/excel": "^3.1",
+        "spatie/laravel-activitylog": "^4.7",
         "symfony/debug-bundle": "^6.0"
     },
     "require-dev": {

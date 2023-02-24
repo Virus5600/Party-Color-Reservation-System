@@ -134,7 +134,7 @@ class User extends Authenticatable
 		return $this->first_name . ($include_middle ? (' ' . $this->middle_name . ' ') : ' ') . $this->last_name;
 	}
 
-	// Static Functions
+	// STATIC FUNCTIONS
 	public static function getIP() {
 		$ip = request()->ip();
 
@@ -146,5 +146,9 @@ class User extends Authenticatable
 			$ip = $_SERVER['REMOTE_ADDR'];
 
 		return $ip;
+	}
+
+	public static function showRoute($id) {
+		return route('admin.users.show', [$id]);
 	}
 }

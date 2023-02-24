@@ -18,7 +18,7 @@ class SwalFlash {
 
 	static info(title, msg = undefined, has_icon = undefined, toast = undefined, pos = undefined, has_timer = undefined, duration = undefined) {
 		SwalFlash.#sendEvent(`flash_info`, {
-			flash_error: title,
+			flash_info: title,
 			message: msg,
 			has_icon: has_icon,
 			is_toast: toast,
@@ -30,7 +30,7 @@ class SwalFlash {
 
 	static success(title, msg = undefined, has_icon = undefined, toast = undefined, pos = undefined, has_timer = undefined, duration = undefined) {
 		SwalFlash.#sendEvent(`flash_success`, {
-			flash_error: title,
+			flash_success: title,
 			message: msg,
 			has_icon: has_icon,
 			is_toast: toast,
@@ -105,6 +105,8 @@ window.addEventListener('flash_success', (e) => {
 });
 
 const __setSwalFlashOptions = (options, flash, type) => {
+	console.log(flash);
+
 	if (flash.has_icon != undefined)
 		options["icon"] = `${type}`;
 
@@ -115,7 +117,7 @@ const __setSwalFlashOptions = (options, flash, type) => {
 	 	options["position"] = flash.position;
 
 	if (flash.is_toast != undefined)
-		options["is_toast"] = flash.is_toast;
+		options["toast"] = flash.is_toast;
 	
 	if (flash.has_timer != undefined)
 		if (flash.has_timer)

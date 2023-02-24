@@ -10,7 +10,6 @@ use Carbon\Carbon;
 use App\Enum\ApprovalStatus;
 use App\Enum\Status;
 
-use App\ActivityLog;
 use App\Booking;
 use App\ContactInformation;
 use App\Inventory;
@@ -29,8 +28,16 @@ class BookingController extends Controller
 	protected function index(Request $req) {
 		$bookings = Booking::with("menus")->get();
 
+		$targetBooking = Booking::where('control_no', '=', $req->cn)->first();
+		$isShow = $targetBooking != null;
+		$control_no = $isShow ? $targetBooking->control_no : null;
+		$reserved_at = $isShow ? $targetBooking->reserved_at : null;
+
 		return view('admin.bookings.index', [
-			'bookings' => $bookings
+			'bookings' => $bookings,
+			'isShow' => $isShow,
+			'control_no' => $control_no,
+			'reserved_at' => $reserved_at
 		]);
 	}
 
@@ -94,12 +101,23 @@ class BookingController extends Controller
 			}
 
 			// Logger
-			ActivityLog::log(
-				"Booking #{$booking->control_no} created.",
-				$booking->id,
-				"Booking",
-				auth()->user()->id
-			);
+			activity('booking')
+				->by(auth()->user())
+				->on($booking)
+				->event('create')
+				->withProperties([
+					'control_no' => $booking->control_no,
+					'booking_type' => $booking->booking_type,
+					'start_at' => $booking->start_at,
+					'end_at' => $booking->end_at,
+					'reserved_at' => $booking->reserved_at,
+					'extension' => $booking->extension,
+					'price' => $booking->price,
+					'pax' => $booking->pax,
+					'phone_numbers' => $booking->phone_numbers,
+					'special_request' => $booking->special_request
+				])
+				->log("Booking #{$booking->control_no} created.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -294,12 +312,23 @@ class BookingController extends Controller
 			}
 
 			// Logger
-			ActivityLog::log(
-				"Booking #{$booking->control_no} updated.",
-				$booking->id,
-				"Booking",
-				auth()->user()->id
-			);
+			activity('booking')
+				->by(auth()->user())
+				->on($booking)
+				->event('update')
+				->withProperties([
+					'control_no' => $booking->control_no,
+					'booking_type' => $booking->booking_type,
+					'start_at' => $booking->start_at,
+					'end_at' => $booking->end_at,
+					'reserved_at' => $booking->reserved_at,
+					'extension' => $booking->extension,
+					'price' => $booking->price,
+					'pax' => $booking->pax,
+					'phone_numbers' => $booking->phone_numbers,
+					'special_request' => $booking->special_request
+				])
+				->log("Booking #{$booking->control_no} updated.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -353,15 +382,36 @@ class BookingController extends Controller
 			}
 
 			$control_no = $booking->control_no;
+			$booking_type = $booking->booking_type;
+			$start_at = $booking->start_at;
+			$end_at = $booking->end_at;
+			$reserved_at = $booking->reserved_at;
+			$extension = $booking->extension;
+			$price = $booking->price;
+			$pax = $booking->pax;
+			$phone_numbers = $booking->phone_numbers;
+			$special_request = $booking->special_request;
+
 			$booking->forceDelete();
 
 			// Logger
-			ActivityLog::log(
-				"Booking #{$control_no} deleted.",
-				$booking->id,
-				"Booking",
-				auth()->user()->id
-			);
+			activity('booking')
+				->by(auth()->user())
+				->on($booking)
+				->event('delete')
+				->withProperties([
+					'control_no' => $control_no,
+					'booking_type' => $booking_type,
+					'start_at' => $start_at,
+					'end_at' => $end_at,
+					'reserved_at' => $reserved_at,
+					'extension' => $extension,
+					'price' => $price,
+					'pax' => $pax,
+					'phone_numbers' => $phone_numbers,
+					'special_request' => $special_request
+				])
+				->log("Booking #{$control_no} deleted.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -372,8 +422,6 @@ class BookingController extends Controller
 				->route('admin.bookings.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::itemDeleted($id);
 
 		return redirect()
 			->route('admin.bookings.index')
@@ -421,6 +469,24 @@ class BookingController extends Controller
 			$booking->delete();
 
 			// Logger
+			activity('booking')
+				->by(auth()->user())
+				->on($booking)
+				->event('archive')
+				->withProperties([
+					'control_no' => $booking->control_no,
+					'booking_type' => $booking->booking_type,
+					'start_at' => $booking->start_at,
+					'end_at' => $booking->end_at,
+					'reserved_at' => $booking->reserved_at,
+					'extension' => $booking->extension,
+					'price' => $booking->price,
+					'pax' => $booking->pax,
+					'phone_numbers' => $booking->phone_numbers,
+					'special_request' => $booking->special_request
+				])
+				->log("Booking #{$booking->control_no} archived.");
+
 			ActivityLog::log(
 				"Booking #{$booking->control_no} archived.",
 				$booking->id,
@@ -482,12 +548,23 @@ class BookingController extends Controller
 			$booking->save();
 
 			// Logger
-			ActivityLog::log(
-				"Booking #{$booking->control_no} accepted.",
-				$booking->id,
-				"Booking",
-				auth()->user()->id
-			);
+			activity('booking')
+				->by(auth()->user())
+				->on($booking)
+				->event('accept')
+				->withProperties([
+					'control_no' => $booking->control_no,
+					'booking_type' => $booking->booking_type,
+					'start_at' => $booking->start_at,
+					'end_at' => $booking->end_at,
+					'reserved_at' => $booking->reserved_at,
+					'extension' => $booking->extension,
+					'price' => $booking->price,
+					'pax' => $booking->pax,
+					'phone_numbers' => $booking->phone_numbers,
+					'special_request' => $booking->special_request
+				])
+				->log("Booking #{$booking->control_no} accepted.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -569,12 +646,23 @@ class BookingController extends Controller
 			$booking->save();
 
 			// Logger
-			ActivityLog::log(
-				"Booking #{$booking->control_no} rejected.",
-				$booking->id,
-				"Booking",
-				auth()->user()->id
-			);
+			activity('booking')
+				->by(auth()->user())
+				->on($booking)
+				->event('reject')
+				->withProperties([
+					'control_no' => $booking->control_no,
+					'booking_type' => $booking->booking_type,
+					'start_at' => $booking->start_at,
+					'end_at' => $booking->end_at,
+					'reserved_at' => $booking->reserved_at,
+					'extension' => $booking->extension,
+					'price' => $booking->price,
+					'pax' => $booking->pax,
+					'phone_numbers' => $booking->phone_numbers,
+					'special_request' => $booking->special_request
+				])
+				->log("Booking #{$booking->control_no} rejected.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -640,13 +728,23 @@ class BookingController extends Controller
 			$booking->save();
 
 			// Logger
-			ActivityLog::log(
-				trim("Booking {$booking->control_no} moved to pending. " . ($automated ? "This is an automated action after #{$booking->control_no} is updated." : "")),
-				$booking->id,
-				"Booking",
-				auth()->user()->id,
-				$automated
-			);
+			activity('booking')
+				->by(auth()->user())
+				->on($booking)
+				->event('create')
+				->withProperties([
+					'control_no' => $booking->control_no,
+					'booking_type' => $booking->booking_type,
+					'start_at' => $booking->start_at,
+					'end_at' => $booking->end_at,
+					'reserved_at' => $booking->reserved_at,
+					'extension' => $booking->extension,
+					'price' => $booking->price,
+					'pax' => $booking->pax,
+					'phone_numbers' => $booking->phone_numbers,
+					'special_request' => $booking->special_request
+				])
+				->log(trim("Booking {$booking->control_no} moved to pending. " . ($automated ? "This is an automated action after #{$booking->control_no} is updated." : "")));
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -731,12 +829,23 @@ class BookingController extends Controller
 			// Mailer to customer that his cancellation is approved
 
 			// Logger
-			ActivityLog::log(
-				"Approval for the cancellation of booking #{$booking->control_no}.",
-				$booking->id,
-				"Booking",
-				auth()->user()->id
-			);
+			activity('booking')
+				->by(auth()->user())
+				->on($booking)
+				->event('approve-cancel')
+				->withProperties([
+					'control_no' => $booking->control_no,
+					'booking_type' => $booking->booking_type,
+					'start_at' => $booking->start_at,
+					'end_at' => $booking->end_at,
+					'reserved_at' => $booking->reserved_at,
+					'extension' => $booking->extension,
+					'price' => $booking->price,
+					'pax' => $booking->pax,
+					'phone_numbers' => $booking->phone_numbers,
+					'special_request' => $booking->special_request
+				])
+				->log("Approval for the cancellation of booking #{$booking->control_no}.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -797,13 +906,24 @@ class BookingController extends Controller
 
 			// Mailer to customer that his cancellation is approved
 
-			// Logger
-			ActivityLog::log(
-				"Rejected cancellation request for booking #{$booking->control_no}.",
-				$booking->id,
-				"Booking",
-				auth()->user()->id
-			);
+			// LOGGER
+			activity('booking')
+				->by(auth()->user())
+				->on($booking)
+				->event('reject-cancel')
+				->withProperties([
+					'control_no' => $booking->control_no,
+					'booking_type' => $booking->booking_type,
+					'start_at' => $booking->start_at,
+					'end_at' => $booking->end_at,
+					'reserved_at' => $booking->reserved_at,
+					'extension' => $booking->extension,
+					'price' => $booking->price,
+					'pax' => $booking->pax,
+					'phone_numbers' => $booking->phone_numbers,
+					'special_request' => $booking->special_request
+				])
+				->log("Rejected cancellation request for booking #{$booking->control_no}.");
 
 			DB::commit();
 		} catch (Exception $e) {

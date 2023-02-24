@@ -10,10 +10,10 @@
 		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.dashboard') }}" aria-hidden="false" aria-label="Dashboard"><i class="fas fa-tachometer-alt mr-2"></i>Dashboard</a>
 		@endif
 
-		{{-- RESERVATION --}}
-		@if (\Request::is('admin/booking'))
+		{{-- BOOKINGS --}}
+		@if (\Request::is('admin/bookings'))
 		<span class="bg-secondary text-white"><i class="fas fa-calendar-alt mr-2"></i>Bookings</span>
-		@elseif (\Request::is('admin/booking*'))
+		@elseif (\Request::is('admin/bookings*'))
 		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.bookings.index') }}" aria-hidden="false" aria-label="Booking"><i class="fas fa-calendar-alt mr-2"></i>Booking</a>
 		@else
 		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.bookings.index') }}" aria-hidden="false" aria-label="Booking"><i class="fas fa-calendar-alt mr-2"></i>Booking</a>

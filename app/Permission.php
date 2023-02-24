@@ -39,4 +39,9 @@ class Permission extends Model
 
 		return $users->get();
 	}
+
+	// STATIC FUNCTIONS
+	public static function showRoute($id) {
+		return route('admin.permissions.show', [Permission::find($id)->slug]);
+	}
 }

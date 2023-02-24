@@ -9,7 +9,6 @@ use Carbon\Carbon;
 use App\Enum\ApprovalStatus;
 use App\Enum\Status;
 
-use App\ActivityLog;
 use App\Announcement;
 use App\Booking;
 use App\ContactInformation;
@@ -118,14 +117,23 @@ class ReactApiController extends Controller
 			// CREATE MAILER TO THE CONTACT PERSON
 
 			// Logger
-			ActivityLog::log(
-				"Reservation #{$booking->control_no} created via the User Reservation.",
-				$booking->id,
-				"Booking",
-				null,
-				false,
-				false
-			);
+			activity('react-api')
+				->byAnonymous()
+				->on($booking)
+				->event('create')
+				->withProperties([
+					'control_no' => $booking->control_no,
+					'booking_type' => $booking->booking_type,
+					'start_at' => $booking->start_at,
+					'end_at' => $booking->end_at,
+					'reserved_at' => $booking->reserved_at,
+					'extension' => $booking->extension,
+					'price' => $booking->price,
+					'pax' => $booking->pax,
+					'phone_numbers' => $booking->phone_numbers,
+					'special_request' => $booking->special_request
+				])
+				->log("Reservation #{$booking->control_no} created via the User Reservation.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -295,14 +303,24 @@ class ReactApiController extends Controller
 			for ($i = 0; $i < count($sn); $i++)
 				$status_types[$sn[$i]] = $sv[$i];
 
-			ActivityLog::log(
-				"Booking #{$req->control_no} received a cancellation request from the customer",
-				$booking->id,
-				"Booking",
-				null,
-				false,
-				false,
-			);
+			// LOGGER
+			activity('react-api')
+				->byAnonymous()
+				->on($booking)
+				->event('cancel-create')
+				->withProperties([
+					'control_no' => $booking->control_no,
+					'booking_type' => $booking->booking_type,
+					'start_at' => $booking->start_at,
+					'end_at' => $booking->end_at,
+					'reserved_at' => $booking->reserved_at,
+					'extension' => $booking->extension,
+					'price' => $booking->price,
+					'pax' => $booking->pax,
+					'phone_numbers' => $booking->phone_numbers,
+					'special_request' => $booking->special_request
+				])
+				->log("Booking #{$req->control_no} received a cancellation request from the customer");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -376,14 +394,24 @@ class ReactApiController extends Controller
 
 			// CREATE MAILER HERE TO NOTIFY CLIENT OF THE RETRACTION OF CANCELLATION
 
-			ActivityLog::log(
-				"Booking #{$req->control_no}'s cancellation request from the customer was retracted",
-				$booking->id,
-				"Booking",
-				null,
-				false,
-				false
-			);
+			// LOGGER
+			activity('react-api')
+				->byAnonymous()
+				->on($booking)
+				->event('cancel-revoke')
+				->withProperties([
+					'control_no' => $booking->control_no,
+					'booking_type' => $booking->booking_type,
+					'start_at' => $booking->start_at,
+					'end_at' => $booking->end_at,
+					'reserved_at' => $booking->reserved_at,
+					'extension' => $booking->extension,
+					'price' => $booking->price,
+					'pax' => $booking->pax,
+					'phone_numbers' => $booking->phone_numbers,
+					'special_request' => $booking->special_request
+				])
+				->log("Booking #{$req->control_no}'s cancellation request from the customer was retracted");
 
 			DB::commit();
 		} catch (Exception $e) {

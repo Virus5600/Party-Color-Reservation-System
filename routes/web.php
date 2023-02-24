@@ -49,8 +49,8 @@ Route::group(['prefix' => 'admin'], function() {
 		Route::post('/check-password', 'ApiController@checkPassword')->middleware('throttle:6,1')->name('password.confirm.check');
 
 		// DASHBAORD
-		Route::get('/', 'PageController@redirectToDashboard')->name('admin.redirectToDashboard');
-		Route::get('/dashboard', 'PageController@dashboard')->name('admin.dashboard');
+		Route::get('/', 'PageController@redirectToDashboard')->name('admin.redirectToDashboard')->middleware(['permissions:sanctum']);
+		Route::get('/dashboard', 'PageController@dashboard')->name('admin.dashboard')->middleware(['permissions:sanctum']);
 
 		// BOOKINGS
 		Route::group(['prefix' => 'bookings', 'middleware' => ['permissions:bookings_tab_access']], function() {
@@ -142,6 +142,9 @@ Route::group(['prefix' => 'admin'], function() {
 					Route::get('/delete', 'InventoryController@delete')->name('admin.inventory.delete');
 					Route::get('/restore', 'InventoryController@restore')->name('admin.inventory.restore');
 				});
+
+				// Show
+				Route::get('/', 'InventoryController@show')->name('admin.inventory.show');
 			});
 
 			// Index
@@ -202,10 +205,23 @@ Route::group(['prefix' => 'admin'], function() {
 		});
 
 		// ACTIVITY LOG
-		// Route::group(['prefix' => 'activity-log', 'middleware' => ['permissions:activity_log_access']], function() {
-		Route::group(['prefix' => 'activity-log'], function() {
+		Route::group(['prefix' => 'activity-log', 'middleware' => ['permissions:activity_logs_tab_access']], function() {
 			// Index
 			Route::get('/', 'ActivityLogController@index')->name('admin.activity-log.index');
+
+			Route::group(['prefix' => '{id}', 'middleware' => ['permissions:activity_logs_tab_manage']], function() {
+				// Show
+				Route::get('/', 'ActivityLogController@show')->name('admin.activity-log.show');
+
+				// Update
+				Route::post('/update', 'ActivityLogController@update')->name('admin.activity-log.update');
+
+				// Mark
+				Route::post('/mark', 'ActivityLogController@mark')->name('admin.activity-log.mark');
+				
+				// Unmark
+				Route::post('/unmark', 'ActivityLogController@unmark')->name('admin.activity-log.unmark');
+			});
 		});
 
 
@@ -243,7 +259,6 @@ Route::group(['prefix' => 'admin'], function() {
 			
 			// Index
 			Route::get('/', 'AnnouncementController@index')->name('admin.announcements.index');
-
 		});
 
 		// USERS
@@ -254,8 +269,8 @@ Route::group(['prefix' => 'admin'], function() {
 				Route::post('/store', 'UserController@store')->name('admin.users.store');
 			});
 
-			// Edit
 			Route::group(['prefix' => '{id}', 'middleware' => ['permissions:users_tab_create']], function() {
+				// Edit
 				Route::group(['middleware' => ['permissions:users_tab_edit']], function() {
 					Route::get('/edit', 'UserController@edit')->name('admin.users.edit');
 					Route::post('/update', 'UserController@update')->name('admin.users.update');
@@ -277,6 +292,9 @@ Route::group(['prefix' => 'admin'], function() {
 
 				// Permanent Delete
 				Route::get('/perma-delete', 'UserController@permaDelete')->name('admin.users.permaDelete')->middleware('permissions:users_tab_perma_delete');
+
+				// Show
+				Route::get('/', 'UserController@show')->name('admin.users.show');
 			});
 
 			// Index

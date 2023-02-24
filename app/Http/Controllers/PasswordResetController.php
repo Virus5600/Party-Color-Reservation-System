@@ -10,7 +10,6 @@ use App\Jobs\AccountNotification;
 
 use App\PasswordReset;
 use App\User;
-use App\ActivityLog;
 
 use DB;
 use Exception;
@@ -66,6 +65,17 @@ class PasswordResetController extends Controller
 
 			AccountNotification::dispatch($user, "change-password", $args);
 
+			// LOGGER
+			activity('password-reset')
+				->byAnonymous()
+				->on($pr)
+				->event('renew')
+				->withProperties([
+					'email' => $pr->email,
+					'expires_at' => $pr->expires_at
+				])
+				->log("Password for '{$req->email}' reset requested.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -75,12 +85,6 @@ class PasswordResetController extends Controller
 				->back()
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Password for '{$req->email}' reset requested.",
-			null,
-			"PasswordReset"
-		);
 
 		return redirect()
 			->route('login')
@@ -156,8 +160,37 @@ class PasswordResetController extends Controller
 			// Uses past-tense due to password is now changed
 			AccountNotification::dispatch($user, "changed-password", $args);
 
+			$email = $pr->email;
+			$expires_at = $pr->expires_at;
+
 			$user->save();
 			$pr->delete();
+
+			// LOGGER
+			activity('user')
+				->byAnonymous()
+				->on($user)
+				->event('update')
+				->withProperties([
+					'first_name' => $user->first_name,
+					'middle_name' => $user->middle_name,
+					'last_name' => $user->last_name,
+					'suffix' => $user->suffix,
+					'is_avatar_link' => $user->is_avatar_link,
+					'avatar' => $user->avatar,
+					'email' => $user->email,
+					'type_id' => $user->type
+				])
+				->log("Password for '{$user->email}' updated.");
+
+			activity('password-reset')
+				->byAnonymous()
+				->event('delete')
+				->withProperties([
+					'email' => $email,
+					'expires_at' => $expires_at
+				])
+				->log("Password for '{$user->email}' updated.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -168,12 +201,6 @@ class PasswordResetController extends Controller
 				->back()
 				->with('flash_error', 'Something went wrong, please try again later.');
 		}
-
-		ActivityLog::log(
-			"Password for '{$user->email}' updated.",
-			null,
-			"PasswordReset"
-		);
 
 		return redirect()
 			->route('login')

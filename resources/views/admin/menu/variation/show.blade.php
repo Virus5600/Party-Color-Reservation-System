@@ -29,6 +29,14 @@
 					<span class="float-left">{{ $variation->name }}</span>
 					<span class="float-right">{{ $variation->getPrice() }}</span>
 				</h3>
+
+				<div class="card-body">
+					<p class="h5">Duration: </p>
+
+					<ul class="list-group">
+						<li class="list-group-item">{{ $variation->duration }} hrs</li>
+					</ul>
+				</div>
 				
 				<div class="card-body">
 					<p class="h5">Includes: </p>

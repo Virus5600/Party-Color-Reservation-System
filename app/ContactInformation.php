@@ -15,4 +15,9 @@ class ContactInformation extends Model
 
 	// Relationships
 	public function booking() { return $this->belongsTo('App\Booking', 'booking_id', 'id'); }
+
+	// STATIC FUNCTIONS
+	public static function showRoute($id) {
+		return route('admin.bookings.index', ['cn' => ContactInformation::find($id)->booking->control_no]);
+	}
 }

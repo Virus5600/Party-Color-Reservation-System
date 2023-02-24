@@ -131,4 +131,8 @@ class AdditionalOrder extends Model
 			'validator' => $validator
 		];
 	}
+
+	public static function showRoute($id) {
+		return route('admin.bookings.additional-orders.show', [AdditionalOrder::withTrashed()->find($id)->booking_id, $id]);
+	}
 }

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
 use App\Inventory;
-use App\ActivityLog;
 
 use Auth;
 use DB;
@@ -78,6 +78,19 @@ class InventoryController extends Controller
 			if (!$req->is_active)
 				$item->delete();
 
+			// LOGGER
+			activity('inventory')
+				->by(auth()->user())
+				->on($item)
+				->event('create')
+				->withProperties([
+					'item_name' => $item->item_name,
+					'quantity' => $item->quantity,
+					'measurement_unit' => $item->measurement_unit,
+					'critical_level' => $item->critical_level
+				])
+				->log("Item '{$item->item_name}' created.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -88,16 +101,26 @@ class InventoryController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
-		ActivityLog::log(
-			"Item '{$req->item_name}' created.",
-			$item->id,
-			"Inventory",
-			Auth::user()->id
-		);
-
 		return redirect()
 			->route('admin.inventory.index')
 			->with('flash_success', 'Successfully added ' . $req->item_name);
+	}
+
+	protected function show(Request $req, $id) {
+		$item = Inventory::withTrashed()->find($id);
+
+		if ($item == null) {
+			return redirect()
+				->route('admin.inventory.index')
+				->with('flash_error', 'The item either does not exists or is already deleted.');
+		}
+
+		$format = Inventory::LOG_FORMAT;
+
+		return view('admin.inventory.show', [
+			'item' => $item,
+			'format' => $format
+		]);
 	}
 
 	protected function edit(Request $req, $id) {
@@ -171,6 +194,19 @@ class InventoryController extends Controller
 
 			$item->save();
 
+			// LOGGER
+			activity('inventory')
+				->by(auth()->user())
+				->on($item)
+				->event('update')
+				->withProperties([
+					'item_name' => $item->item_name,
+					'quantity' => $item->quantity,
+					'measurement_unit' => $item->measurement_unit,
+					'critical_level' => $item->critical_level
+				])
+				->log("Item '{$item->item_name}' updated.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -180,13 +216,6 @@ class InventoryController extends Controller
 				->route('admin.inventory.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Item '{$item->item_name}' updated.",
-			$item->id,
-			"Inventory",
-			Auth::user()->id
-		);
 
 		return redirect()
 			->route('admin.inventory.index')
@@ -226,6 +255,19 @@ class InventoryController extends Controller
 			$item->quantity = $prevCount + $req->quantity;
 			$item->save();
 
+			// LOGGER
+			activity('inventory')
+				->by(auth()->user())
+				->on($item)
+				->event('update')
+				->withProperties([
+					'item_name' => $item->item_name,
+					'quantity' => $item->quantity,
+					'measurement_unit' => $item->measurement_unit,
+					'critical_level' => $item->critical_level
+				])
+				->log("Item '{$item->item_name}' increased by '{$req->quantity}' from '{$prevCount}' to '{$item->quantity}'.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -235,13 +277,6 @@ class InventoryController extends Controller
 				->route('admin.inventory.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Item '{$item->item_name}' increased by '{$req->quantity}' from '{$prevCount}' to '{$item->quantity}'.",
-			$item->id,
-			"Inventory",
-			Auth::user()->id
-		);
 
 		return response()
 			->json([
@@ -259,8 +294,23 @@ class InventoryController extends Controller
 		}
 
 		try {
-			DB::beginTransaction();			
+			DB::beginTransaction();
+
 			$item->delete();
+
+			// LOGGER
+			activity('inventory')
+				->by(auth()->user())
+				->on($item)
+				->event('delete')
+				->withProperties([
+					'item_name' => $item->item_name,
+					'quantity' => $item->quantity,
+					'measurement_unit' => $item->measurement_unit,
+					'critical_level' => $item->critical_level
+				])
+				->log("Item '{$item->item_name}' deactivated.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -270,13 +320,6 @@ class InventoryController extends Controller
 				->route('admin.inventory.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Item '{$item->item_name}' deactivated.",
-			$item->id,
-			"Inventory",
-			Auth::user()->id
-		);
 
 		return redirect()
 			->back()
@@ -299,7 +342,21 @@ class InventoryController extends Controller
 
 		try {
 			DB::beginTransaction();
+
 			$item->restore();
+
+			activity('inventory')
+				->by(auth()->user())
+				->on($item)
+				->event('delete')
+				->withProperties([
+					'item_name' => $item->item_name,
+					'quantity' => $item->quantity,
+					'measurement_unit' => $item->measurement_unit,
+					'critical_level' => $item->critical_level
+				])
+				->log("Item '{$item->item_name}' activated.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -309,13 +366,6 @@ class InventoryController extends Controller
 				->route('admin.inventory.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Item '{$item->item_name}' activated.",
-			$item->id,
-			"Inventory",
-			Auth::user()->id
-		);
 
 		return redirect()
 			->back()
@@ -334,7 +384,24 @@ class InventoryController extends Controller
 		try {
 			DB::beginTransaction();
 			
+			$item_name = $item->item_name;
+			$quantity = $item->quantity;
+			$measurement_unit = $item->measurement_unit;
+			$critical_level = $item->critical_level;
+
 			$item->forceDelete();
+
+			activity('inventory')
+				->by(auth()->user())
+				->on($item)
+				->event('delete')
+				->withProperties([
+					'item_name' => $item_name,
+					'quantity' => $quantity,
+					'measurement_unit' => $measurement_unit,
+					'critical_level' => $critical_level
+				])
+				->log("Item '{$item->item_name}' permanently deleted.");
 			
 			DB::commit();
 		} catch (Exception $e) {
@@ -345,15 +412,6 @@ class InventoryController extends Controller
 				->route('admin.inventory.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Item '{$item->item_name}' permanently deleted.",
-			null,
-			"Inventory",
-			Auth::user()->id
-		);
-
-		ActivityLog::itemDeleted($id);
 
 		return redirect()
 			->route('admin.inventory.index')

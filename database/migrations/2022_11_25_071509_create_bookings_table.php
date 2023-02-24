@@ -22,7 +22,7 @@ class CreateBookingsTable extends Migration
 			$table->time('start_at');
 			$table->time('end_at');
 			$table->date('reserved_at');
-			$table->decimal('extension', 4, 2)->unsigned()->default(0);
+			$table->decimal('extension', 4, 1)->unsigned()->default(0);
 			$table->decimal('price', 17, 2)->unsigned();
 			$table->integer('pax')->unsigned();
 			$table->string('phone_numbers');

@@ -37,4 +37,9 @@ class Type extends Model
 
 		return $matches == count($permissions);
 	}
+
+	// STATIC FUNCTIONS
+	public static function showRoute($id) {
+		return "javascript:SwalFlash.info(`Not Applicable`, `Automated action by the system.`, true, false, `center`, false)";
+	}
 }

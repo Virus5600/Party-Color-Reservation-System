@@ -11,7 +11,6 @@ use App\Enum\ApprovalStatus;
 use App\Announcement;
 use App\Booking;
 use App\User;
-use App\ActivityLog;
 
 use Auth;
 use DB;
@@ -273,12 +272,21 @@ class ApiController extends Controller
 		}
 
 		if (!$emptyResponse) {
-			ActivityLog::log(
-				"{$user->getName()} removed avatar image ('{$req->type}').",
-				$user->id,
-				"User",
-				$Auth::user()->id
-			);
+			activity('api')
+				->by(auth()->user())
+				->on($user)
+				->event('update')
+				->withProperties([
+					'first_name' => $user->first_name,
+					'middle_name' => $user->middle_name,
+					'last_name' => $user->last_name,
+					'suffix' => $user->suffix,
+					'is_avatar_link' => $user->is_avatar_link,
+					'avatar' => $user->avatar,
+					'email' => $user->email,
+					'type_id' => $user->type
+				])
+				->log("{$user->getName()} removed avatar image ('{$req->type}').");
 
 			return response()
 				->json([
@@ -358,13 +366,10 @@ class ApiController extends Controller
 			if (defined("{$controller[0]}::CONFIRM_PASS_MSG"))
 				$msg = $controller[0]::CONFIRM_PASS_MSG[$controller[1]];
 
-		ActivityLog::log(
-			"Password confirmation requested for action authenticity",
-			null,
-			null,
-			Auth::user()->id,
-			true
-		);
+		activity('api')
+			->by(auth()->user())
+			->event('auth-confirm')
+			->log("Password confirmation requested for action authenticity");
 
 		return view('middleware.confirm-password', [
 			"message" => $msg
@@ -373,27 +378,21 @@ class ApiController extends Controller
 
 	protected function checkPassword(Request $req) {
 		if (!Hash::check($req->password, Auth::user()->password)) {
-			ActivityLog::log(
-				"Password confirmation rejected.",
-				null,
-				null,
-				Auth::user()->id,
-				false
-			);
-			
+			activity('api')
+				->by(auth()->user())
+				->event('auth-confirm')
+				->log("Password confirmation rejected.");
+
 			return back()
 				->with('flash_error', 'Incorrect password');
 		}
 
 		$req->session()->passwordConfirmed();
 
-		ActivityLog::log(
-			"Password confirmation accepted. Valid for five (5) minutes",
-			null,
-			null,
-			Auth::user()->id,
-			false
-		);
+		activity('api')
+			->by(auth()->user())
+			->event('auth-confirm')
+			->log("Password confirmation accepted. Valid for five (5) minutes");
 
 		session()->forget("confirmPassPrev");
 		return redirect()

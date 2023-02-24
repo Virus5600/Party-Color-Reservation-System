@@ -171,8 +171,8 @@ $extensionFee = App\Settings::getValue('extension_fee');
 			control_no: "{{ $b->control_no }}",
 			booking_type: "{{ ucwords($b->booking_type) }}",
 			title: "#{{ $b->control_no }} - Booking for {{ $b->contactInformation()->first()->contact_name }} ({{ ucwords($b->booking_type) }})",
-			start: "{{ \Carbon\Carbon::parse("$b->reserved_at $b->start_at")->format("Y-m-d\TH:i:s") }}",
-			end: "{{ \Carbon\Carbon::parse("$b->reserved_at $b->end_at")->format("Y-m-d\TH:i:s") }}",
+			start: "{{ \Carbon\Carbon::parse("$b->reserved_at $b->start_at")->format("Y-m-d H:i:s") }}",
+			end: "{{ \Carbon\Carbon::parse("$b->reserved_at $b->end_at")->format("Y-m-d H:i:s") }}",
 			data_id: "{{ $b->id }}",
 			color: "{{ $b->getStatusColorCode($b->getOverallStatus()) }}"
 		},
@@ -211,5 +211,17 @@ $extensionFee = App\Settings::getValue('extension_fee');
 
 {{-- Calendar Initialization --}}
 <script type="text/javascript" src="{{ asset('js/views/admin/bookings/index.js') }}"></script>
+
+{{-- Opens the event if from activity log --}}
+@if ($isShow)
+<script data-for-removal>
+	$(document).ready(() => {
+		calendar.gotoDate("{{ $reserved_at }}");
+		$(`#reservation-{{ $control_no }}`)[0].click();
+	});
+</script>
+@endif
+
+{{-- FOR REMOVAL --}}
 <script type="text/javascript" data-for-removal> $(document).ready(() => { $('[data-for-removal]').remove(); }); </script>
 @endsection

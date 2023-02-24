@@ -108,7 +108,7 @@ class Tables extends Component
 				// If the condition is * (all), query then break the loop immediately.
 				if ($c == "*") {
 					$clazz = $this->clazz;
-					$clazz = $clazz::select("id");
+					$clazz = $clazz::select("*");
 
 					// Re-adds all SELECT queries
 					foreach ($this->columns as $c) {

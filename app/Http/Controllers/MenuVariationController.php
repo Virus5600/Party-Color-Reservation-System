@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Inventory;
 use App\Menu;
 use App\MenuVariation;
-use App\ActivityLog;
 
 use DB;
 
@@ -79,12 +78,17 @@ class MenuVariationController extends Controller
 				]);
 			}
 			
-			ActivityLog::log(
-				"Menu Variation '{$req->menu_name}' created.",
-				$variation->id,
-				"MenuVariation",
-				auth()->user()->id
-			);
+			activity('menu-variation')
+				->by(auth()->user())
+				->on($variation)
+				->event('create')
+				->withProperties([
+					'menu_id' => $mid,
+					'name' => $req->variation_name,
+					'price' => $req->price,
+					'duration' => $req->duration,
+				])
+				->log("Menu Variation '{$req->menu_name}' created.");
 			
 			DB::commit();
 		} catch (Exception $e) {
@@ -196,6 +200,19 @@ class MenuVariationController extends Controller
 			// Saving...
 			$variation->save();
 
+			// LOGGER
+			activity('menu-variation')
+				->by(auth()->user())
+				->on($variation)
+				->event('create')
+				->withProperties([
+					'menu_id' => $mid,
+					'name' => $req->variation_name,
+					'price' => $req->price,
+					'duration' => $req->duration,
+				])
+				->log("Menu Variation '{$variation->name}' updated.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -205,13 +222,6 @@ class MenuVariationController extends Controller
 				->route('admin.menu.variation.index', [$mid])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Menu Variation '{$variation->name}' updated.",
-			$variation->id,
-			"MenuVariation",
-			auth()->user()->id
-		);
 
 		return redirect()
 			->route('admin.menu.variation.index', [$mid])
@@ -238,12 +248,18 @@ class MenuVariationController extends Controller
 			
 			$variation->delete();
 
-			ActivityLog::log(
-				"Menu '{$variation->name}' deactivated.",
-				$variation->id,
-				"MenuVariation",
-				auth()->user()->id
-			);
+			// LOGGER
+			activity('menu-variation')
+				->by(auth()->user())
+				->on($variation)
+				->event('create')
+				->withProperties([
+					'menu_id' => $mid,
+					'name' => $req->variation_name,
+					'price' => $req->price,
+					'duration' => $req->duration,
+				])
+				->log("Menu Variation '{$req->menu_name}' deactivated.");
 			
 			DB::commit();
 		} catch (Exception $e) {
@@ -282,12 +298,18 @@ class MenuVariationController extends Controller
 			
 			$variation->restore();
 
-			ActivityLog::log(
-				"Menu '{$variation->name}' activated.",
-				$variation->id,
-				"MenuVariation",
-				auth()->user()->id
-			);
+			// LOGGER
+			activity('menu-variation')
+				->by(auth()->user())
+				->on($variation)
+				->event('create')
+				->withProperties([
+					'menu_id' => $mid,
+					'name' => $req->variation_name,
+					'price' => $req->price,
+					'duration' => $req->duration,
+				])
+				->log("Menu Variation '{$req->menu_name}' activated.");
 			
 			DB::commit();
 		} catch (Exception $e) {
