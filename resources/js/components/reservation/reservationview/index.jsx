@@ -9,18 +9,49 @@ import ReservationConfirmation from '../reservationconfirmation/index';
 
 // Under Development
 export async function action() {
+
 	const API = '/api/react/bookings/cancel-request';
+
 	const token = document.querySelector('meta[name=csrf-token]').content;
 
-	const result = await axios.post(`${API}`, {
+
+	function getSessionItem() {
+		return {
+			control_number: sessionStorage.getItem('control_number'),
+			cancellation_reason: sessionStorage.getItem('cancellation_reason'),
+		};
+	}
+
+	function removeSessionItem() {
+		sessionStorage.removeItem('control_number');
+		sessionStorage.removeItem('cancellation_reason');
+	}
+
+
+	const { control_number, cancellation_reason } = getSessionItem();
+
+	let isSuccess;
+
+	await axios.post(`${API}`, {
 		_token: token,
-		control_no: "control number here",
-		reason: "Cancellation reason. This is required."
+		control_no: control_number,
+		reason: cancellation_reason,
 	}).then(res => {
-		console.log(res)
+		console.log('after sending cancellation request:', res);
+		removeSessionItem();
 	}).catch(res => {
-		console.log(res)
+		console.log('error cancelling request:', res);
 	});
+
+	// if (isSuccess == true) {
+	// 	const reservationsuccess = true;
+	// 	sessionStorage.setItem('reservationsuccess', JSON.stringify(reservationsuccess));
+	// 	return redirect('/reservation/success');
+	// }
+
+
+	// return redirect('/reservation');
+
 
 	return redirect('/reservation/cancel');
 }
@@ -32,7 +63,7 @@ export default function ReservationView() {
 	const handleViewClick = (control_number) => {
 		getReservationInfo(control_number).then((response) => {
 			const data = response.data;
-			console.log(data);
+			// console.log(data);
 
 			if (data.type == 'validation') {
 				SwalFlash.error(
@@ -57,9 +88,9 @@ export default function ReservationView() {
 				let name = contact.contact_name.split(" ");
 
 				// For debugging and development
-				console.log('booking:', booking);
-				console.log('contact:', contact);
-				console.log('menus:', menus);
+				// console.log('booking:', booking);
+				// console.log('contact:', contact);
+				// console.log('menus:', menus);
 
 				if (name.length == 1) {
 					name[1] = name[0];
@@ -82,8 +113,8 @@ export default function ReservationView() {
 					}
 				}
 
-				console.log('time extension:', booking.extension);
-				console.log('special request:', booking.special_request);
+				// console.log('time extension:', booking.extension);
+				// console.log('special request:', booking.special_request);
 
 				let reservationInfo = {
 					first_name: name[1],
@@ -136,6 +167,7 @@ const ViewReservation = ({ onViewClick, validationError }) => {
 	const [controlNumber, setControlNumber] = useState('');
 
 	const handleInputControlNumber = (event) => {
+		sessionStorage.setItem('control_number', event.target.value);
 		setControlNumber(event.target.value);
 	}
 	const handleViewButton = () => {
