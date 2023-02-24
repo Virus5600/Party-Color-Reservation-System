@@ -85,10 +85,24 @@ const ReservationButtons = () => {
 }
 
 const ReservationButtonsForView = () => {
+	const handleTextAreaInput = (event) => {
+		sessionStorage.setItem('cancellation_reason', event.target.value);
+	}
 	return (
-		<div className='text-right mt-4'>
-			<button className='btn btn-danger' type='submit'>Cancel Request</button>
-		</div>
+		<>
+			<div className='row mb-3'>
+				<div className='col-5 text-right text-white' style={{ fontWeight: '900' }}>
+					Cancellation reason:
+				</div>
+				<textarea rows='4' cols='50' onChange={handleTextAreaInput}></textarea>
+			</div>
+
+			<div className='text-right mt-4'>
+
+				<button className='btn btn-danger' type='submit'>Cancel Request</button>
+			</div>
+		</>
+
 	);
 }
 

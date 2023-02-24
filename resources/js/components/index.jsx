@@ -44,6 +44,10 @@ import {
 } from './reservation/reservationconfirmation/index';
 
 import {
+    action as reservationCancelAction,
+} from './reservation/reservationview/index';
+
+import {
     createBrowserRouter,
     RouterProvider,
 } from 'react-router-dom';
@@ -72,7 +76,7 @@ const router = createBrowserRouter([
             {
                 path: '/viewreservation',
                 element: <ReservationView />,
-                action: null,
+                action: reservationCancelAction,
             },
             {
                 path: 'reservation/confirm',
