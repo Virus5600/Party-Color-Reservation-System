@@ -8,26 +8,16 @@ import axios from 'axios';
 
 import { useLoaderData, Link } from 'react-router-dom';
 
+
 export async function loader({ params }) {
-    let announcement;
 
-    // if (sessionStorage.getItem('latestannouncement') == null) {
-
-    //     const announcements = JSON.parse(sessionStorage.getItem('announcement'));
-    //     const _announcements = announcements.filter(announcement => announcement.id == params.announcementId);
-    //     return _announcements[0];
-    // }
-
-    // const announcements = JSON.parse(sessionStorage.getItem('latestannouncement'));
-    // const _announcements = announcements.filter(announcement => announcement.id == params.announcementId);
-    // console.log(_announcements[0]);
-    // return _announcements[0];
     const API = 'api/react/announcements';
-    await axios.get(`${API}/${params.announcementId}`).then(res => {
-        announcement = res.data.announcement;
-    }).catch(res => console.log(res));
-    return announcement;
+
+    const response = await axios.get(`${API}/${params.announcementId}`);
+
+    return response.data.announcement;
 }
+
 
 export default function AnnouncementContent() {
     const announcement = useLoaderData();
@@ -46,7 +36,7 @@ export default function AnnouncementContent() {
                     <hr className='dark' />
                     <br />
 
-                    <div className='fs-6'>
+                    <div className='fs-6 text-start m-4'>
 
                         {ReactHtmlParser(announcement.content)}
                     </div>
@@ -57,8 +47,5 @@ export default function AnnouncementContent() {
                 <Link to='..' relative='path' className="btn btn-primary">Back</Link>
             </div>
         </>
-
-
-
     );
 }
