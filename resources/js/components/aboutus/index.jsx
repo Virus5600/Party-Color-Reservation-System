@@ -61,8 +61,8 @@ const AboutUs = () => {
         <div className='AboutUs' id='AboutUs'>
             <div className='container'>
                 <h1>About Us</h1>
-                <p className='text-center fs-1' style={{ backgroundColor: 'transparent' }}>{settings.web_name}</p>
-                <p className='text-center fs-5' style={{ backgroundColor: 'transparent' }}>"{settings.web_description}"</p>
+                <p className='text-center fs-1'>{settings.web_name}</p>
+                <p className='text-center fs-5'>"{settings.web_description}"</p>
                 <hr />
                 <div className='row'>
                     <div className='col'>
