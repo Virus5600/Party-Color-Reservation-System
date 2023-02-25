@@ -58,8 +58,20 @@ export default function Announcement() {
 	);
 }
 
+/**
+ * -------------------------------------------------------
+ * React memo hooks
+ * -------------------------------------------------------
+ * to render the component only when the props are changed
+ * 
+ * usage:
+ * wrap the functional component with React.memo()
+ * 
+ * e.g. 
+ * React.memo(<Component />);
+ */
+const AnnouncementItem = React.memo(({ id, poster, created_at, title, summary }) => {
 
-const AnnouncementItem = ({ id, poster, created_at, title, summary }) => {
 	function changeDateFormat(string_date) {
 		const current_date = new Date(string_date);
 
@@ -75,6 +87,7 @@ const AnnouncementItem = ({ id, poster, created_at, title, summary }) => {
 
 		return year + '.' + month + '.' + date;
 	};
+
 
 	return (
 		<Link to={`/announcements/${id}`}>
@@ -95,4 +108,4 @@ const AnnouncementItem = ({ id, poster, created_at, title, summary }) => {
 		</Link>
 
 	);
-};
+});
