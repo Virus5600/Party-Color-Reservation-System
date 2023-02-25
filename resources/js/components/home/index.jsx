@@ -15,16 +15,16 @@ export default function Home() {
         <div className='Home'>
             <div className='d-flex justify-content-center'>
                 <div>
-                    <Link to="/">
-                        <img src={mainImage} className='img-fluid' />
-                    </Link>
+
+                    <img src={mainImage} className='img-fluid' />
+
                 </div>
             </div>
 
             <QuickReservation />
 
             <Announcement />
-            <p className=''><Link to='/announcements' className='moredetails'>See More</Link></p>
+            <p><Link to='/announcements' className='moredetails'>See More</Link></p>
         </div>
     );
 }
