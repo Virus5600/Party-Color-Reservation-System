@@ -87,10 +87,7 @@ export default function ReservationView() {
 
 				let name = contact.contact_name.split(" ");
 
-				// For debugging and development
-				// console.log('booking:', booking);
-				// console.log('contact:', contact);
-				// console.log('menus:', menus);
+
 
 				if (name.length == 1) {
 					name[1] = name[0];
@@ -113,9 +110,12 @@ export default function ReservationView() {
 					}
 				}
 
-				// console.log('time extension:', booking.extension);
-				// console.log('special request:', booking.special_request);
 
+				console.log('booking:', booking);
+
+				/**
+				 * i prepared the required data for reservationInfo
+				 */
 				let reservationInfo = {
 					first_name: name[1],
 					last_name: name[0],
@@ -128,6 +128,8 @@ export default function ReservationView() {
 					starting_time: booking.start_at,
 					extension: booking.extension,
 					special_request: booking.special_request == null ? '' : booking.special_request,
+					cancel_request_reason: booking.cancel_request_reason,
+					isCancelled: booking.cancel_requested == 1 ? true : false,
 				};
 
 
@@ -144,7 +146,7 @@ export default function ReservationView() {
 			_token: token,
 			control_no: control_number
 		}).then(res => {
-			// console.log(res);
+			console.log('after fetching reservation:', res);
 			return res;
 		}).catch(res => {
 			// console.log(res);

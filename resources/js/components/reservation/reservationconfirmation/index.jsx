@@ -1,5 +1,7 @@
 import '../style.css';
 
+import React from 'react';
+
 import axios from 'axios';
 import { useLoaderData, Form, Link, redirect, } from 'react-router-dom';
 
@@ -42,12 +44,14 @@ export async function action() {
 	return redirect('/reservation');
 }
 
-export default function ReservationConfirmation(other) {
+export default function ReservationConfirmation(props) {
 	var reservationInfo;
 
-	if (other.forViewReservation == true) { // to use in reservationview component
-		reservationInfo = other.reservationInfo;
+	if (props.forViewReservation == true) { // to use in reservationview component
+		reservationInfo = props.reservationInfo;
+		console.log('reservationInfo at confirmation component', reservationInfo);
 	} else {
+		console.log('inside else statement before useLoaderData');
 		reservationInfo = useLoaderData();
 	}
 
@@ -63,6 +67,7 @@ export default function ReservationConfirmation(other) {
 		starting_time,
 		extension,
 		special_request,
+
 	} = reservationInfo;
 
 
@@ -84,7 +89,7 @@ export default function ReservationConfirmation(other) {
 						<FieldValue label={'Special Requests'} data={special_request} />
 					</div>
 					{
-						other.forViewReservation ? <ReservationButtonsForView /> : <ReservationButtons />
+						props.forViewReservation ? <ReservationButtonsForView cancel_request_reason={props.reservationInfo.cancel_request_reason} isCancelled={props.reservationInfo.isCancelled} /> : <ReservationButtons />
 					}
 				</Form>
 			</div>
@@ -103,21 +108,51 @@ const ReservationButtons = () => {
 	);
 }
 
-const ReservationButtonsForView = () => {
+const ReservationButtonsForView = (props) => {
+
+
+	const [textAreaContent, setTextAreaContent] = React.useState(props.cancel_request_reason);
+
 	const handleTextAreaInput = (event) => {
 		sessionStorage.setItem('cancellation_reason', event.target.value);
+		setTextAreaContent(event.target.value);
 	}
+
+	const handleUndoButton = (event) => {
+		alert('not implemented yet');
+	}
+
+	console.log('ReservationButtonsForView mounted!!');
+	console.log('props.cancel_request_reason:', props.cancel_request_reason);
+	console.log(props.cancel_request_reason === null ? '' : props.cancel_request_reason);
+
 	return (
 		<>
 			<div className='row mt-sm-4 my-3'>
-				<label for="cancellation-reason" className='col-5 text-white form-label' style={{ fontWeight: '900' }}>Cancellation Reason:</label>
+				<label htmlFor="cancellation-reason" className='col-5 text-white form-label' style={{ fontWeight: '900' }}>Cancellation Reason:</label>
 				<div className='col-12'>
-					<textarea className="form-control" id="cancellation-reason" rows='4' onChange={handleTextAreaInput} style={{resize:'none'}}></textarea>
+					<textarea
+						className="form-control"
+						id="cancellation-reason"
+						rows='4'
+						value={textAreaContent}
+						onChange={handleTextAreaInput}
+						style={{ resize: 'none' }}
+						required={props.isCancelled ? true : false}
+						disabled={props.isCancelled ? true : false}
+					>
+					</textarea>
 				</div>
 			</div>
 
+			{/* undo cancel request button */}
 			<div className='text-end mt-4'>
-				<button className='btn btn-danger' type='submit'>Cancel Request</button>
+				<button className='btn btn-secondary' type='button' onClick={handleUndoButton} disabled={!props.isCancelled ? true : false}>Undo Cancel Request</button>
+			</div>
+
+			{/* cancel request button */}
+			<div className='text-end mt-4'>
+				<button className='btn btn-danger' type='submit' onClick={handleUndoButton} disabled={props.isCancelled ? true : false}>Cancel Request</button>
 			</div>
 		</>
 
