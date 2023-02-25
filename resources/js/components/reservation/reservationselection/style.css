@@ -13,6 +13,8 @@
 .ReservationSelectionCard-inner p {
     text-decoration: underline;
     font-weight: 900;
+    color: black;
+    padding: 10px;
     margin-bottom: 0px;
 }
 
