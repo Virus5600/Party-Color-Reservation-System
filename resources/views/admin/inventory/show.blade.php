@@ -38,10 +38,12 @@
 								</span>
 								
 								<span>
-									{{ $item->$f }}
-
 									@if (in_array($f, ['quantity', 'critical_level']))
-									{{ $item->measurement_unit }}
+									{{ "{$item->$f} {$item->measurement_unit}" }}
+									@elseif (Str::endsWith($f, '_at'))
+									{{ Carbon\Carbon::parse($item->$f)->format("M d, Y h:i:s A") }}
+									@else
+									{{ $item->$f }}
 									@endif
 								</span>
 							</li>

@@ -29,6 +29,7 @@ class Tables extends Component
 	public $urlNamespace;
 	public $paginate;
 	public $fnFirst;
+	public $hasShow;
 
 	public function mount(
 			$clazz,
@@ -42,7 +43,8 @@ class Tables extends Component
 			string $urlNamespace = null,
 			bool $hasActions = true,
 			int $paginate = 10,
-			bool $fnFirst = false) {
+			bool $fnFirst = false,
+			bool $hasShow = true) {
 		
 		$this->clazz = $clazz;
 		$this->name = $name ? $name : $this->getShortName($clazz);
@@ -55,6 +57,7 @@ class Tables extends Component
 		$this->urlNamespace = $urlNamespace ? $urlNamespace : strtolower($this->getShortName($clazz));
 		$this->paginate = $paginate;
 		$this->fnFirst = $fnFirst;
+		$this->hasShow = $hasShow;
 
 		$this->hasActions = $hasActions;
 
@@ -154,14 +157,17 @@ class Tables extends Component
 		}
 
 		return view('livewire.dashboard.tables', [
+			'clazz' => $this->clazz,
 			'data' => $data,
+			'hiddenColumns' => $this->hiddenColumns,
 			'columns' => $this->columns,
 			'namespace' => $this->urlNamespace,
 			'name' => $this->name,
 			'hasActions' => $this->hasActions,
 			'columnsFn' => $this->columnsFn,
 			'aliasFn' => $this->aliasFn,
-			'fnFirst' => $this->fnFirst
+			'fnFirst' => $this->fnFirst,
+			'hasShow' => $this->hasShow
 		]);
 	}
 

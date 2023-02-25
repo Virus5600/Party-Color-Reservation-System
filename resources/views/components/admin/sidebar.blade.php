@@ -49,6 +49,7 @@
 		{{-- ADMIN SETTING AREA --}}
 		@php
 		$userAccess = Auth::user()->hasPermission('users_tab_access');
+		$typesAccess = Auth::user()->hasPermission('types_tab_access');
 		$permsAccess = Auth::user()->hasPermission('permissions_tab_access');
 		$logsAccess = Auth::user()->hasPermission('activity_logs_tab_access');
 		$settingsAccess = Auth::user()->hasPermission('settings_tab_access');
@@ -65,6 +66,17 @@
 				<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.users.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-user-alt mr-2"></i>Users</a>
 				@else
 				<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.users.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-user-alt mr-2"></i>Users</a>
+				@endif
+			@endif
+
+			{{-- TYPES --}}
+			@if ($typesAccess)
+				@if (\Request::is('admin/types'))
+				<span class="bg-secondary text-white"><i class="fas fa-user-alt mr-2"></i>(Role) Types</span>
+				@elseif (\Request::is('admin/types*'))
+				<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.types.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-circle-user mr-2"></i>(Role) Types</a>
+				@else
+				<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.types.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-circle-user mr-2"></i>(Role) Types</a>
 				@endif
 			@endif
 

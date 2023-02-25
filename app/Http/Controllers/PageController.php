@@ -84,7 +84,8 @@ class PageController extends Controller
 				'clazz' => Announcement::class,
 				'name' => 'Drafted Announcements',
 				'conditions' => ['is_draft = 1'],
-				'columns' => ['title', 'summary'],
+				'hiddenColumns' => ['user_id'],
+				'columns' => ['title', 'summary', 'user_id'],
 				'columnsFn' => ['author'],
 				'hasActions' => false,
 				'paginate' => 5
@@ -94,7 +95,7 @@ class PageController extends Controller
 				'name' => 'Latest Announcements',
 				'conditions' => ['is_draft = 0', 'latest'],
 				'hiddenColumns' => ['user_id'],
-				'columns' => ['title', 'summary'],
+				'columns' => ['title', 'summary', 'user_id'],
 				'columnsFn' => ['author'],
 				'hasActions' => false,
 				'paginate' => 5

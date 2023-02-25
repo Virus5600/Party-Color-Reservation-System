@@ -20,7 +20,7 @@ class Type extends Model
 	];
 
 	// Relationships
-	protected function users() { return $this->hasMany('App\User'); }
+	public function users() { return $this->hasMany('App\User'); }
 	public function permissions() { return $this->belongsToMany('App\Permission', 'type_permissions'); }
 
 	// Custom Functions
@@ -40,6 +40,6 @@ class Type extends Model
 
 	// STATIC FUNCTIONS
 	public static function showRoute($id) {
-		return "javascript:SwalFlash.info(`Not Applicable`, `Automated action by the system.`, true, false, `center`, false)";
+		return route('admin.types.show', [$id]);
 	}
 }
