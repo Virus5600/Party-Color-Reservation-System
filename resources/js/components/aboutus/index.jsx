@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 import axios from 'axios';
 
@@ -12,9 +12,12 @@ import appearanceImage from './img/appearance.png';
 import './style.css';
 
 async function fetchSettings() {
+
     const API_ENDPOINT = 'api/react/settings/fetch';
+
     const response = await axios.get(API_ENDPOINT);
     // console.log('response:', response);
+
 
     function isInDay(currentIdx, indices) {
         const idxArray = indices.split(',');
@@ -26,38 +29,41 @@ async function fetchSettings() {
         return false;
     }
 
+
     return {
         opening_time: response.data.settings[6].value,
         closing_time: response.data.settings[7].value,
         opening_day: response.data.days.filter((day, currentIdx) => { return isInDay(currentIdx, response.data.settings[8].value) }),
         contact_number: response.data.settings[4].value,
         address: response.data.settings[3].value,
-        /**
-         * data that is not showed to client side
-         * 1. web-name
-         * 2. web-description
-         * 3. email
-         * 
-         */
-
-    }
+        web_name: response.data.settings[1].value,
+        web_description: response.data.settings[2].value,
+        email: response.data.settings[5].value,
+    };
 }
 
 const AboutUs = () => {
-    const [settings, setSettings] = useState({});
 
-    useEffect(() => {
+    const [settings, setSettings] = React.useState({});
+
+
+    React.useEffect(() => {
         async function getSettings() {
             const data = await fetchSettings();
-            // console.log(data);
+            // console.log('data:', data);
             setSettings(data);
         }
         getSettings();
     }, []);
+
+
     return (
         <div className='AboutUs' id='AboutUs'>
             <div className='container'>
                 <h1>About Us</h1>
+                <p className='text-center fs-1' style={{ backgroundColor: 'transparent' }}>{settings.web_name}</p>
+                <p className='text-center fs-5' style={{ backgroundColor: 'transparent' }}>"{settings.web_description}"</p>
+                <hr />
                 <div className='row'>
                     <div className='col'>
                         <TimeLocation
@@ -66,6 +72,7 @@ const AboutUs = () => {
                             opening_day={settings.opening_day}
                             contact_number={settings.contact_number}
                             address={settings.address}
+                            email={settings.email}
                         />
                     </div>
                     <div className='col-md mt-3'>
@@ -90,7 +97,7 @@ const Appearance = () => {
     );
 };
 
-const TimeLocation = (props) => {
+const TimeLocation = React.memo((props) => {
     function arrangeOpeningDay(arr = []) {
         let opening_day_str = '';
         for (var i = 0; i < arr.length; i++) {
@@ -126,18 +133,27 @@ const TimeLocation = (props) => {
             <hr />
             <div className='row align-items-center my-2'>
                 <div className='col-auto'>
+                    <FontAwesomeIcon icon='fa-solid fa-envelope' className='h5 my-0' />
+                </div>
+                <div className='col'>
+                    {props.email}
+                </div>
+            </div>
+            <hr />
+            <div className='row align-items-center my-2'>
+                <div className='col-auto'>
                     <FontAwesomeIcon icon={faLocationArrow} className='h5 my-0' />
                 </div>
                 <div className='col'>
                     {props.address}
                 </div>
             </div>
-            <hr className='my-2'/>
+            <hr className='my-2' />
             <div>
                 <img className='img-fluid' src={locationImage} alt='location map of party color' />
             </div>
         </div>
     );
-};
+});
 
 export default AboutUs;
