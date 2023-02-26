@@ -65,6 +65,10 @@ const ReservationDetails = () => {
 		return year + '-' + month + '-' + date;
 	}
 
+	const customHooksForPax = () => {
+		const [total_pax, set_total_pax] = useState(0);
+	}
+
 	return (
 		<Form method='post' className='px-sm-5 p-4'>
 			{/* 
@@ -123,7 +127,7 @@ const ReservationDetails = () => {
 				{ type: 'number', name: 'junior', label: 'Junior', placeholder: 'pax', min_value: 0, isRequired: true, reservationInfo, },
 				// Elementary
 				{ type: 'number', name: 'elementary', label: 'Elementary', placeholder: 'pax', min_value: 0, isRequired: true, reservationInfo, },
-			]} />
+			]} customHookForPax={customHooksForPax} />
 
 			<InputRow inputs={[
 				// Date
@@ -150,7 +154,8 @@ const ReservationDetails = () => {
 }
 
 // INPUTS
-const InputRow = ({ inputs }) => {
+const InputRow = ({ inputs, ...other }) => {
+	console.log('boolean value of other:', other != null);
 	return (
 		<div className='row g-4 mb-3'>
 			{
