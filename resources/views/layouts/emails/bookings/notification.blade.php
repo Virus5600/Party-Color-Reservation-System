@@ -35,6 +35,7 @@
 			</div>
 		@endforeach
 	</div>
+{{-- CANCELLATION --}}
 @elseif ($type == 'cancellation request')
 	<p>You've requested for a reservation cancellation for booking number #{{ $booking->control_no }}</p>
 
@@ -46,6 +47,21 @@
 	@endif
 @elseif ($type == 'cancellation revoke')
 	<p>You've retracted your cancellation request for booking number #{{ $booking->control_no }}</p>
+
+{{-- STATUSES --}}
+@elseif ($type == 'accept')
+	<p>You're reservation with a control number #{{ $booking->control_no }} has been accepted!</p>
+@elseif ($type == 'reject')
+	<p>You've retracted your cancellation request for booking number #{{ $booking->control_no }}</p>
+
+	@if ($reason != null)
+	<p>Below is the reason why the reservation is cancelled:</p>
+	<div style="border: 1px #343A40 solid; border-radius: 0.5rem; margin: 0.5rem; padding: 0.25rem;">
+		<p>{{ $reason }}</p>
+	</div>
+	@endif
+@elseif ($type == 'pending')
+	<p>You're reservation with a control number #{{ $booking->control_no }} has been moved to pending.</p>
 @endif
 
 <p>If you have any concerns, feel free to contact us through our channels:</p>

@@ -35,7 +35,7 @@
 							@if (!in_array($p->id, $listedPerms))
 							<li class="list-group-item">
 								{{-- PARENT PERMISSIONS --}}
-								<p class="cursor-pointer" data-toggle="collapse" data-target="#{{ $p->slug }}" aria-expanded="false" aria-controls="{{ $p->slug }}">
+								<p class="cursor-pointer my-0" data-toggle="collapse" data-target="#{{ $p->slug }}" aria-expanded="false" aria-controls="{{ $p->slug }}">
 									{{ $p->name }}
 									
 									@if ($p->parent_permission == null)
@@ -52,7 +52,7 @@
 										@if (count($cp->childPermissions()) > 0)
 											@continue
 										@endif
-										<p class="w-100 ml-2"><i class="fas fa-caret-right mr-2"></i>{{ $cp->name }}</p>
+										<p class="w-100 ml-2 my-0"><i class="fas fa-caret-right mr-2"></i>{{ $cp->name }}</p>
 										@php(array_push($listedPerms, $cp->id))
 									@endforeach
 								</div>

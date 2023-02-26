@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 use App\Jobs\BookingCancellationNotification;
+use App\Jobs\BookingNotification;
 
 use App\Enum\ApprovalStatus;
 use App\Enum\Status;
@@ -549,6 +550,13 @@ class BookingController extends Controller
 			$booking->reason = null;
 			$booking->save();
 
+			// Mail customer about their reservation status
+			$args = [
+				'subject' => 'Reservation Accepted',
+				'reason' => null
+			];
+			BookingNotification::dispatch($booking, "accept", $args);
+
 			// Logger
 			activity('booking')
 				->by(auth()->user())
@@ -647,6 +655,13 @@ class BookingController extends Controller
 			$booking->status = ApprovalStatus::Rejected;
 			$booking->save();
 
+			// Mail customer about their reservation status
+			$args = [
+				'subject' => 'Reservation Rejected',
+				'reason' => $booking->reason
+			];
+			BookingNotification::dispatch($booking, "reject", $args);
+
 			// Logger
 			activity('booking')
 				->by(auth()->user())
@@ -728,6 +743,13 @@ class BookingController extends Controller
 			$booking->status = ApprovalStatus::Pending;
 			$booking->reason = null;
 			$booking->save();
+
+			// Mail customer about their reservation status
+			$args = [
+				'subject' => 'Reservation Moved back to Pending',
+				'reason' => null
+			];
+			BookingNotification::dispatch($booking, "pending", $args);
 
 			// Logger
 			activity('booking')
