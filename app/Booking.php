@@ -232,7 +232,7 @@ class Booking extends Model
 	}
 
 	// Validation
-	public static function validate($req) {
+	public static function validate($req, $id = null) {
 		$datetime = Carbon::now()->timezone('Asia/Tokyo');
 		$openingTime = Settings::getValue('opening');
 		$closingTime = Settings::getValue('closing');
@@ -388,7 +388,7 @@ class Booking extends Model
 		$end_at = Carbon::parse("{$req->booking_date} {$req->time_hour}:{$req->time_min}")
 			->addHours($hoursToAdd)->addMinutes($minutesToAdd);
 
-		$validator->after(function ($validator) use ($req, $storeCap, $start_at, $end_at, $closing) {
+		$validator->after(function ($validator) use ($req, $storeCap, $start_at, $end_at, $closing, $id) {
 			// Checks whether the booking exceeded the closing time
 			if ($end_at->gt($closing)) {
 				$toSubtract = $end_at->diffInMinutes($closing) / 60;
@@ -402,6 +402,8 @@ class Booking extends Model
 			// Checks if the booking can still be accomodated (store capacity related)
 			{
 				$paxAccomodated = Booking::whereDate('reserved_at', '=', $req->booking_date)
+					->where('id', '<>', $id)
+					->where('status', '=', ApprovalStatus::Approved->value)
 					->whereTime('start_at', '<', $end_at)
 					->whereTime('end_at', '>', $start_at)
 					->sum('pax');

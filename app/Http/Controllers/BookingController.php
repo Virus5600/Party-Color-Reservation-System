@@ -174,21 +174,23 @@ class BookingController extends Controller
 		foreach ($booking->menus as $m) {
 			foreach ($m->items as $i) {
 				// If the item is marked as unlimited
-				if ($i->is_unlimited)
+				if ($i->pivot->is_unlimited)
 					continue;
 
 				// Proceed to check if stock is viable still if it is not unlimited
-				$item = $i->variationItem()->first();
+				$item = $i->variationItem()->first()->item;
 				$key = Str::snake($item->item_name);
+
 				if (array_key_exists($key, $relatedInventory)) {
-					$relatedInventory["$key"] += $i->amount * $m->pivot->count;
+					$relatedInventory["$key"] += $i->pivot->amount * $m->pivot->count;
 				}
 				else {
 					array_push($relatedInventoryName, $item->item_name);
-					$relatedInventory["$key"] = $i->amount * $m->pivot->count;
+					$relatedInventory["$key"] = $i->pivot->amount * $m->pivot->count;
 				}
 			}
 		}
+
 
 		// Iterate through the additional orders made, if there are any
 		if ($booking->additionalOrders != null) {
@@ -200,14 +202,14 @@ class BookingController extends Controller
 							continue;
 
 						// Proceed to check if stock is viable still if it is not unlimited
-						$item = $i->variationItem()->first();
+						$item = $i->variationItem()->first()->item;
 						$key = Str::snake($item->item_name);
 						if (array_key_exists($key, $relatedInventory)) {
-							$relatedInventory["$key"] += $i->amount * $m->pivot->count;
+							$relatedInventory["$key"] += $i->pivot->amount * $m->pivot->count;
 						}
 						else {
 							array_push($relatedInventoryName, $item->item_name);
-							$relatedInventory["$key"] = $i->amount * $m->pivot->count;
+							$relatedInventory["$key"] = $i->pivot->amount * $m->pivot->count;
 						}
 					}
 				}
@@ -269,7 +271,7 @@ class BookingController extends Controller
 				->with('flash_error', 'The bookings either does not exists or is already deleted.');
 		}
 
-		extract(Booking::validate($req));
+		extract(Booking::validate($req, $id));
 
 		if ($validator->fails()) {
 			return redirect()
