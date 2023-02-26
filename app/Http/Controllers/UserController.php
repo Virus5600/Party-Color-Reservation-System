@@ -665,7 +665,9 @@ class UserController extends Controller
 	}
 
 	protected function updatePermissions(Request $req, $id) {
-		$user = User::withTrashed()->find($id);
+		$user = User::withTrashed()
+			->with(['userPerms'])
+			->find($id);
 		$from = $req->from ? $req->from : route('admin.users.index');
 
 		if ($user == null) {
@@ -685,72 +687,13 @@ class UserController extends Controller
 		try {
 			DB::beginTransaction();
 
-			$userPerms = UserPermission::where('user_id', '=', $user->id)->get();
-			$typePerms = $user->type->permissions;
-			$userPermsID = array();
+			$userPerms = sort($user->userPerms->pluck(['id'])->toArray());
+			$typePerms = sort($user->type->permissions->pluck(['id'])->toArray());
 
-			foreach ($userPerms as $up)
-				array_push($userPermsID, $up->permission_id);
-			$userPerms = Permission::whereIn('id', $userPermsID)->get();
-			
-			// If there are are still permissions...
-			if ($req->permissions != null) {
-				// Store the list of permissions from the request and all department permissions.
-				$selectedPerms = array();
-				$userPermis = array();
-				$typesPerms = array();
-
-				foreach ($req->permissions as $sp)
-					array_push($selectedPerms, $sp);
-
-				foreach ($userPerms as $up)
-					array_push($userPermis, $up->slug);
-
-				foreach ($typePerms as $dp)
-					array_push($typesPerms, $dp->slug);
-
-				// Sort them...
-				sort($selectedPerms);
-				sort($userPermis);
-				sort($typesPerms);
-
-				// If the permission from the request is exactly the same as the department permissions...
-				if ($selectedPerms === $typesPerms) {
-					// Remove all user permission so that the default (department permissions) will be used.
-					DB::table('user_permissions')
-						->where('user_id', '=', $user->id)
-						->delete();
-				}
-				// Otherwise...
-				else {
-					// Remove all permissions that are in the use permission but not in the request...
-					foreach ($userPerms as $up) {
-						if (!in_array($up->slug, $selectedPerms)) {
-							DB::table('user_permissions')
-								->where('user_id', '=', $user->id)
-								->where('permission_id', '=', $up->id)
-								->delete();
-						}
-					}
-
-					// ...Then add all those that aren't in the user permission yet
-					foreach ($selectedPerms as $sp) {
-						if (!in_array($sp, $userPermis) && !UserPermission::isDuplicatePermission(Permission::where('slug', '=', $sp)->first(), $user->id)) {
-							UserPermission::insert([
-								'user_id' => $user->id,
-								'permission_id' => Permission::where('slug', '=', $sp)->first()->id
-							]);
-						}
-					}
-				}
-			}
-			// If all user permissions is remove...
-			else {
-				// Remove all instances of user permission for this user
-				DB::table('user_permissions')
-					->where('user_id', '=', $user->id)
-					->delete();
-			}
+			if ($userPerms == $typePerms)
+				$user->userPerm->detach();
+			else
+				$user->userPerm->sync($req->permissions);
 
 			// LOGGER
 			activity('user')
