@@ -25,7 +25,8 @@ use Validator;
 class ReactApiController extends Controller
 {
 	// ANNOUNCEMENTS
-	protected function fetchSingleAnnouncement(Request $req, $id) {
+	protected function fetchSingleAnnouncement(Request $req, $id)
+	{
 		$announcement = Announcement::find($id);
 
 		if ($announcement == null) {
@@ -47,7 +48,8 @@ class ReactApiController extends Controller
 			]);
 	}
 
-	protected function fetchAnnouncements(Request $req) {
+	protected function fetchAnnouncements(Request $req)
+	{
 		$announcements = Announcement::select(
 			DB::raw("
 				`id`,
@@ -68,7 +70,8 @@ class ReactApiController extends Controller
 	}
 
 	// RESERVATIONS
-	protected function bookingsCreate(Request $req) {
+	protected function bookingsCreate(Request $req)
+	{
 		extract(Booking::validate($req));
 
 		if ($validator->fails()) {
@@ -115,7 +118,7 @@ class ReactApiController extends Controller
 					'booking_id' => $booking->id
 				]);
 			}
-			
+
 			// CREATE MAILER TO THE CONTACT PERSON
 			$args = [
 				'subject' => 'Reservation Created',
@@ -156,21 +159,22 @@ class ReactApiController extends Controller
 		}
 
 		return response()
-				->json([
-					'success' => true,
-					'type' => 'success',
-					'message' => 'Successfully added a new booking'
-				]);
+			->json([
+				'success' => true,
+				'type' => 'success',
+				'message' => 'Successfully added a new booking'
+			]);
 	}
 
-	protected function bookingsShow(Request $req) {
+	protected function bookingsShow(Request $req)
+	{
 		$validator = Validator::make($req->all(), [
 			'control_no' => 'required|numeric|between:0,9999999999'
 		], [
-			'control_no.required' => 'Control number is required',
-			'control_no.numeric' => 'Control number is only composed of numbers',
-			'control_no.between' => 'Control number is only 10 characters long',
-		]);
+				'control_no.required' => 'Control number is required',
+				'control_no.numeric' => 'Control number is only composed of numbers',
+				'control_no.between' => 'Control number is only 10 characters long',
+			]);
 
 		if ($validator->fails()) {
 			return response()
@@ -185,9 +189,9 @@ class ReactApiController extends Controller
 			DB::beginTransaction();
 
 			$booking = Booking::with([
-					'primaryContactInformation:booking_id,contact_name,email',
-					'menus:duration,menu_id,name,price'
-				])
+				'primaryContactInformation:booking_id,contact_name,email',
+				'menus:duration,menu_id,name,price'
+			])
 				->where('control_no', '=', $req->control_no)
 				->first();
 
@@ -201,7 +205,7 @@ class ReactApiController extends Controller
 			}
 
 			extract($this->isValidForFetch($booking));
-			
+
 			if ($doNotReturn) {
 				return response()
 					->json([
@@ -212,13 +216,13 @@ class ReactApiController extends Controller
 			}
 
 			$booking->makeHidden([
-					"id",
-					"booking_type",
-					"control_no",
-					"created_at",
-					"updated_at",
-					"deleted_at"
-				]);
+				"id",
+				"booking_type",
+				"control_no",
+				"created_at",
+				"updated_at",
+				"deleted_at"
+			]);
 
 			$status_types = [];
 			$sn = array_merge(array_column(Status::cases(), "name"), array_column(ApprovalStatus::cases(), "name"));
@@ -250,18 +254,19 @@ class ReactApiController extends Controller
 			]);
 	}
 
-	protected function bookingCancellationRequest(Request $req) {
+	protected function bookingCancellationRequest(Request $req)
+	{
 		$validator = Validator::make($req->all(), [
 			'control_no' => 'required|numeric|between:0,9999999999',
 			'reason' => 'required|string|max:255'
 		], [
-			'control_no.required' => 'Control number is required',
-			'control_no.numeric' => 'Control number is only composed of numbers',
-			'control_no.between' => 'Control number is only 10 characters long',
-			'reason.required' => 'A reason is required',
-			'reason.string' => 'Malformed data',
-			'reason.max' => 'Character limit reached (255)',
-		]);
+				'control_no.required' => 'Control number is required',
+				'control_no.numeric' => 'Control number is only composed of numbers',
+				'control_no.between' => 'Control number is only 10 characters long',
+				'reason.required' => 'A reason is required',
+				'reason.string' => 'Malformed data',
+				'reason.max' => 'Character limit reached (255)',
+			]);
 
 		if ($validator->fails()) {
 			return response()
@@ -287,7 +292,7 @@ class ReactApiController extends Controller
 			}
 
 			extract($this->isValidForFetch($booking));
-			
+
 			if ($doNotReturn) {
 				return response()
 					->json([
@@ -357,14 +362,15 @@ class ReactApiController extends Controller
 			]);
 	}
 
-	protected function bookingRetractCancellationRequest(Request $req) {
+	protected function bookingRetractCancellationRequest(Request $req)
+	{
 		$validator = Validator::make($req->all(), [
 			'control_no' => 'required|numeric|between:0,9999999999'
 		], [
-			'control_no.required' => 'Control number is required',
-			'control_no.numeric' => 'Control number is only composed of numbers',
-			'control_no.between' => 'Control number is only 10 characters long',
-		]);
+				'control_no.required' => 'Control number is required',
+				'control_no.numeric' => 'Control number is only composed of numbers',
+				'control_no.between' => 'Control number is only 10 characters long',
+			]);
 
 		if ($validator->fails()) {
 			return response()
@@ -388,7 +394,7 @@ class ReactApiController extends Controller
 						'errors' => "Reservation either does not exists or is already deleted"
 					]);
 			}
-			
+
 			extract($this->isValidForFetch($booking));
 
 			if ($doNotReturn) {
@@ -461,7 +467,8 @@ class ReactApiController extends Controller
 	}
 
 	// SETTINGS (ABOUT US)
-	protected function fetchSettings(Request $req) {
+	protected function fetchSettings(Request $req)
+	{
 		$aboutUs = [
 			'web-logo',
 			'web-name',
@@ -477,10 +484,10 @@ class ReactApiController extends Controller
 		$days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 		$settings = Settings::select([
-				'name',
-				'value',
-				'is_file'
-			])
+			'name',
+			'value',
+			'is_file'
+		])
 			->whereIn('name', $aboutUs)
 			->get();
 
@@ -493,7 +500,8 @@ class ReactApiController extends Controller
 
 	// PRIVATE FUNCTIONS //
 	// RESERVATIONS
-	private function isValidForFetch(Booking $booking) {
+	private function isValidForFetch(Booking $booking)
+	{
 		$start = Carbon::parse("{$booking->reserved_at} {$booking->start_at}");
 		$end = Carbon::parse("{$booking->reserved_at} {$booking->end_at}");
 
@@ -508,8 +516,7 @@ class ReactApiController extends Controller
 		if (now()->timezone("Asia/Tokyo")->gt($start) && now()->timezone("Asia/Tokyo")->lt($end)) {
 			$doNotReturn = true;
 			$status = "ongoing";
-		}
-		else if (now()->timezone("Asia/Tokyo")->gt($start) && now()->timezone("Asia/Tokyo")->gt($end)) {
+		} else if (now()->timezone("Asia/Tokyo")->gt($start) && now()->timezone("Asia/Tokyo")->gt($end)) {
 			$doNotReturn = true;
 		}
 

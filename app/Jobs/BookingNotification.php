@@ -27,7 +27,8 @@ class BookingNotification implements ShouldQueue
 	 *
 	 * @return void
 	 */
-	public function __construct(Booking $booking, $type, $args) {
+	public function __construct(Booking $booking, $type, $args)
+	{
 		$this->booking = $booking;
 		$this->type = $type;
 		$this->args = $args;
@@ -38,7 +39,8 @@ class BookingNotification implements ShouldQueue
 	 *
 	 * @return void
 	 */
-	public function handle() {
+	public function handle()
+	{
 		// Set subject
 		if (!isset($this->args['subject']))
 			$this->args['subject'] = "Reservation Notification";
