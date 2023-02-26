@@ -69,7 +69,7 @@ class AccountNotification implements ShouldQueue
 					'subject' => $this->args["subject"],
 					'recipients' => $this->args["recipients"],
 					'email' => $this->args["email"],
-					'type' => $this->args["type"],
+					'type' => $this->type,
 				])
 				->log("Account mail notification sent to {$this->user->getName()}");
 		}
