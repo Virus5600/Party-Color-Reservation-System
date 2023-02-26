@@ -104,7 +104,7 @@ class BookingController extends Controller
 			}
 
 			$args = [
-				'subject' => 'Reservation Accepted',
+				'subject' => 'Reservation Created',
 				'reason' => null
 			];
 			BookingNotification::dispatch($booking, "creation", $args);
