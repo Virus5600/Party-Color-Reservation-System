@@ -1,39 +1,47 @@
 <!DOCTYPE html>
 <html lang="en-US">
 	<head>
+		@php
+		$webName = App\Settings::getValue('web-name');
+		$webDesc = App\Settings::getValue('web-desc');
+		$webLogoInstance = App\Settings::getInstance('web-logo');
+		$webLogo = $webLogoInstance->getImage(!$webLogoInstance->is_file);
+		@endphp
+		
 		{{-- META DATA --}}
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta http-equiv="Content-Language" content="en-US" />
 
 		{{-- SITE META --}}
 		<meta name="type" content="website">
-		<meta name="title" content="{{ App\Settings::getValue('web-name') }}">
-		<meta name="description" content="{{ App\Settings::getValue('web-desc') }}">
-		<meta name="image" content="{{ asset('images/meta-banner.jpg') }}">
+		<meta name="title" content="{{ $webName }}">
+		<meta name="description" content="{{ $webDesc }}">
+		<meta name="image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
 		<meta name="keywords" content="{{ env('APP_KEYW') }}">
-		<meta name="application-name" content="{{ App\Settings::getValue('web-name') }}">
+		<meta name="application-name" content="{{ $webName }}">
 
 		{{-- TWITTER META --}}
 		<meta name="twitter:card" content="summary_large_image">
-		<meta name="twitter:title" content="{{ App\Settings::getValue('web-name') }}">
-		<meta name="twitter:description" content="{{ App\Settings::getValue('web-desc') }}">
-		<meta name="twitter:image" content="{{asset('/images/meta-banner.jpg')}}">
+		<meta name="twitter:title" content="{{ $webName }}">
+		<meta name="twitter:description" content="{{ $webDesc }}">
+		<meta name="twitter:image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
 
 		{{-- OG META --}}
 		<meta name="og:url" content="{{Request::url()}}">
 		<meta name="og:type" content="website">
-		<meta name="og:title" content="{{ App\Settings::getValue('web-name') }}">
-		<meta name="og:description" content="{{ App\Settings::getValue('web-desc') }}">
-		<meta name="og:image" content="{{asset('/images/meta-banner.jpg')}}">
+		<meta name="og:title" content="{{ $webName }}">
+		<meta name="og:description" content="{{ $webDesc }}">
+		<meta name="og:image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
 
 		{{-- CSS --}}
-		<link href="{{ asset('css/app.css') }}" rel="stylesheet">
+		<link href="{{ asset('css/lib-styles.css') }}" rel="stylesheet">
 		<link href="{{ asset('css/style.css') }}" rel="stylesheet">
 		<link href="{{ asset('css/login.css') }}" rel="stylesheet">
 
-		{{-- JQUERY / SWEETALERT 2 / SLICK CAROUSEL --}}
-		<script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
+		{{-- JQUERY / SWEETALERT 2 / SLICK CAROUSEL / FONTAWESOME 6 / SUMMERNOTE / TAGGING JS --}}
+		<script type="text/javascript" src="{{ asset('js/lib-scripts.js') }}"></script>
 
 		{{-- Removes the code that shows up when script is disabled/not allowed/blocked --}}
 		<script type="text/javascript" id="for-js-disabled-js">$('head').append('<style id="for-js-disabled">#js-disabled { display: none; }</style>');$(document).ready(function() {$('#js-disabled').remove();$('#for-js-disabled').remove();$('#for-js-disabled-js').remove();});</script>
