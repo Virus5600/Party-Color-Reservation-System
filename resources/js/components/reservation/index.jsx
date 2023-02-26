@@ -65,6 +65,17 @@ const ReservationDetails = () => {
 		return year + '-' + month + '-' + date;
 	}
 
+	// const customHooksForPax = () => {
+	// 	const [total_pax, set_total_pax] = useState(0);
+
+
+	// 	// this is for handling the pax inputs
+	// 	return (no_as_string) => {
+	// 		console.log('clicked pax:', no_as_string); // for testing / debugging
+	// 		set_total_pax(prev => prev + Number(no_as_string));
+	// 	};
+	// }
+
 	return (
 		<Form method='post' className='px-sm-5 p-4'>
 			{/* 
@@ -118,7 +129,7 @@ const ReservationDetails = () => {
 
 			<InputRow inputs={[
 				// Adult / Senior
-				{ type: 'number', name: 'adult_senior', label: 'Adult/Senior', placeholder: 'pax', min_value: 0, isRequired: true, reservationInfo, },
+				{ type: 'number', name: 'adult_senior', label: 'Adult/Senior', placeholder: 'pax', min_value: 1, isRequired: true, reservationInfo, },
 				// Junior
 				{ type: 'number', name: 'junior', label: 'Junior', placeholder: 'pax', min_value: 0, isRequired: true, reservationInfo, },
 				// Elementary
@@ -150,11 +161,17 @@ const ReservationDetails = () => {
 }
 
 // INPUTS
-const InputRow = ({ inputs }) => {
+const InputRow = (props) => {
+	// console.log('others.customHooksForPax:', props.customHooksForPax);
+	// let paxHandler;
+	// if (props.customHooksForPax != undefined) {
+	// 	paxHandler = props.customHooksForPax();
+	// }
+
 	return (
 		<div className='row g-4 mb-3'>
 			{
-				inputs.map(input =>
+				props.inputs.map(input =>
 					<InputField
 						key={uuidv4()}
 						type={input.type}
@@ -166,6 +183,7 @@ const InputRow = ({ inputs }) => {
 						onCountChange={input.onCountChange}
 						isRequired={input.isRequired}
 						reservationInfo={input.reservationInfo}
+					// onPaxClick={paxHandler}
 					/>
 				)
 			}
@@ -174,18 +192,32 @@ const InputRow = ({ inputs }) => {
 };
 
 // FIELDS
-const InputField = ({ type, name, label, placeholder, min, max, isRequired, reservationInfo }) => {
+const InputField = (props) => {
 	let field;
-	if (type == "textarea")
-		field = <textarea name={name} defaultValue={reservationInfo[name] == null ? '' : reservationInfo[name]} placeholder={placeholder} required={isRequired} className="form-control" id={name}></textarea>
+	if (props.type == "textarea")
+		field = <textarea name={props.name} defaultValue={props.reservationInfo[props.name] == null ? '' : props.reservationInfo[props.name]} placeholder={props.placeholder} required={props.isRequired} className="form-control" id={props.name}></textarea>
 	else
-		field = <input type={type} name={name} defaultValue={reservationInfo[name] == null ? '' : reservationInfo[name]} placeholder={placeholder} min={min} max={max} required={isRequired} className="form-control" id={name}></input>
+		field = <input
+			type={props.type}
+			name={props.name}
+			defaultValue={props.reservationInfo[props.name] == null ? '' : props.reservationInfo[props.name]}
+			placeholder={props.placeholder}
+			min={props.min}
+			max={props.max}
+			required={props.isRequired}
+			className="form-control"
+			id={props.name}
+		// onChange={props.onPaxClick == null ? null : (event) => {
+
+		// 	props.onPaxClick(event.target.value)
+		// }}
+		/>
 
 	return (
 		<div className="col-md">
-			<label htmlFor={name} className="form-label text-white">{label}</label>
+			<label htmlFor={props.name} className="form-label text-white">{props.label}</label>
 
-			{isRequired ? '' : <span className='text-white text-opacity-50 fw-light'> (Optional)</span>}
+			{props.isRequired ? '' : <span className='text-white text-opacity-50 fw-light'> (Optional)</span>}
 
 			{field}
 		</div>

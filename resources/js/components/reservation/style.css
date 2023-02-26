@@ -36,3 +36,7 @@ hr {
     width: 800px;
     max-width: 100%;
 }
+
+.outcome-price {
+    background-color: rgb(0, 0, 0, 0.2)
+}

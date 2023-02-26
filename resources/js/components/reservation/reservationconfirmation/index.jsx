@@ -3,7 +3,7 @@ import '../style.css';
 import React from 'react';
 
 import axios from 'axios';
-import { useLoaderData, Form, Link } from 'react-router-dom';
+import { useLoaderData, Form, Link, redirect } from 'react-router-dom';
 
 import ReservationStatus from '../reservationsuccess';
 
@@ -17,6 +17,7 @@ export default function ReservationConfirmation(props) {
 
 	// this is used for change the page to success page
 	const [success_booking, set_success_booking] = React.useState(false);
+	const [failed, setFailed] = React.useState(false);
 
 
 	/**
@@ -60,6 +61,11 @@ export default function ReservationConfirmation(props) {
 		// 2.
 		const isSuccess = await handleReserveClick(JSON.parse(raw_session_data));
 
+		if (!isSuccess) {
+			setFailed(true);
+		}
+
+
 		// 3. and 4.
 		set_success_booking(isSuccess);
 	}
@@ -92,9 +98,52 @@ export default function ReservationConfirmation(props) {
 						<FieldValue label={'Time Extension'} data={extension} />
 						<FieldValue label={'Special Requests'} data={special_request} />
 					</div>
-					<div className='text-white text-center '>
-						<span>total</span><br />
-						<span className='fs-1 fw-bold'>¥{compute_price(Number(adult_senior), Number(junior), Number(elementary))}</span>
+					<div className='text-white text-center outcome-price p-3'>
+						<div className='row'>
+							<div className='col-md-4'>
+								Adult/Senior:
+							</div>
+							<div className='col-md-4'>
+								{adult_senior}pax x ¥{static_prices['adult']}
+							</div>
+							<div className='col-md-4'>
+								¥{Number(adult_senior) * static_prices['adult']}
+							</div>
+						</div>
+						<div className='row'>
+							<div className='col-md-4'>
+								Junior:
+							</div>
+							<div className='col-md-4'>
+								{junior}pax x ¥{static_prices['junior']}
+							</div>
+							<div className='col-md-4'>
+								¥{Number(junior) * static_prices['junior']}
+							</div>
+						</div>
+						<div className='row'>
+							<div className='col-md-4'>
+								Elementary:
+							</div>
+							<div className='col-md-4'>
+								{elementary}pax x ¥{static_prices['elementary']}
+							</div>
+							<div className='col-md-4'>
+								¥{Number(elementary) * static_prices['elementary']}
+							</div>
+						</div>
+						<div className='row pt-3'>
+							<div className='col-md-4'>
+
+							</div>
+							<div className='col-md-4'>
+								Total
+							</div>
+							<div className='col-md-4 fw-bolder'>
+								¥{compute_price(Number(adult_senior), Number(junior), Number(elementary))}
+							</div>
+						</div>
+
 					</div>
 					{
 						props.forViewReservation ?
@@ -105,7 +154,7 @@ export default function ReservationConfirmation(props) {
 								onUndoCancelRequestClick={props.onUndoCancelRequestClick}
 							/>
 							:
-							<ReservationButtons onReserveClick={sendReserveRequest} />
+							<ReservationButtons onReserveClick={sendReserveRequest} failed={failed} />
 					}
 				</Form>
 			</div>
@@ -143,7 +192,7 @@ const ReservationButtons = (props) => {
 
 	return (
 		<div className='text-end mt-4'>
-			<Link to='/reservation' style={disabled == true ? { pointerEvents: 'none' } : null}><button className='btn btn-danger mx-2' disabled={disabled}>Edit</button></Link>
+			<Link to='/reservation' style={props.failed ? null : disabled == true ? { pointerEvents: 'none' } : null}><button className='btn btn-danger mx-2' disabled={props.failed ? null : disabled}>Edit</button></Link>
 			<button className='btn btn-success mx-2' type='button' onClick={handleReserveClick} disabled={disabled}>Reserve</button>
 		</div>
 	);
@@ -284,12 +333,19 @@ const handleReserveClick = async ({
 			return response;
 		}
 		// implement SwalFlash here
-
-		for (const key in data.errors) {
-			if (data.errors.hasOwnProperty(key)) {
-				alert(`${data.errors[key]}`);
-			}
+		if (data.type == 'validation') {
+			SwalFlash.error(
+				"Input Error",
+				data.errors[Object.keys(data.errors)[0]][0],
+				true
+			);
 		}
+		// }
+		// for (const key in data.errors) {
+		// 	if (data.errors.hasOwnProperty(key)) {
+		// 		alert(`${data.errors[key]}`);
+		// 	}
+		// }
 
 		return response;
 
