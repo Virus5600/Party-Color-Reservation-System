@@ -18,23 +18,25 @@
 <p>If you did not this action, please contact us:</p>
 
 @if ($type == 'creation')
-	<p style="font-size: 1.5rem;">Control Number: #{{ $booking->control_no }}</p>
+	<p style="font-size: 1.5em;">Control Number: #{{ $booking->control_no }}</p>
 
 	<p>View your reservations <a href="{{ route('home') }}/viewreservation">here</a>.</p>
 	<p>Copy this URL if the link does not work: <span style="font-weight: bold; font-family: monospace; font-size: 1.25em;">{{ route('home') }}/viewreservation</span></p>
 
-	<div style="display: flex; flex-direction: column; border: 1px solid #6c757d; border-radius: 0.5rem;">
-		@foreach ($booking->toArray() as $k => $v)
-			@if (in_array($k, explode(",", "id,control_no,archived,status,items_returned,reason,cancel_requested,cancel_request_reason,deleted_at,updated_at")))
-				@continue
-			@endif
-
-			<div style="width: 100%; display: flex; flex-direction: row; border-bottom: 1px solid #6c757d; padding-top: 4px; padding-bottom: 4px;">
-				<div style="width: 50%; text-align: center; padding-left: 4px; padding-right: 4px;">{{ ucwords(str_replace("_", " ", $k)) }}</div>
-				<div style="width: 50%; text-align: center; padding-left: 4px; padding-right: 4px;">{{ $v }}</div>
-			</div>
-		@endforeach
-	</div>
+	<table style="width: 100%; border: 1px solid #6c757d; border-radius: 0.5em;">
+		<tbody>
+			@foreach ($booking->toArray() as $k => $v)
+				@if (in_array($k, explode(",", "id,control_no,archived,status,items_returned,reason,cancel_requested,cancel_request_reason,deleted_at,updated_at")))
+					@continue
+				@endif
+				
+				<tr style="width: 100%; border-bottom: 1px solid #6c757d; padding-top: 1em; padding-bottom: 1em;">
+					<td style="text-align: center; padding-left: 1em; padding-right: 1em; border-bottom: 1px solid #6c757d;">{{ ucwords(str_replace("_", " ", $k)) }}</div>
+					<td style="text-align: center; padding-left: 1em; padding-right: 1em; border-bottom: 1px solid #6c757d;">{{ $v }}</div>
+				</tr>
+			@endforeach
+		</tbody>
+	</table>
 {{-- CANCELLATION --}}
 @elseif ($type == 'cancellation request')
 	<p>You've requested for a reservation cancellation for booking number #{{ $booking->control_no }}</p>
