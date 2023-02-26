@@ -17,6 +17,6 @@
     text-decoration: underline;
 }
 
-a:hover {
+.moredetails:hover {
     color: rgb(53, 52, 52);
 }
