@@ -42,7 +42,7 @@
 										<div class="card-body">
 											{{-- PERMISSION PARENT --}}
 											<div class="form-check col-12">
-												<input type="checkbox" name="permissions[]" id="perms_{{ $p->slug }}" {{ $user->hasPermission($p->slug) ? 'checked' : '' }} value="{{ $p->slug }}" {{ ($pp = $p->parentPermission()) != null ? "data-parent=#perms_{$pp->slug}" : "" }}>
+												<input type="checkbox" name="permissions[]" id="perms_{{ $p->slug }}" {{ $user->hasPermission($p->slug) ? 'checked' : '' }} value="{{ $p->id }}" {{ ($pp = $p->parentPermission()) != null ? "data-parent=#perms_{$pp->slug}" : "" }}>
 												<label class="form-label font-weight-bold" for="perms_{{ $p->slug }}">
 													{{ $p->name }}
 													
@@ -59,7 +59,7 @@
 												@endif
 
 												<div class="form-check col-12 ml-4">
-													<input type="checkbox" name="permissions[]" id="perms_{{ $cp->slug }}" {{ $user->hasPermission($cp->slug) ? 'checked' : '' }} value="{{ $cp->slug }}" data-parent="#perms_{{ $p->slug }}">
+													<input type="checkbox" name="permissions[]" id="perms_{{ $cp->slug }}" {{ $user->hasPermission($cp->slug) ? 'checked' : '' }} value="{{ $cp->id }}" data-parent="#perms_{{ $p->slug }}">
 													<label class="form-label" for="perms_{{ $cp->slug }}">{{ $cp->name }}</label>
 												</div>
 												@php(array_push($listed_perms, $cp->slug))
