@@ -158,6 +158,7 @@ class UserController extends Controller
 							$args = [
 								"subject" => "Your account has been locked!",
 								"token" => $pr->token,
+								"email" => $user->email,
 								"recipients" => [$user->email]
 							];
 							AccountNotification::dispatch($user, "locked", $args);
