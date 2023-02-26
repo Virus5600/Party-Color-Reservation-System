@@ -49,9 +49,9 @@ export default function ReservationConfirmation(props) {
 
 	if (props.forViewReservation == true) { // to use in reservationview component
 		reservationInfo = props.reservationInfo;
-		console.log('reservationInfo at confirmation component', reservationInfo);
+		// console.log('reservationInfo at confirmation component', reservationInfo);
 	} else {
-		console.log('inside else statement before useLoaderData');
+		// console.log('inside else statement before useLoaderData');
 		reservationInfo = useLoaderData();
 	}
 
@@ -122,9 +122,9 @@ const ReservationButtonsForView = (props) => {
 		alert('not implemented yet');
 	}
 
-	console.log('ReservationButtonsForView mounted!!');
-	console.log('props.cancel_request_reason:', props.cancel_request_reason);
-	console.log(props.cancel_request_reason === null ? '' : props.cancel_request_reason);
+	// console.log('ReservationButtonsForView mounted!!');
+	// console.log('props.cancel_request_reason:', props.cancel_request_reason);
+	// console.log(props.cancel_request_reason === null ? '' : props.cancel_request_reason);
 
 	return (
 		<>
@@ -186,7 +186,6 @@ const handleReserveClick = async ({
 	special_request,
 }) => {
 
-	let isSuccess = false;
 	const token = document.querySelector('meta[name=csrf-token]').content;
 	const API_TO_SEND_RESERVATION = '/api/react/bookings/create';
 	const prices = {
@@ -211,7 +210,7 @@ const handleReserveClick = async ({
 		pax += Number(p);
 	}
 
-	const result = await axios.post(API_TO_SEND_RESERVATION, {
+	const response = await axios.post(API_TO_SEND_RESERVATION, {
 		_token: token,																	// Cross site forgery (security concepts) csrf attacks
 		booking_date: date,
 		booking_type: 'reservation',
@@ -234,23 +233,26 @@ const handleReserveClick = async ({
 		const data = response.data;
 		if (data.success) {
 			sessionStorage.removeItem('reservationInfo');
-			isSuccess = true;
-			alert('success');
-		} else {
-			alert('internal error');
-			for (const key in data.errors) {
-				if (data.errors.hasOwnProperty(key)) {
-					alert(`${data.errors[key]}`);
-				}
+			return response;
+		}
+		// implement SwalFlash here
+
+		for (const key in data.errors) {
+			if (data.errors.hasOwnProperty(key)) {
+				alert(`${data.errors[key]}`);
 			}
 		}
 
+		return response;
+
 		// document.write(response.data);
 	}).catch(response => {
-		console.log(response);
-		alert('internal error');
+		// console.log(response);
+
+		// implement SwalFlash here
 
 		// document.write(response.response.data);
+		return response;
 	});
-	return isSuccess;
+	return response.data.success;
 }
