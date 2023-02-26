@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Enum\Status;
+
 use App\AdditionalOrder;
 use App\Booking;
 use App\Inventory;
@@ -71,7 +73,9 @@ class AdditionalOrderController extends Controller
 		try {
 			DB::beginTransaction();
 
-			app(BookingController::class)->pending($booking->id, true);
+			$movedToPending = !in_array($booking->getOverallStatus(), array(Status::Happening, Status::Done, Status::Ghosted, Status::Cancelled));
+			if ($movedToPending)
+				app(BookingController::class)->pending($booking->id, true);
 
 			// Create the additional order entry
 			$additionalOrder = AdditionalOrder::create([
@@ -117,9 +121,9 @@ class AdditionalOrderController extends Controller
 		return redirect()
 			->route('admin.bookings.additional-orders.index', [$booking->id])
 			->with('flash_success', 'Successfully added additional order')
-			->with('has_icon', "true")
-			->with('message', "Please re-evaluate the booking if it should still be accepted or not.")
-			->with('has_timer', "false");
+			->with('has_icon', $movedToPending ? "true" : "false")
+			->with('message', $movedToPending ? "Please re-evaluate the booking if it should still be accepted or not." : null)
+			->with('has_timer', $movedToPending ? "false" : "true");
 	}
 
 	protected function show($booking_id, $order_id) {
@@ -206,7 +210,9 @@ class AdditionalOrderController extends Controller
 		try {
 			DB::beginTransaction();
 
-			app(BookingController::class)->pending($booking->id, true);
+			$movedToPending = !in_array($booking->getOverallStatus(), array(Status::Happening, Status::Done, Status::Ghosted, Status::Cancelled));
+			if ($movedToPending)
+				app(BookingController::class)->pending($booking->id, true);
 
 			// Create the additional order entry
 			$additionalOrder->extension = $req->extension;
@@ -249,9 +255,9 @@ class AdditionalOrderController extends Controller
 		return redirect()
 			->route('admin.bookings.additional-orders.index', [$booking->id])
 			->with('flash_success', 'Successfully added additional order')
-			->with('has_icon', "true")
-			->with('message', "Please re-evaluate the booking if it should still be accepted or not.")
-			->with('has_timer', "false");
+			->with('has_icon', $movedToPending ? "true" : "false")
+			->with('message', $movedToPending ? "Please re-evaluate the booking if it should still be accepted or not." : null)
+			->with('has_timer', $movedToPending ? "false" : "true");
 	}
 
 	protected function delete($booking_id, $order_id) {
@@ -272,7 +278,9 @@ class AdditionalOrderController extends Controller
 		try {
 			DB::beginTransaction();
 
-			app(BookingController::class)->pending($booking->id, true);
+			$movedToPending = !in_array($booking->getOverallStatus(), array(Status::Happening, Status::Done, Status::Ghosted, Status::Cancelled));
+			if ($movedToPending)
+				app(BookingController::class)->pending($booking->id, true);
 
 			$additionalOrder->delete();
 			$additionalOrder->save();
@@ -303,8 +311,8 @@ class AdditionalOrderController extends Controller
 		return redirect()
 			->route('admin.bookings.additional-orders.index', [$booking_id])
 			->with("flash_success", "Successfully voided the order")
-			->with('has_icon', "true")
-			->with('message', "Please re-evaluate the booking if it should still be accepted or not.")
-			->with('has_timer', "false");
+			->with('has_icon', $movedToPending ? "true" : "false")
+			->with('message', $movedToPending ? "Please re-evaluate the booking if it should still be accepted or not." : null)
+			->with('has_timer', $movedToPending ? "false" : "true");
 	}
 }
