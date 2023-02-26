@@ -60,7 +60,7 @@ class User extends Authenticatable
 		if ($this->userPerm->count() <= 0)
 			$perms = $this->type->permissions;
 
-		return $perms ?? null;
+		return $perms ?? [];
 	}
 
 	public function isUsingTypePermissions() {
