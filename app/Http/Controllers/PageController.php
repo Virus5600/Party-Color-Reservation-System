@@ -56,7 +56,7 @@ class PageController extends Controller
 			'latest_activities' => [
 				'clazz' => Activity::class,
 				'name' => 'Latest Activities',
-				'conditions' => ['*'],
+				'conditions' => ['latest'],
 				'columns' => ['ip_address', 'description'],
 				'hasActions' => false
 			],
