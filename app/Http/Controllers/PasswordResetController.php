@@ -67,7 +67,7 @@ class PasswordResetController extends Controller
 				'token' => $pr->token
 			];
 
-			AccountNotification::dispatch($user, "change-password", $args);
+			AccountNotification::dispatchAfterResponse($user, "change-password", $args);
 
 			// LOGGER
 			activity('password-reset')
@@ -162,7 +162,7 @@ class PasswordResetController extends Controller
 			];
 
 			// Uses past-tense due to password is now changed
-			AccountNotification::dispatch($user, "changed-password", $args);
+			AccountNotification::dispatchAfterResponse($user, "changed-password", $args);
 
 			$email = $pr->email;
 			$expires_at = $pr->expires_at;

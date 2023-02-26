@@ -161,7 +161,7 @@ class UserController extends Controller
 								"email" => $user->email,
 								"recipients" => [$user->email]
 							];
-							AccountNotification::dispatch($user, "locked", $args);
+							AccountNotification::dispatchAfterResponse($user, "locked", $args);
 						}
 
 						$user->locked = 1;
@@ -330,7 +330,7 @@ class UserController extends Controller
 				'email' => $req->email,
 				'recipients' => [$req->email, auth()->user()->email]
 			];
-			AccountNotification::dispatch($user, "creation", $args)->afterCommit();
+			AccountNotification::dispatchAfterResponse($user, "creation", $args)->afterCommit();
 
 			// LOGGER
 			activity('user')
@@ -555,7 +555,7 @@ class UserController extends Controller
 			];
 
 			// Uses past-tense due to password is now changed
-			AccountNotification::dispatch($user, "changed-password", $args);
+			AccountNotification::dispatchAfterResponse($user, "changed-password", $args);
 
 			$user->save();
 
