@@ -72,4 +72,8 @@ class RemoveInactiveItems implements ShouldQueue
 		}
 		Log::info("Checking for inactive items done...");
 	}
+
+	public function __destruct() {
+		Artisan::call('queue:work --stop-when-empty');
+	}
 }

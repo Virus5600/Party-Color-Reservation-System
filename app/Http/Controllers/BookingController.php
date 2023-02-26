@@ -103,6 +103,12 @@ class BookingController extends Controller
 				]);
 			}
 
+			$args = [
+				'subject' => 'Reservation Accepted',
+				'reason' => null
+			];
+			BookingNotification::dispatch($booking, "create", $args);
+
 			// Logger
 			activity('booking')
 				->by(auth()->user())
@@ -747,7 +753,7 @@ class BookingController extends Controller
 			// Mail customer about their reservation status
 			$args = [
 				'subject' => 'Reservation Moved back to Pending',
-				'reason' => null
+				'reason' => "Automated action after booking #{$booking->control_no} is updated."
 			];
 			BookingNotification::dispatch($booking, "pending", $args);
 
