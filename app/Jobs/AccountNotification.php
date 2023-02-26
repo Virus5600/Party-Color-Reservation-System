@@ -74,4 +74,8 @@ class AccountNotification implements ShouldQueue
 				->log("Account mail notification sent to {$this->user->getName()}");
 		}
 	}
+
+	public function __destruct() {
+		Artisan::call('queue:work --stop-when-empty');
+	}
 }
