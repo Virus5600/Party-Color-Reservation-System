@@ -63,7 +63,8 @@ class ReactApiController extends Controller
 		)
 			->where('is_draft', '!=', '1')
 			->latest()
-			->take(3);
+			->take(3)
+			->get();
 
 		return response()->json([
 			'announcements' => $announcements
