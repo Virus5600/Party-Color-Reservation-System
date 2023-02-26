@@ -736,7 +736,7 @@ class UserController extends Controller
 
 		if ($user == null) {
 			return redirect()
-				->route('admin.user.index')
+				->route('admin.users.index')
 				->with('flash_error', 'The user either does not exists or is already deleted.');
 		}
 
@@ -769,7 +769,7 @@ class UserController extends Controller
 			Log::error($e);
 
 			return redirect()
-				->route('admin.user.index')
+				->route('admin.users.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
@@ -783,7 +783,7 @@ class UserController extends Controller
 
 		if ($user == null) {
 			return redirect()
-				->route('admin.user.index')
+				->route('admin.users.index')
 				->with('flash_error', 'The account either does not exists or is already deleted permanently.');
 		}
 		else if (!$user->trashed()) {
@@ -821,7 +821,7 @@ class UserController extends Controller
 			Log::error($e);
 
 			return redirect()
-				->route('admin.user.index')
+				->route('admin.users.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
