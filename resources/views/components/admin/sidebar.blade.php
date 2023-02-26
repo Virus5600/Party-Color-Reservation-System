@@ -1,6 +1,13 @@
 <div class="d-flex flex-row dark-shadow position-absolute position-lg-relative h-100 w-100 w-lg-auto" style="overflow: hidden;">
 	{{-- Navigation Bar (SIDE) --}}
 	<div class="sidebar dark-shadow custom-scroll d-flex flex-column py-3 px-0 collapse-horizontal overflow-y-auto h-100 bg-white" id="sidebar" aria-labelledby="sidebar-toggler" aria-expanded="false">
+		@php
+		$bookingAccess = Auth::user()->hasPermission('bookings_tab_access');
+		$inventoryAccess = Auth::user()->hasPermission('inventory_tab_access');
+		$menuAccess = Auth::user()->hasPermission('menu_tab_access');
+		$announcementAccess = Auth::user()->hasPermission('announcements_tab_access');
+		@endphp
+
 		{{-- DASHBOARD --}}
 		@if (\Request::is('admin/dashboard'))
 		<span class="bg-secondary text-white"><i class="fas fa-tachometer-alt mr-2"></i>Dashboard</span>
@@ -11,50 +18,59 @@
 		@endif
 
 		{{-- BOOKINGS --}}
-		@if (\Request::is('admin/bookings'))
-		<span class="bg-secondary text-white"><i class="fas fa-calendar-alt mr-2"></i>Bookings</span>
-		@elseif (\Request::is('admin/bookings*'))
-		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.bookings.index') }}" aria-hidden="false" aria-label="Booking"><i class="fas fa-calendar-alt mr-2"></i>Booking</a>
-		@else
-		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.bookings.index') }}" aria-hidden="false" aria-label="Booking"><i class="fas fa-calendar-alt mr-2"></i>Booking</a>
+		@if ($bookingAccess)
+			@if (\Request::is('admin/bookings'))
+			<span class="bg-secondary text-white"><i class="fas fa-calendar-alt mr-2"></i>Bookings</span>
+			@elseif (\Request::is('admin/bookings*'))
+			<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.bookings.index') }}" aria-hidden="false" aria-label="Booking"><i class="fas fa-calendar-alt mr-2"></i>Booking</a>
+			@else
+			<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.bookings.index') }}" aria-hidden="false" aria-label="Booking"><i class="fas fa-calendar-alt mr-2"></i>Booking</a>
+			@endif
 		@endif
 
 		{{-- INVENTORY --}}
-		@if (\Request::is('admin/inventory'))
-		<span class="bg-secondary text-white"><i class="fas fa-boxes mr-2"></i>Inventory</span>
-		@elseif (\Request::is('admin/inventory*'))
-		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.inventory.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-boxes mr-2"></i>Inventory</a>
-		@else
-		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.inventory.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-boxes mr-2"></i>Inventory</a>
+		@if ($inventoryAccess)
+			@if (\Request::is('admin/inventory'))
+			<span class="bg-secondary text-white"><i class="fas fa-boxes mr-2"></i>Inventory</span>
+			@elseif (\Request::is('admin/inventory*'))
+			<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.inventory.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-boxes mr-2"></i>Inventory</a>
+			@else
+			<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.inventory.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-boxes mr-2"></i>Inventory</a>
+			@endif
 		@endif
 
 		{{-- MENU --}}
-		@if (\Request::is('admin/menu'))
-		<span class="bg-secondary text-white"><i class="fas fa-utensils mr-2"></i>Menu</span>
-		@elseif (\Request::is('admin/menu*'))
-		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.menu.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-utensils mr-2"></i>Menu</a>
-		@else
-		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.menu.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-utensils mr-2"></i>Menu</a>
+		@if ($menuAccess)
+			@if (\Request::is('admin/menu'))
+			<span class="bg-secondary text-white"><i class="fas fa-utensils mr-2"></i>Menu</span>
+			@elseif (\Request::is('admin/menu*'))
+			<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.menu.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-utensils mr-2"></i>Menu</a>
+			@else
+			<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.menu.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-utensils mr-2"></i>Menu</a>
+			@endif
 		@endif
 
 		{{-- ANNOUNCEMENT --}}
-		@if (\Request::is('admin/announcement'))
-		<span class="bg-secondary text-white"><i class="fas fa-bullhorn mr-2"></i>Announcements</span>
-		@elseif (\Request::is('admin/announcement*'))
-		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.announcements.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-bullhorn mr-2"></i>Announcements</a>
-		@else
-		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.announcements.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-bullhorn mr-2"></i>Announcements</a>
+		@if ($announcementAccess)
+			@if (\Request::is('admin/announcement'))
+			<span class="bg-secondary text-white"><i class="fas fa-bullhorn mr-2"></i>Announcements</span>
+			@elseif (\Request::is('admin/announcement*'))
+			<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.announcements.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-bullhorn mr-2"></i>Announcements</a>
+			@else
+			<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.announcements.index') }}" aria-hidden="false" aria-label="Inventory"><i class="fas fa-bullhorn mr-2"></i>Announcements</a>
+			@endif
 		@endif
 
 		{{-- ADMIN SETTING AREA --}}
 		@php
 		$userAccess = Auth::user()->hasPermission('users_tab_access');
+		$typesAccess = Auth::user()->hasPermission('types_tab_access');
 		$permsAccess = Auth::user()->hasPermission('permissions_tab_access');
 		$logsAccess = Auth::user()->hasPermission('activity_logs_tab_access');
 		$settingsAccess = Auth::user()->hasPermission('settings_tab_access');
 		@endphp
 
-		@if ($userAccess || $permsAccess || $settingsAccess)
+		@if ($userAccess || $typesAccess || $permsAccess || $logsAccess || $settingsAccess)
 			<hr class="w-100 custom-hr">
 
 			{{-- USERS --}}
@@ -65,6 +81,17 @@
 				<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.users.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-user-alt mr-2"></i>Users</a>
 				@else
 				<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.users.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-user-alt mr-2"></i>Users</a>
+				@endif
+			@endif
+
+			{{-- TYPES --}}
+			@if ($typesAccess)
+				@if (\Request::is('admin/types'))
+				<span class="bg-secondary text-white"><i class="fas fa-user-alt mr-2"></i>(Role) Types</span>
+				@elseif (\Request::is('admin/types*'))
+				<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.types.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-circle-user mr-2"></i>(Role) Types</a>
+				@else
+				<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.types.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-circle-user mr-2"></i>(Role) Types</a>
 				@endif
 			@endif
 

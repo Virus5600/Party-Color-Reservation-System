@@ -56,7 +56,7 @@ class PageController extends Controller
 			'latest_activities' => [
 				'clazz' => Activity::class,
 				'name' => 'Latest Activities',
-				'conditions' => ['*'],
+				'conditions' => ['latest'],
 				'columns' => ['ip_address', 'description'],
 				'hasActions' => false
 			],
@@ -84,7 +84,8 @@ class PageController extends Controller
 				'clazz' => Announcement::class,
 				'name' => 'Drafted Announcements',
 				'conditions' => ['is_draft = 1'],
-				'columns' => ['title', 'summary'],
+				'hiddenColumns' => ['user_id'],
+				'columns' => ['title', 'summary', 'user_id'],
 				'columnsFn' => ['author'],
 				'hasActions' => false,
 				'paginate' => 5
@@ -94,7 +95,7 @@ class PageController extends Controller
 				'name' => 'Latest Announcements',
 				'conditions' => ['is_draft = 0', 'latest'],
 				'hiddenColumns' => ['user_id'],
-				'columns' => ['title', 'summary'],
+				'columns' => ['title', 'summary', 'user_id'],
 				'columnsFn' => ['author'],
 				'hasActions' => false,
 				'paginate' => 5

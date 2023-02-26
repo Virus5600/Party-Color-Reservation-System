@@ -49,7 +49,7 @@ class TypePermissionsTableSeeder extends Seeder
 			]);
 
 		$menuVarAcc = Permission::where('slug', '=', 'menu_var_tab_access')->first();
-		$menuVarPerm = Permission::where('parent_permission', '=', $menuVarAcc->id)->orWhere('slug', '=', $menuVarAcc->slug)->get();
+		$menuVarPerm = Permission::where('parent_permission', '=', $menuVarAcc->id)->get();
 		foreach ($menuVarPerm as $mv)
 			TypePermission::insert([
 				'type_id' => 2,
@@ -65,11 +65,14 @@ class TypePermissionsTableSeeder extends Seeder
 			]);
 
 		// Staff
-		$staffAccess = [
-			Permission::where('slug', '=', 'inventory_tab_access')->first(),
-			Permission::where('slug', '=', 'inventory_tab_create')->first(),
-			Permission::where('slug', '=', 'inventory_tab_edit')->first()
-		];
+		$staffAccess = Permission::whereIn('slug', [
+			'inventory_tab_access',
+			'inventory_tab_create',
+			'inventory_tab_edit',
+			'bookings_tab_access',
+			'bookings_tab_create',
+			'bookings_tab_respond',
+		])->get();
 
 		foreach ($staffAccess as $s)
 			TypePermission::insert([

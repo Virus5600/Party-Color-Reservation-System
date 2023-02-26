@@ -38,7 +38,7 @@ class Inventory extends Model
 				if ($inventory->quantity <= 0) {
 					$id = $inventory->id;
 					$name = $inventory->name;
-					$mu = $item->measurement_unit;
+					$mu = $inventory->measurement_unit;
 
 					$inventory->delete();
 

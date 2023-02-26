@@ -3,7 +3,9 @@ import '../style.css';
 import React from 'react';
 
 import axios from 'axios';
-import { useLoaderData, Form, Link, redirect, } from 'react-router-dom';
+import { useLoaderData, Form, Link } from 'react-router-dom';
+
+import ReservationStatus from '../reservationsuccess';
 
 export function loader() {
 	const rawdata = sessionStorage.getItem('reservationInfo');
@@ -11,49 +13,21 @@ export function loader() {
 }
 
 
-// this is the action for confirm button in create reservation page
-export async function action() {
+export default function ReservationConfirmation(props) {
+
+	// this is used for change the page to success page
+	const [success_booking, set_success_booking] = React.useState(false);
+
 
 	/**
-	 * flow
-	 * 1. get the reservation info made in create reservation page
-	 * 2. send the reservation info to backend
-	 * 3. if success go to success page
-	 * 4. if not success go back to create reservation page
+	 * -----------------
+	 * reservationInfo
+	 * -----------------
+	 * if props exist then set its reservationInfo
+	 * otherwise use the data from session storage
 	 */
+	const reservationInfo = props.forViewReservation == true ? props.reservationInfo : useLoaderData();
 
-	// 1.
-	const raw_session_data = sessionStorage.getItem('reservationInfo');
-
-	// 2.
-	const isSuccess = await handleReserveClick(JSON.parse(raw_session_data));
-
-	// 3.
-	if (isSuccess == true) {
-		const reservationsuccess = true;
-
-
-		// this is the way to access the success page (current solution)
-		sessionStorage.setItem('reservationsuccess', JSON.stringify(reservationsuccess));
-
-
-		return redirect('/reservation/success');
-	}
-
-	// 4.
-	return redirect('/reservation');
-}
-
-export default function ReservationConfirmation(props) {
-	var reservationInfo;
-
-	if (props.forViewReservation == true) { // to use in reservationview component
-		reservationInfo = props.reservationInfo;
-		// console.log('reservationInfo at confirmation component', reservationInfo);
-	} else {
-		// console.log('inside else statement before useLoaderData');
-		reservationInfo = useLoaderData();
-	}
 
 	const {
 		first_name,
@@ -70,13 +44,43 @@ export default function ReservationConfirmation(props) {
 
 	} = reservationInfo;
 
+	const sendReserveRequest = async () => {
 
+		/**
+		  * flow
+		  * 1. get the reservation info made in create reservation page
+		  * 2. send the reservation info to backend
+		  * 3. if success go to success page
+		  * 4. if not success go back to create reservation page
+		  */
+
+		// 1.
+		const raw_session_data = sessionStorage.getItem('reservationInfo');
+
+		// 2.
+		const isSuccess = await handleReserveClick(JSON.parse(raw_session_data));
+
+		// 3. and 4.
+		set_success_booking(isSuccess);
+	}
+
+
+	if (success_booking) {
+		return <ReservationStatus
+			title={'Your reservation has been confirmed!'}
+			description={'An email confirmation has been sent to you.'}
+			link_label={'make another reservation'}
+			link={'/reservation'}
+			bg_style={{ backgroundColor: '#1D7B3E' }}
+			icon_style={{ color: '#00ff59a1' }}
+		/>
+	}
 	return (
 		<div className='container container-small'>
 			<div className='background m-5'>
 				<h1 className='text-center text-white'>Reservation Details</h1>
 
-				<Form method='post' className='px-sm-5 p-4'>
+				<Form className='px-sm-5 p-4'>
 					<div className="text-white">
 						<FieldValue label={'Full Name'} data={first_name + ' ' + last_name} />
 						<FieldValue label={'Email'} data={email} />
@@ -88,8 +92,12 @@ export default function ReservationConfirmation(props) {
 						<FieldValue label={'Time Extension'} data={extension} />
 						<FieldValue label={'Special Requests'} data={special_request} />
 					</div>
+					<div className='text-white text-center '>
+						<span>total</span><br />
+						<span className='fs-1 fw-bold'>¥{compute_price(Number(adult_senior), Number(junior), Number(elementary))}</span>
+					</div>
 					{
-						props.forViewReservation ? <ReservationButtonsForView cancel_request_reason={props.reservationInfo.cancel_request_reason} isCancelled={props.reservationInfo.isCancelled} /> : <ReservationButtons />
+						props.forViewReservation ? <ReservationButtonsForView cancel_request_reason={props.reservationInfo.cancel_request_reason} isCancelled={props.reservationInfo.isCancelled} /> : <ReservationButtons onReserveClick={sendReserveRequest} />
 					}
 				</Form>
 			</div>
@@ -99,15 +107,38 @@ export default function ReservationConfirmation(props) {
 
 
 
-const ReservationButtons = () => {
+// this is used in reservation confirm page
+const ReservationButtons = (props) => {
+
+	/**
+	 * current solution
+	 * 1. send the data in sessionStorage to backend
+	 * 2. if success go to success page
+	 * 3. if not go back to reservation make page
+	 * technical process
+	 *  submit -> action (save the key for accessing the success page) -> load success page
+	 * 
+	 * 
+	 * new solution
+	 * 1. use state for success page, cancel page, undo cancel page
+	 * 2. pass the props to button
+	 * 3. make onClick handler for success, cancel, undo cancel
+	 */
+
+	const handleReserveClick = () => {
+		props.onReserveClick();
+	}
+
 	return (
 		<div className='text-end mt-4'>
 			<Link to='/reservation'><button className='btn btn-danger mx-2'>Edit</button></Link>
-			<button className='btn btn-success mx-2' type='submit'>Reserve</button>
+			<button className='btn btn-success mx-2' type='button' onClick={handleReserveClick}>Reserve</button>
 		</div>
 	);
 }
 
+
+// this is used in reservation view page
 const ReservationButtonsForView = (props) => {
 
 
@@ -172,6 +203,16 @@ const FieldValue = ({ label, data }) => {
 	);
 }
 
+const static_prices = {
+	'adult': 3500,
+	'junior': 2000,
+	'elementary': 1000,
+};
+
+function compute_price(no_adult, no_junior, no_elementary) {
+	return no_adult * static_prices['adult'] + no_junior * static_prices['junior'] + no_elementary * static_prices['elementary'];
+}
+
 const handleReserveClick = async ({
 	first_name,
 	last_name,
@@ -188,15 +229,7 @@ const handleReserveClick = async ({
 
 	const token = document.querySelector('meta[name=csrf-token]').content;
 	const API_TO_SEND_RESERVATION = '/api/react/bookings/create';
-	const prices = {
-		'adult': 3500,
-		'junior': 2000,
-		'elementary': 1000,
-	};
 
-	function compute_price(no_adult, no_junior, no_elementary) {
-		return no_adult * prices['adult'] + no_junior * prices['junior'] + no_elementary * prices['elementary'];
-	}
 
 	let menu = [], amount = [], pax = 0, index = 0;
 	for (let p of [Number(adult_senior), Number(junior), Number(elementary)]) {

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
-
 use App\Jobs\AccountNotification;
 
 use App\PasswordReset;
@@ -256,7 +256,7 @@ class UserController extends Controller
 			'first_name' => array('required', 'string', 'max:255'),
 			'middle_name' => array('string', 'max:255', 'nullable'),
 			'last_name' => array('required', 'string', 'max:255'),
-			'email' => 'required|email|string|max:255',
+			'email' => 'required|email|string|max:255|unique:users,email',
 			'type' => 'required|numeric|exists:types,id',
 			'password' => array('required', 'string', 'min:8', 'max:255', 'regex:/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]*$/'),
 			'avatar' => 'max:5120|mimes:jpeg,jpg,png,webp|nullable',
@@ -273,6 +273,7 @@ class UserController extends Controller
 			'email.email' => 'Invalid email address',
 			'email.string' => 'Inavlid email address',
 			'email.max' => 'Emails must not exceed 255 characters',
+			'email.unique' => 'Email already registered',
 			'type.required' => 'Please select the department where the user works under',
 			'type.numeric' => 'Please refrain from modifying the form',
 			'type.exists' => 'Unknown department',
@@ -372,7 +373,14 @@ class UserController extends Controller
 				->with('flash_error', 'The account either does not exists or is already deleted.');
 		}
 
-		$format = User::LOG_FORMAT;
+		$format = [
+			'first_name',
+			'middle_name',
+			'last_name',
+			'suffix',
+			'email',
+			'last_auth',
+		];
 
 		return view('admin.users.show', [
 			'user' => $user,
@@ -409,7 +417,7 @@ class UserController extends Controller
 			'first_name' => array('required', 'string', 'max:255'),
 			'middle_name' => array('string', 'max:255', 'nullable'),
 			'last_name' => array('required', 'string', 'max:255'),
-			'email' => 'required|email|string|max:255',
+			'email' => array('required', 'email', 'string', 'max:255', Rule::unique('users', 'email')->ignore($user->id)),
 			'type' => 'required|numeric|exists:types,id',
 			'avatar' => 'max:5120|mimes:jpeg,jpg,png,webp|nullable',
 		], [
@@ -425,6 +433,7 @@ class UserController extends Controller
 			'email.email' => 'Invalid email address',
 			'email.string' => 'Inavlid email address',
 			'email.max' => 'Emails must not exceed 255 characters',
+			'email.unique' => 'Email already registered',
 			'type.required' => 'Please select the department where the user works under',
 			'type.numeric' => 'Please refrain from modifying the form',
 			'type.exists' => 'Unknown department',
@@ -656,7 +665,9 @@ class UserController extends Controller
 	}
 
 	protected function updatePermissions(Request $req, $id) {
-		$user = User::withTrashed()->find($id);
+		$user = User::withTrashed()
+			->with(['userPerm'])
+			->find($id);
 		$from = $req->from ? $req->from : route('admin.users.index');
 
 		if ($user == null) {
@@ -676,72 +687,16 @@ class UserController extends Controller
 		try {
 			DB::beginTransaction();
 
-			$userPerms = UserPermission::where('user_id', '=', $user->id)->get();
-			$typePerms = $user->type->permissions;
-			$userPermsID = array();
+			$userPerms = ($user->userPerms == null ? array() : $user->userPerms->pluck(['id'])->toArray());
+			$typePerms = ($user->type->permissions == null ? array() : $user->type->permissions->pluck(['id'])->toArray());
 
-			foreach ($userPerms as $up)
-				array_push($userPermsID, $up->permission_id);
-			$userPerms = Permission::whereIn('id', $userPermsID)->get();
-			
-			// If there are are still permissions...
-			if ($req->permissions != null) {
-				// Store the list of permissions from the request and all department permissions.
-				$selectedPerms = array();
-				$userPermis = array();
-				$typesPerms = array();
+			sort($userPerms);
+			sort($typePerms);
 
-				foreach ($req->permissions as $sp)
-					array_push($selectedPerms, $sp);
-
-				foreach ($userPerms as $up)
-					array_push($userPermis, $up->slug);
-
-				foreach ($typePerms as $dp)
-					array_push($typesPerms, $dp->slug);
-
-				// Sort them...
-				sort($selectedPerms);
-				sort($userPermis);
-				sort($typesPerms);
-
-				// If the permission from the request is exactly the same as the department permissions...
-				if ($selectedPerms === $typesPerms) {
-					// Remove all user permission so that the default (department permissions) will be used.
-					DB::table('user_permissions')
-						->where('user_id', '=', $user->id)
-						->delete();
-				}
-				// Otherwise...
-				else {
-					// Remove all permissions that are in the use permission but not in the request...
-					foreach ($userPerms as $up) {
-						if (!in_array($up->slug, $selectedPerms)) {
-							DB::table('user_permissions')
-								->where('user_id', '=', $user->id)
-								->where('permission_id', '=', $up->id)
-								->delete();
-						}
-					}
-
-					// ...Then add all those that aren't in the user permission yet
-					foreach ($selectedPerms as $sp) {
-						if (!in_array($sp, $userPermis) && !UserPermission::isDuplicatePermission(Permission::where('slug', '=', $sp)->first(), $user->id)) {
-							UserPermission::insert([
-								'user_id' => $user->id,
-								'permission_id' => Permission::where('slug', '=', $sp)->first()->id
-							]);
-						}
-					}
-				}
-			}
-			// If all user permissions is remove...
-			else {
-				// Remove all instances of user permission for this user
-				DB::table('user_permissions')
-					->where('user_id', '=', $user->id)
-					->delete();
-			}
+			if ($userPerms == $typePerms)
+				$user->userPerms()->detach();
+			else
+				$user->userPerms()->sync($req->permissions);
 
 			// LOGGER
 			activity('user')
@@ -781,7 +736,7 @@ class UserController extends Controller
 
 		if ($user == null) {
 			return redirect()
-				->route('admin.user.index')
+				->route('admin.users.index')
 				->with('flash_error', 'The user either does not exists or is already deleted.');
 		}
 
@@ -814,12 +769,12 @@ class UserController extends Controller
 			Log::error($e);
 
 			return redirect()
-				->route('admin.user.index')
+				->route('admin.users.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
 		return redirect()
-			->back()
+			->route('admin.users.index')
 			->with('flash_success', 'Successfully deactivated account.');
 	}
 
@@ -828,7 +783,7 @@ class UserController extends Controller
 
 		if ($user == null) {
 			return redirect()
-				->route('admin.user.index')
+				->route('admin.users.index')
 				->with('flash_error', 'The account either does not exists or is already deleted permanently.');
 		}
 		else if (!$user->trashed()) {
@@ -858,7 +813,7 @@ class UserController extends Controller
 					'type_id' => $user->type,
 					'last_auth' => $user->last_auth
 				])
-				->log("User '{$user->email()}' reactivated account.");
+				->log("User '{$user->getName()}' reactivated account.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -866,12 +821,12 @@ class UserController extends Controller
 			Log::error($e);
 
 			return redirect()
-				->route('admin.user.index')
+				->route('admin.users.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
 		return redirect()
-			->back()
+			->route('admin.users.index')
 			->with('flash_success', 'Successfully re-activated account.');
 	}
 

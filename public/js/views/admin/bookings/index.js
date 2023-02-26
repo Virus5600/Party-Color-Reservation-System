@@ -202,6 +202,17 @@ $(document).ready(() => {
 			var data = e.event.extendedProps
 			let htmlContent = `<div class="spinner-border text-dark" role="status"><span class="sr-only">Loading...</span></div>`;
 
+			// Updates the color of the event
+			$.ajaxSetup({
+				headers: {
+					'Authorization': `Bearer ${$("meta[name=bearer]").attr('content')}`
+				}
+			});
+
+			$.get(bookingFetchOne.replace('%241', data.data_id), (response) => {
+				calendar.getEventById(data.data_id).setProp('color', response.props.statusColorCode);
+			});
+
 			$.get(showBooking.replace('%241', data.data_id), (response) => {
 				if (response.success) {
 					let booking = response.booking;

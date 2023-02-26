@@ -115,7 +115,12 @@ class InventoryController extends Controller
 				->with('flash_error', 'The item either does not exists or is already deleted.');
 		}
 
-		$format = Inventory::LOG_FORMAT;
+		$format = [
+			'item_name',
+			'quantity',
+			'critical_level',
+			'updated_at'
+		];
 
 		return view('admin.inventory.show', [
 			'item' => $item,

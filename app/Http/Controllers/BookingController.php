@@ -7,6 +7,9 @@ use Illuminate\Support\Str;
 
 use Carbon\Carbon;
 
+use App\Jobs\BookingCancellationNotification;
+use App\Jobs\BookingNotification;
+
 use App\Enum\ApprovalStatus;
 use App\Enum\Status;
 
@@ -364,7 +367,7 @@ class BookingController extends Controller
 			// Return the inventory for realtime update
 			if ($booking->items_returned == 0) {
 				foreach ($booking->menus as $m) {
-					$response = $m->returnInventory($m->pivot->count);
+					$response = $m->returnInventory($m->pivot->count, $booking);
 
 					if (!$response->success) {
 						throw new Exception($response->message);
@@ -373,7 +376,7 @@ class BookingController extends Controller
 
 				foreach ($booking->additionalOrders as $o) {
 					foreach ($o->menus as $m) {
-						$response = $m->returnInventory($m->pivot->count);
+						$response = $m->returnInventory($m->pivot->count, $booking);
 
 						if (!$response->success)
 							throw new Exception($response->message);
@@ -445,7 +448,7 @@ class BookingController extends Controller
 			if (!($booking->getOverallStatus() == Status::Happening || $booking->getOverallStatus() == Status::Done)) {
 				if ($booking->items_returned == 0) {
 					foreach ($booking->menus as $m) {
-						$response = $m->returnInventory($m->pivot->count);
+						$response = $m->returnInventory($m->pivot->count, $booking);
 
 						if (!$response->success) {
 							throw new Exception($response->message);
@@ -454,7 +457,7 @@ class BookingController extends Controller
 
 					foreach ($booking->additionalOrders as $o) {
 						foreach ($o->menus as $m) {
-							$response = $m->returnInventory($m->pivot->count);
+							$response = $m->returnInventory($m->pivot->count, $booking);
 
 							if (!$response->success)
 								throw new Exception($response->message);
@@ -524,7 +527,7 @@ class BookingController extends Controller
 			if ($booking->items_returned == 1) {
 				// Reduce the inventoy for realtime update
 				foreach ($booking->menus as $m) {
-					$response = $m->reduceInventory($m->pivot->count);
+					$response = $m->reduceInventory($m->pivot->count, $booking);
 
 					if (!$response->success) {
 						throw new Exception($response->message);
@@ -533,7 +536,7 @@ class BookingController extends Controller
 
 				foreach ($booking->additionalOrders as $o) {
 					foreach ($o->menus as $m) {
-						$response = $m->reduceInventory($m->pivot->count);
+						$response = $m->reduceInventory($m->pivot->count, $booking);
 
 						if (!$response->success)
 							throw new Exception($response->message);
@@ -546,6 +549,13 @@ class BookingController extends Controller
 			$booking->status = ApprovalStatus::Approved;
 			$booking->reason = null;
 			$booking->save();
+
+			// Mail customer about their reservation status
+			$args = [
+				'subject' => 'Reservation Accepted',
+				'reason' => null
+			];
+			BookingNotification::dispatch($booking, "accept", $args);
 
 			// Logger
 			activity('booking')
@@ -622,7 +632,7 @@ class BookingController extends Controller
 			if ($booking->items_returned == 0) {
 				// Return the inventory for realtime update
 				foreach ($booking->menus as $m) {
-					$response = $m->returnInventory($m->pivot->count);
+					$response = $m->returnInventory($m->pivot->count, $booking);
 
 					if (!$response->success) {
 						throw new Exception($response->message);
@@ -631,7 +641,7 @@ class BookingController extends Controller
 
 				foreach ($booking->additionalOrders as $o) {
 					foreach ($o->menus as $m) {
-						$response = $m->returnInventory($m->pivot->count);
+						$response = $m->returnInventory($m->pivot->count, $booking);
 
 						if (!$response->success)
 							throw new Exception($response->message);
@@ -644,6 +654,13 @@ class BookingController extends Controller
 			$booking->reason = $req->reason;
 			$booking->status = ApprovalStatus::Rejected;
 			$booking->save();
+
+			// Mail customer about their reservation status
+			$args = [
+				'subject' => 'Reservation Rejected',
+				'reason' => $booking->reason
+			];
+			BookingNotification::dispatch($booking, "reject", $args);
 
 			// Logger
 			activity('booking')
@@ -704,7 +721,7 @@ class BookingController extends Controller
 			if ($booking->items_returned == 0) {
 				// Reduce the inventoy for realtime update
 				foreach ($booking->menus as $m) {
-					$response = $m->returnInventory($m->pivot->count);
+					$response = $m->returnInventory($m->pivot->count, $booking);
 
 					if (!$response->success) {
 						throw new Exception($response->message);
@@ -713,7 +730,7 @@ class BookingController extends Controller
 
 				foreach ($booking->additionalOrders as $o) {
 					foreach ($o->menus as $m) {
-						$response = $m->returnInventory($m->pivot->count);
+						$response = $m->returnInventory($m->pivot->count, $booking);
 
 						if (!$response->success)
 							throw new Exception($response->message);
@@ -726,6 +743,13 @@ class BookingController extends Controller
 			$booking->status = ApprovalStatus::Pending;
 			$booking->reason = null;
 			$booking->save();
+
+			// Mail customer about their reservation status
+			$args = [
+				'subject' => 'Reservation Moved back to Pending',
+				'reason' => null
+			];
+			BookingNotification::dispatch($booking, "pending", $args);
 
 			// Logger
 			activity('booking')
@@ -802,7 +826,7 @@ class BookingController extends Controller
 			if ($booking->items_returned == 0) {
 				// Return the inventory for realtime update
 				foreach ($booking->menus as $m) {
-					$response = $m->returnInventory($m->pivot->count);
+					$response = $m->returnInventory($m->pivot->count, $booking);
 
 					if (!$response->success) {
 						throw new Exception($response->message);
@@ -811,7 +835,7 @@ class BookingController extends Controller
 
 				foreach ($booking->additionalOrders as $o) {
 					foreach ($o->menus as $m) {
-						$response = $m->returnInventory($m->pivot->count);
+						$response = $m->returnInventory($m->pivot->count, $booking);
 
 						if (!$response->success)
 							throw new Exception($response->message);
@@ -827,6 +851,11 @@ class BookingController extends Controller
 			$booking->save();
 
 			// Mailer to customer that his cancellation is approved
+			$args = [
+				'subject' => 'Reservation Cancellation Accepted',
+				'reason' => $booking->reason
+			];
+			BookingCancellationNotification::dispatch($booking, "accept", $args);
 
 			// Logger
 			activity('booking')
@@ -904,7 +933,12 @@ class BookingController extends Controller
 			$booking->reason = $req->reason;
 			$booking->save();
 
-			// Mailer to customer that his cancellation is approved
+			// Mailer to customer that his cancellation is rejected
+			$args = [
+				'subject' => 'Reservation Cancellation Rejected',
+				'reason' => $booking->reason
+			];
+			BookingCancellationNotification::dispatch($booking, "reject", $args);
 
 			// LOGGER
 			activity('booking')

@@ -75,12 +75,6 @@ class PermissionsTableSeeder extends Seeder
 			'slug' => 'inventory_tab_delete'
 		]);
 
-		// Permission::create([
-		// 	'parent_permission' => $invPerm->id,
-		// 	'name' => 'Inventory Tab Perma Delete',
-		// 	'slug' => 'inventory_tab_perma_delete'
-		// ]);
-
 		// MENU
 		$menuPerm = Permission::create([
 			'name' => 'Menu Tab Access',
@@ -129,12 +123,6 @@ class PermissionsTableSeeder extends Seeder
 			'name' => 'Menu Variation Tab Delete',
 			'slug' => 'menu_var_tab_delete'
 		]);
-
-		// Permission::create([
-		// 	'parent_permission' => $menuPerm->id,
-		// 	'name' => 'Menu Tab Perma Delete',
-		// 	'slug' => 'menu_tab_perma_delete'
-		// ]);
 
 		// ANNOUNCEMENTS
 		 $annPerm = Permission::create([
@@ -218,6 +206,42 @@ class PermissionsTableSeeder extends Seeder
 			'parent_permission' => $userPerm->id,
 			'name' => 'Users Tab Perma Delete',
 			'slug' => 'users_tab_perma_delete'
+		]);
+
+		// TYPE
+		$typePerm = Permission::create([
+			'name' => 'Types Tab Access',
+			'slug' => 'types_tab_access'
+		]);
+
+		Permission::create([
+			'parent_permission' => $typePerm->id,
+			'name' => 'Types Tab Create',
+			'slug' => 'types_tab_create'
+		]);
+
+		Permission::create([
+			'parent_permission' => $typePerm->id,
+			'name' => 'Types Tab Edit',
+			'slug' => 'types_tab_edit'
+		]);
+
+		Permission::create([
+			'parent_permission' => $typePerm->id,
+			'name' => 'Types Tab Delete',
+			'slug' => 'types_tab_delete'
+		]);
+
+		Permission::create([
+			'parent_permission' => $typePerm->id,
+			'name' => 'Types Tab Perma Delete',
+			'slug' => 'types_tab_perma_delete'
+		]);
+
+		Permission::create([
+			'parent_permission' => $typePerm->id,
+			'name' => 'Types Tab Permissions',
+			'slug' => 'types_tab_permissions'
 		]);
 
 		// PERMISSIONS

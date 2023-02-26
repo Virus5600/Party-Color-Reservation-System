@@ -54,13 +54,14 @@ class User extends Authenticatable
 	public function type() { return $this->belongsTo('App\Type'); }
 	protected function passwordReset() { return $this->belongsTo('App\PasswordReset', 'email', 'email'); }
 	public function userPerm() { return $this->hasMany('App\UserPermission'); }
+	public function userPerms() { return $this->belongsToMany('App\Permission', 'user_permissions'); }
 
 	// Custom Function
 	public function permissions() {
 		if ($this->userPerm->count() <= 0)
 			$perms = $this->type->permissions;
 
-		return $perms;
+		return $perms ?? $this->userPerm;
 	}
 
 	public function isUsingTypePermissions() {
