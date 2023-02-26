@@ -42,7 +42,7 @@ class Booking extends Model
 	];
 
 	protected $casts = [
-		'created_at' => 'datetime:H:i',
+		'created_at' => 'datetime:Y-m-d h:i A',
 		'updated_at' => 'datetime:H:i',
 		'reserved_at' => 'date:Y-m-d',
 		'deleted_at' => 'datetime',
@@ -54,23 +54,23 @@ class Booking extends Model
 	// Accessor
 	protected function getStartAtAttribute($value) {
 		try {
-			return Carbon::createFromFormat('H:i:s', $value)->format('H:i');
+			return Carbon::createFromFormat('H:i:s', $value)->format('h:i A');
 		} catch (Exception $e) {
-			return Carbon::createFromFormat('Y-m-d H:i:s', $value)->format('H:i');
+			return Carbon::createFromFormat('Y-m-d H:i:s', $value)->format('h:i A');
 		}
 	}
 
 	protected function getEndAtAttribute($value) {
 		try {
-			return Carbon::createFromFormat('H:i:s', $value)->format('H:i');
+			return Carbon::createFromFormat('H:i:s', $value)->format('h:i A');
 		} catch (Exception $e) {
-			return Carbon::createFromFormat('Y-m-d H:i:s', $value)->format('H:i');
+			return Carbon::createFromFormat('Y-m-d H:i:s', $value)->format('h:i A');
 		}
 	}
 
 	protected function getReservedAtAttribute($value) {
 		try {
-			return Carbon::createFromFormat('Y-m-d H:i:s', $value)->format('H:i');
+			return Carbon::createFromFormat('Y-m-d H:i:s', $value)->format('h:i A');
 		} catch (Exception $e) {
 			return Carbon::createFromFormat('Y-m-d', $value)->format('Y-m-d');
 		}
