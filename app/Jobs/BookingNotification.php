@@ -53,6 +53,7 @@ class BookingNotification implements ShouldQueue
 			"layouts.emails.bookings.notification",
 			[
 				'subject' => $this->args['subject'],
+				'reason' => $this->args['reason'],
 				'type' => $this->type,
 				'booking' => $this->booking
 			],
