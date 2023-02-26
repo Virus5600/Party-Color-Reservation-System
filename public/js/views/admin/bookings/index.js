@@ -394,7 +394,7 @@ $(document).ready(() => {
 										<small class="my-auto mx-auto mx-md-0">
 											<small>
 												${response.canAccomodate ? `<small class="badge badge-pill badge-success">` : `<button data-toggle="modal" data-target="#lackingItems" class="btn btn-danger badge badge-pill badge-danger">`}
-													${response.canAccomodate ? "<b>Can</b> be accomodated" : "<b>Cannot</b> be accomodated"}
+													${response.canAccomodate ? "<b>Can</b>" : "<b>Cannot</b>"} be accomodated
 												${response.canAccomodate ? `</small>` : `</button>`}
 											</small>
 										</small>`;
