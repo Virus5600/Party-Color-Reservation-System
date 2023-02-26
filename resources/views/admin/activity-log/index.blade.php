@@ -49,7 +49,7 @@
 					</td>
 
 					<td class="text-center align-middle mx-auto">
-						{{ $a->description }}
+						{!! $a->description !!}
 						@if ($a->is_marked == 1)
 						<span class="badge badge-danger">Marked as Suspicious</span>
 						@endif

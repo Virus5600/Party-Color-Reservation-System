@@ -24,7 +24,7 @@
 	<div class="row">
 		<div class="col-12 col-md-10 col-lg-8 mx-auto">
 			<div class="card dark-shadow mb-5 {{ $log->is_marked == 1 ? "bg-warning" : "" }}" id="inner-content">
-				<h3 class="card-header font-weight-bold text-center">{{ $log->description }}</h3>
+				<h3 class="card-header font-weight-bold text-center">{!! $log->description !!}</h3>
 				
 				<div class="card-body d-flex flex-column">
 					<ul class="list-group">
