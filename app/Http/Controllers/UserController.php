@@ -774,7 +774,7 @@ class UserController extends Controller
 		}
 
 		return redirect()
-			->back()
+			->route('admin.users.index')
 			->with('flash_success', 'Successfully deactivated account.');
 	}
 
@@ -826,7 +826,7 @@ class UserController extends Controller
 		}
 
 		return redirect()
-			->back()
+			->route('admin.users.index')
 			->with('flash_success', 'Successfully re-activated account.');
 	}
 
