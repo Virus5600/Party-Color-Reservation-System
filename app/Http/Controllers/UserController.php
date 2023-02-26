@@ -690,8 +690,8 @@ class UserController extends Controller
 			$userPerms = ($user->userPerms == null ? array() : $user->userPerms->pluck(['id'])->toArray());
 			$typePerms = ($user->type->permissions == null ? array() : $user->type->permissions->pluck(['id'])->toArray());
 
-			$userPerms = sort($userPerms);
-			$typePerms = sort($typePerms);
+			sort($userPerms);
+			sort($typePerms);
 
 			if ($userPerms == $typePerms)
 				$user->userPerms()->detach();
