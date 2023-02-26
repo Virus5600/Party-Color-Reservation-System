@@ -666,7 +666,7 @@ class UserController extends Controller
 
 	protected function updatePermissions(Request $req, $id) {
 		$user = User::withTrashed()
-			->with(['userPerms'])
+			->with(['userPerm'])
 			->find($id);
 		$from = $req->from ? $req->from : route('admin.users.index');
 
