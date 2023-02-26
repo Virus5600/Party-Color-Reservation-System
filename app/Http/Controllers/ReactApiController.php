@@ -121,7 +121,8 @@ class ReactApiController extends Controller
 
 			// CREATE MAILER TO THE CONTACT PERSON
 			$args = [
-				'subject' => 'Reservation Created'
+				'subject' => 'Reservation Created',
+				'reason' => null
 			];
 			BookingNotification::dispatch($booking, "creation", $args);
 
