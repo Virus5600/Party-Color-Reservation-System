@@ -52,6 +52,11 @@ class SettingsTableSeeder extends Seeder
 		]);
 
 		Settings::create([
+			'name' => 'extension_fee',
+			'value' => '500'
+		]);
+
+		Settings::create([
 			'name' => 'opening',
 			'value' => '17:00'
 		]);

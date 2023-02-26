@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Settings;
-use App\ActivityLog;
 
 use DB;
 use Exception;
@@ -33,6 +32,7 @@ class SettingsController extends Controller
 			'web-desc' => 'required|string|max:16777215',
 			'address' => 'required|string|max:16777215',
 			'capacity' => 'required|numeric|between:1,2147483647',
+			'extension_fee' => 'required|numeric|between:1,2147483647',
 			'day-schedule' => 'required|array|min:1',
 			'day-schedule.*' => 'required|numeric|between:0,6',
 			'contact-single' => 'max:16777215',
@@ -57,6 +57,9 @@ class SettingsController extends Controller
 			'capacity.required' => 'Capacity is required',
 			'capacity.numeric' => 'Capacity should be a number',
 			'capacity.between' => 'Capacity should be between 1 and 2,147,483,647',
+			'extension_fee.required' => 'Extension Fee is required',
+			'extension_fee.numeric' => 'Extension Fee should be a number',
+			'extension_fee.between' => 'Extension Fee should be between 1 and 2,147,483,647',
 			'day-schedule.required' => 'At least 1 open date is required',
 			'day-schedule.min' => 'At least 1 open date is required',
 			'day-schedule.*.required' => 'At least 1 open date is required',
@@ -126,6 +129,14 @@ class SettingsController extends Controller
 				}
 			}
 
+			// LOGGER
+			activity('settings')
+				->by(auth()->user())
+				->on($setting)
+				->event('update')
+				->withProperties($req->except('_token'))
+				->log("Settings updated.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -136,12 +147,6 @@ class SettingsController extends Controller
 				->withInput()
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Settings updated.",
-			null,
-			true
-		);
 
 		return redirect()
 			->route('admin.settings.index')

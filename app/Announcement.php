@@ -27,7 +27,7 @@ class Announcement extends Model
 	];
 
 	// Relationship Function
-	protected function user() { return $this->belongsTo('App\User'); }
+	protected function user() { return $this->belongsTo('App\User', 'user_id', 'id'); }
 	protected function announcementContentImages() { return $this->hasMany('App\AnnouncementContentImage', 'announcement_id', 'id'); }
 
 	// Custom Function
@@ -37,5 +37,10 @@ class Announcement extends Model
 
 	public function author() {
 		return $this->user->getName();
+	}
+
+	// STATIC FUNCTIONS
+	public static function showRoute($id) {
+		return route('admin.announcements.show', [$id]);
 	}
 }

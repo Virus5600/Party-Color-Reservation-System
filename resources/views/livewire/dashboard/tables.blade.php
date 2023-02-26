@@ -17,7 +17,9 @@
 					@endif
 
 					@foreach ($columns as $c)
+					@if (!in_array($c, $hiddenColumns))
 					<th class="text-center align-middle mx-auto">{{ ucwords(preg_replace('/(_+)/', " ", $c)) }}</th>
+					@endif
 					@endforeach
 
 					{{-- IF FN IS LAST --}}
@@ -31,6 +33,10 @@
 
 
 					@if ($hasActions)
+					<th class="text-center align-middle mx-auto"></th>
+					@endif
+
+					@if ($hasShow)
 					<th class="text-center align-middle mx-auto"></th>
 					@endif
 				</tr>
@@ -50,9 +56,11 @@
 					@endif
 
 					@foreach ($columns as $c)
+					@if (!in_array($c, $hiddenColumns))
 					<td class="text-center align-middle mx-auto">
 						{{ $d->$c }}
 					</td>
+					@endif
 					@endforeach
 
 					{{-- IF FN IS LAST --}}
@@ -65,9 +73,9 @@
 						@endforeach
 					@endif
 
-					@if ($hasActions)
-					<td class="align-middle d-flex">
-						<div class="dropdown mx-auto">
+					@if ($hasActions && !$hasShow)
+					<td class="align-middle text-center">
+						<div class="dropdown text-left">
 							<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="dropdown{{$d->id}}" aria-haspopup="true" aria-expanded="false">
 								Action
 							</button>
@@ -88,11 +96,15 @@
 							</div>
 						</div>
 					</td>
+					@elseif ($hasShow)
+					<td class="align-middle">
+						<a href="{{ $clazz == 'Spatie\Activitylog\Models\Activity' ? route('admin.activity-log.show', [$d->id]) : $clazz::showRoute($d->id) }}" class="btn btn-primary btn-sm m-auto"><i class="fas fa-eye fa-sm"></i></a>
+					</td>
 					@endif
 				</tr>
 				@empty
 				<tr>
-					<td colspan="{{ count($columns) + count($columnsFn) + ($hasActions ? 1 : 0) }}" class="text-center">Nothing to show~</td>
+					<td colspan="{{ count($columns) + count($columnsFn) + ($hasActions ? 1 : 0) + ($hasShow ? 1 : 0) }}" class="text-center">Nothing to show~</td>
 				</tr>
 				@endforelse
 			</tbody>
@@ -100,7 +112,7 @@
 			@if (count($data) > 0)
 			<tfoot class="text-center">
 				<tr>
-					<td colspan="{{ count($columns) + count($columnsFn) + ($hasActions ? 1 : 0) }}">
+					<td colspan="{{ count($columns) + count($columnsFn) + ($hasActions ? 1 : 0) + ($hasShow ? 1 : 0) }}">
 						<div class="d-flex align-middle justify-content-center">{{ $data->links() }}</div>
 					</td>
 				</tr>

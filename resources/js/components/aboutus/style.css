@@ -6,10 +6,7 @@
     text-align: center;
     /* font-size: 30px; */
     font-weight: 900;
-}
-
-.time-location .icon {
-    color: white;
+    border: none;
 }
 
 .Appearance h2 {

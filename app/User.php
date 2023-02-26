@@ -7,9 +7,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+use Laravel\Sanctum\HasApiTokens;
+
+use DB;
+use Exception;
+use Log;
+
 class User extends Authenticatable
 {
-	use Notifiable, SoftDeletes;
+	use Notifiable, SoftDeletes, HasApiTokens;
 
 	protected $fillable = [
 		'first_name',
@@ -38,22 +44,27 @@ class User extends Authenticatable
 		'last_auth' => 'datetime',
 	];
 
+	protected $with = [
+		'type.permissions',
+		'userPerm'
+	];
+
 	// Relationships
 	protected function announcements() { return $this->hasMany('App\Announcement'); }
-	protected function type() { return $this->belongsTo('App\Type'); }
+	public function type() { return $this->belongsTo('App\Type'); }
 	protected function passwordReset() { return $this->belongsTo('App\PasswordReset', 'email', 'email'); }
+	public function userPerm() { return $this->hasMany('App\UserPermission'); }
 
 	// Custom Function
 	public function permissions() {
-		$perms = UserPermission::where('user_id', '=', $this->id)->get();
-		if ($perms->count() <= 0)
+		if ($this->userPerm->count() <= 0)
 			$perms = $this->type->permissions;
 
 		return $perms;
 	}
 
 	public function isUsingTypePermissions() {
-		return UserPermission::where('user_id', '=', $this->id)->get()->count() <= 0;
+		return $this->userPerm->count() <= 0;
 	}
 
 	public function hasPermission(...$permissions) {
@@ -123,7 +134,7 @@ class User extends Authenticatable
 		return $this->first_name . ($include_middle ? (' ' . $this->middle_name . ' ') : ' ') . $this->last_name;
 	}
 
-	// Static Functions
+	// STATIC FUNCTIONS
 	public static function getIP() {
 		$ip = request()->ip();
 
@@ -135,5 +146,9 @@ class User extends Authenticatable
 			$ip = $_SERVER['REMOTE_ADDR'];
 
 		return $ip;
+	}
+
+	public static function showRoute($id) {
+		return route('admin.users.show', [$id]);
 	}
 }

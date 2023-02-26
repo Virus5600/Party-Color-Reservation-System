@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Str;
+
 use App\Announcement;
 use App\AnnouncementContentImage;
-use App\ActivityLog;
 
-use Auth;
 use DB;
 use DOMDocument;
 use Exception;
@@ -80,7 +80,7 @@ class AnnouncementController extends Controller
 		try {
 			DB::beginTransaction();
 
-			$slug = preg_replace('/\s+/', '_', $req->title);
+			$slug = Str::of($req->title)->slug('-');
 
 			// Content will be "To add..." to filter images
 			$announcement = Announcement::create([
@@ -88,7 +88,7 @@ class AnnouncementController extends Controller
 				'slug' => $slug,
 				'summary' => $req->summary,
 				'is_draft' => $req->is_draft ? 1 : 0,
-				'user_id' => Auth::user()->id
+				'user_id' => auth()->user()->id
 			]);
 
 			// FILE HANDLING
@@ -115,7 +115,7 @@ class AnnouncementController extends Controller
 				$image = str_replace($replace, '', $i->getAttribute('src'));
 				$image_name = $slug . '-内容' . uniqid() . '.' . $extension;
 
-				Storage::disk('root')->put('/announcements/'.$announcement->id.'/'.$image_name, base64_decode($image));
+				Storage::disk('root')->put('/announcements/'.$announcement->id.'/'.$image_name, base64_decode($image), 'public');
 
 				AnnouncementContentImage::create([
 					'announcement_id' => $announcement->id,
@@ -131,6 +131,22 @@ class AnnouncementController extends Controller
 			$announcement->content = $dom->saveHTML();
 			$announcement->save();
 
+			// LOGGER
+			activity('announcement')
+				->by(auth()->user())
+				->on($announcement)
+				->event('create')
+				->withProperties([
+					'title' => $announcement->title,
+					'slug' => $announcement->slug,
+					'summary' => $announcement->summary,
+					'is_draft' => $announcement->is_draft,
+					'user_id' => $announcement->user_id,
+					'content' => $announcement->content,
+					'poster' => $announcement->poster
+				])
+				->log("Announcement '{$announcement->title}' uploaded.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -140,12 +156,6 @@ class AnnouncementController extends Controller
 				->route('admin.announcements.index', ['d' => $req->show_drafts, 'sd' => $req->show_softdeletes])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-		
-		ActivityLog::log(
-			"Announcement '{$announcement->title}' uploaded.",
-			null,
-			true
-		);
 
 		return redirect()
 			->route('admin.announcements.index', ['d' => $req->show_drafts, 'sd' => $req->show_softdeletes])
@@ -234,7 +244,7 @@ class AnnouncementController extends Controller
 		try {
 			DB::beginTransaction();
 
-			$slug = preg_replace('/\s+/', '_', $req->title);
+			$slug = Str::of($req->title)->slug('-');
 
 			// Content will be "To add..." to filter images
 			$announcement->title = $req->title;
@@ -274,7 +284,7 @@ class AnnouncementController extends Controller
 					$image = str_replace($replace, '', $i->getAttribute('src'));
 					$image_name = $slug . '-内容' . uniqid() . '.' . $extension;
 
-					Storage::disk('root')->put('/announcements/'.$announcement->id.'/'.$image_name, base64_decode($image));
+					Storage::disk('root')->put('/announcements/'.$announcement->id.'/'.$image_name, base64_decode($image), 'public');
 
 					AnnouncementContentImage::create([
 						'announcement_id' => $announcement->id,
@@ -308,7 +318,21 @@ class AnnouncementController extends Controller
 
 			$announcement->content = substr($content, strlen("<div>"), strlen("{$content}") - strlen("<div></div>"));
 			$announcement->save();
-			// Log::debug("Updated Content: {$announcement->content}");
+
+			activity('announcement')
+				->by(auth()->user())
+				->on($announcement)
+				->event('update')
+				->withProperties([
+					'title' => $announcement->title,
+					'slug' => $announcement->slug,
+					'summary' => $announcement->summary,
+					'is_draft' => $announcement->is_draft,
+					'user_id' => $announcement->user_id,
+					'content' => $announcement->content,
+					'poster' => $announcement->poster
+				])
+				->log("Announcement '{$announcement->title}' updated.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -319,12 +343,6 @@ class AnnouncementController extends Controller
 				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Announcement '{$announcement->title}' updated.",
-			null,
-			true
-		);
 
 		return redirect()
 			->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
@@ -346,6 +364,21 @@ class AnnouncementController extends Controller
 			$announcement->is_draft = 0;
 			$announcement->save();
 
+			activity('announcement')
+				->by(auth()->user())
+				->on($announcement)
+				->event('publish')
+				->withProperties([
+					'title' => $announcement->title,
+					'slug' => $announcement->slug,
+					'summary' => $announcement->summary,
+					'is_draft' => $announcement->is_draft,
+					'user_id' => $announcement->user_id,
+					'content' => $announcement->content,
+					'poster' => $announcement->poster
+				])
+				->log("Announcement '{$announcement->title}' published.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -355,12 +388,6 @@ class AnnouncementController extends Controller
 				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Announcement '{$announcement->title}' published.",
-			null,
-			true
-		);
 
 		return redirect()
 			->back()
@@ -382,6 +409,21 @@ class AnnouncementController extends Controller
 			$announcement->is_draft = 1;
 			$announcement->save();
 
+			activity('announcement')
+				->by(auth()->user())
+				->on($announcement)
+				->event('draft')
+				->withProperties([
+					'title' => $announcement->title,
+					'slug' => $announcement->slug,
+					'summary' => $announcement->summary,
+					'is_draft' => $announcement->is_draft,
+					'user_id' => $announcement->user_id,
+					'content' => $announcement->content,
+					'poster' => $announcement->poster
+				])
+				->log("Announcement '{$announcement->title}' drafted.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -392,15 +434,9 @@ class AnnouncementController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
-		ActivityLog::log(
-			"Announcement '{$announcement->title}' unpublished.",
-			null,
-			true
-		);
-
 		return redirect()
 			->back()
-			->with('flash_success', 'Successfully unpublished announcement');
+			->with('flash_success', 'Successfully drafted announcement');
 	}
 
 	protected function delete(Request $req, $id) {
@@ -413,8 +449,25 @@ class AnnouncementController extends Controller
 		}
 
 		try {
-			DB::beginTransaction();			
+			DB::beginTransaction();
+
 			$announcement->delete();
+
+			activity('announcement')
+				->by(auth()->user())
+				->on($announcement)
+				->event('trash')
+				->withProperties([
+					'title' => $announcement->title,
+					'slug' => $announcement->slug,
+					'summary' => $announcement->summary,
+					'is_draft' => $announcement->is_draft,
+					'user_id' => $announcement->user_id,
+					'content' => $announcement->content,
+					'poster' => $announcement->poster
+				])
+				->log("Announcement '{$announcement->title}' moved to trash.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -424,12 +477,6 @@ class AnnouncementController extends Controller
 				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Announcement '{$announcement->title}' moved to trash.",
-			null,
-			true
-		);
 
 		return redirect()
 			->back()
@@ -452,7 +499,24 @@ class AnnouncementController extends Controller
 
 		try {
 			DB::beginTransaction();
+
 			$announcement->restore();
+
+			activity('announcement')
+				->by(auth()->user())
+				->on($announcement)
+				->event('restore')
+				->withProperties([
+					'title' => $announcement->title,
+					'slug' => $announcement->slug,
+					'summary' => $announcement->summary,
+					'is_draft' => $announcement->is_draft,
+					'user_id' => $announcement->user_id,
+					'content' => $announcement->content,
+					'poster' => $announcement->poster
+				])
+				->log("Announcement '{$announcement->title}' restored.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -462,12 +526,6 @@ class AnnouncementController extends Controller
 				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Announcement '{$announcement->title}' restored.",
-			null,
-			true
-		);
 
 		return redirect()
 			->back()
@@ -486,12 +544,32 @@ class AnnouncementController extends Controller
 		try {
 			DB::beginTransaction();
 
-			$poster = $announcement->poster == 'default.png' ? null : $announcement->poster;
 			$id = $announcement->id;
+			$title = $announcement->title;
+			$slug = $announcement->slug;
+			$summary = $announcement->summary;
+			$is_draft = $announcement->is_draft;
+			$user_id = $announcement->user_id;
+			$content = $announcement->content;
+			$poster = $announcement->poster == 'default.png' ? null : $announcement->poster;
 
 			$announcement->forceDelete();
 			if ($poster != null)
 				File::deleteDirectory(public_path() . '/uploads/announcements/' . $id);
+
+			activity('announcement')
+				->by(auth()->user())
+				->event('update')
+				->withProperties([
+					'title' => $title,
+					'slug' => $slug,
+					'summary' => $summary,
+					'is_draft' => $is_draft,
+					'user_id' => $user_id,
+					'content' => $content,
+					'poster' => $poster
+				])
+				->log("Announcement '{$announcement->title}' permanently deleted.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -502,12 +580,6 @@ class AnnouncementController extends Controller
 				->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"Announcement '{$announcement->title}' permanently deleted.",
-			null,
-			true
-		);
 
 		return redirect()
 			->route('admin.announcements.index', ['d' => $req->d, 'sd' => $req->sd])

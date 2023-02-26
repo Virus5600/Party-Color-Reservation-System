@@ -1,0 +1,26 @@
+.card.floating-title {
+	margin-top: 1.5rem;
+	position: relative;
+}
+
+.card.floating-title > .card-title {
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	width: 75%;
+	padding: 0.5rem;
+	border-radius: 0.25rem;
+	background-color: var(--secondary);
+	color: #fff;
+
+	-webkit-transform: translate(5%, -50%);
+	-moz-transform: translate(5%, -50%);
+	-ms-transform: translate(5%, -50%);
+	-o-transform: translate(5%, -50%);
+	transform: translate(5%, -50%);
+}
+
+.card.floating-title > .card-body {
+	padding-top: 2.75rem !important;
+}

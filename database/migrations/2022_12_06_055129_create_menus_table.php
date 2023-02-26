@@ -16,8 +16,6 @@ class CreateMenusTable extends Migration
 		Schema::create('menus', function (Blueprint $table) {
 			$table->id();
 			$table->string('name');
-			$table->decimal('price', 12, 2)->unsigned()->default(0);
-			$table->time('duration')->default('01:00');
 			$table->softDeletes();
 			$table->timestamps();
 		});

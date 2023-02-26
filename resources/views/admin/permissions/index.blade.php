@@ -55,6 +55,16 @@
 				</tr>
 				@endforelse
 			</tbody>
+
+			@if (count($permissions) > 0)
+			<tfoot class="text-center">
+				<tr>
+					<td colspan="3">
+						<div class="d-flex align-middle justify-content-center">{{ $permissions->links() }}</div>
+					</td>
+				</tr>
+			</tfoot>
+			@endif
 		</table>
 	</div>
 </div>

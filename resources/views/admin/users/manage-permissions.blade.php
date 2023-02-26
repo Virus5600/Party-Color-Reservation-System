@@ -42,16 +42,27 @@
 										<div class="card-body">
 											{{-- PERMISSION PARENT --}}
 											<div class="form-check col-12">
-												<input type="checkbox" name="permissions[]" id="perms_{{ $p->slug }}" {{ $user->hasPermission($p->slug) ? 'checked' : '' }} value="{{ $p->slug }}">
-												<label class="form-label font-weight-bold" for="perms_{{ $p->slug }}">{{ $p->name }}</label>
+												<input type="checkbox" name="permissions[]" id="perms_{{ $p->slug }}" {{ $user->hasPermission($p->slug) ? 'checked' : '' }} value="{{ $p->slug }}" {{ ($pp = $p->parentPermission()) != null ? "data-parent=#perms_{$pp->slug}" : "" }}>
+												<label class="form-label font-weight-bold" for="perms_{{ $p->slug }}">
+													{{ $p->name }}
+													
+													@if ($pp != null)
+														<span class="badge badge-info">Child of {{ $pp->name }}</span>
+													@endif
+												</label>
 											</div>
 
+											{{-- PERMISSION CHILD --}}
 											@foreach($p->childPermissions() as $cp)
-											<div class="form-check col-12 ml-4">
-												<input type="checkbox" name="permissions[]" id="perms_{{ $cp->slug }}" {{ $user->hasPermission($cp->slug) ? 'checked' : '' }} value="{{ $cp->slug }}" data-parent="#perms_{{ $p->slug }}">
-												<label class="form-label" for="perms_{{ $cp->slug }}">{{ $cp->name }}</label>
-											</div>
-											@php(array_push($listed_perms, $cp->slug))
+												@if (count($cp->childPermissions()) > 0)
+													@continue
+												@endif
+
+												<div class="form-check col-12 ml-4">
+													<input type="checkbox" name="permissions[]" id="perms_{{ $cp->slug }}" {{ $user->hasPermission($cp->slug) ? 'checked' : '' }} value="{{ $cp->slug }}" data-parent="#perms_{{ $p->slug }}">
+													<label class="form-label" for="perms_{{ $cp->slug }}">{{ $cp->name }}</label>
+												</div>
+												@php(array_push($listed_perms, $cp->slug))
 											@endforeach
 										</div>
 									</div>
@@ -88,16 +99,17 @@
 				pp.push(obj);
 
 				let parent = $(obj);
-				parent.on('click', (e) => {
+				parent.on('click change', (e) => {
 					let p = $(e.currentTarget);
 					if (!p.prop('checked')) {
 						$(`[data-parent="#${p.attr('id')}"]`)
-							.prop('checked', false);
+							.prop('checked', false)
+							.trigger('change');
 					}
 				});
 			}
 
-			$(v).on('click', (e) => {
+			$(v).on('click change', (e) => {
 				let p = $(e.currentTarget);
 				let target = $(v).attr('data-parent');
 
@@ -106,10 +118,20 @@
 					isThereChecked = isThereChecked || $(vv).prop('checked');
 				});
 
-				if (!isThereChecked)
-					$(target).prop('checked', false);
-				else
-					$(target).prop('checked', true);
+				if (!isThereChecked) {
+					target = $(target);
+					target.prop('checked', false);
+					
+					if (typeof target.attr('data-parent') != 'undefined')
+						$(target.attr('data-parent')).prop('checked', false);
+				}
+				else {
+					target = $(target);
+					target.prop('checked', true);
+
+					if (typeof target.attr('data-parent') != 'undefined')
+						$(target.attr('data-parent')).prop('checked', true);
+				}
 			});
 		});
 	});

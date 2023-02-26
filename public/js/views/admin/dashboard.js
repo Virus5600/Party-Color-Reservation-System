@@ -40,7 +40,7 @@ $(document).ready(() => {
 									<table class="table table-striped my-0">
 										<thead>
 											<tr>
-												<th class="text-center">Reservation For</th>
+												<th class="text-center">Booking For</th>
 												<th class="text-center">Pax</th>
 												<th class="text-center">Income</th>
 												<th class="text-center">Duration</th>

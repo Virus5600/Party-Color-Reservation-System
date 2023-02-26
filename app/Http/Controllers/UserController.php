@@ -14,9 +14,7 @@ use App\Type;
 use App\TypePermission;
 use App\User;
 use App\UserPermission;
-use App\ActivityLog;
 
-use Auth;
 use DB;
 use Exception;
 use File;
@@ -24,7 +22,6 @@ use Hash;
 use Location;
 use Log;
 use Mail;
-use Session;
 use Validator;
 
 class UserController extends Controller
@@ -35,18 +32,10 @@ class UserController extends Controller
 	}
 
 	protected function login() {
-		if (!Auth::check())
+		if (!auth()->check())
 			return view('admin.login');
-		else {
-
-			ActivityLog::log(
-				"User login.",
-				null,
-				true
-			);
-
+		else
 			return redirect()->route('admin.dashboard');
-		}
 	}
 
 	protected function authenticate(Request $req) {
@@ -60,7 +49,7 @@ class UserController extends Controller
 
 		$authenticated = false;
 		if (!$user->locked) {
-			$authenticated = Auth::attempt([
+			$authenticated = auth()->attempt([
 				'email' => $req->email,
 				'password' => $req->password
 			]);
@@ -74,6 +63,23 @@ class UserController extends Controller
 					$user->login_attempts = 0;
 					$user->last_auth = Carbon::now()->timezone('Asia/Manila');
 					$user->save();
+
+					activity('user')
+						->byAnonymous()
+						->on($user)
+						->event('login-success')
+						->withProperties([
+							'first_name' => $user->first_name,
+							'middle_name' => $user->middle_name,
+							'last_name' => $user->last_name,
+							'suffix' => $user->suffix,
+							'is_avatar_link' => $user->is_avatar_link,
+							'avatar' => $user->avatar,
+							'email' => $user->email,
+							'type_id' => $user->type,
+							'last_auth' => $user->last_auth
+						])
+						->log("User {$user->email} successfully logged in.");
 			
 					DB::commit();
 				} catch (Exception $e) {
@@ -81,6 +87,9 @@ class UserController extends Controller
 					Log::error($e);
 				}
 			}
+			$user->tokens()->delete();
+			$token = $user->createToken('authenticated');
+			session(["bearer" => $token->plainTextToken]);
 
 			return redirect()
 				->intended(route('admin.dashboard'))
@@ -106,10 +115,44 @@ class UserController extends Controller
 								]);
 								$pr = PasswordReset::where('email', '=', $user->email)->first();
 								$pr->generateToken()->generateExpiration();
+
+								activity('user')
+									->byAnonymous()
+									->on($user)
+									->event('login-attempt')
+									->withProperties([
+										'first_name' => $user->first_name,
+										'middle_name' => $user->middle_name,
+										'last_name' => $user->last_name,
+										'suffix' => $user->suffix,
+										'is_avatar_link' => $user->is_avatar_link,
+										'avatar' => $user->avatar,
+										'email' => $user->email,
+										'type_id' => $user->type,
+										'last_auth' => $user->last_auth
+									])
+									->log("Locked account of {$user->email} after 5 incorrect attempts");
 							}
 							// Otherwise, fetch the row to use the already generated data
 							else {
 								$pr = PasswordReset::where('email', '=', $user->email)->first();
+
+								activity('user')
+									->byAnonymous()
+									->on($booking)
+									->event('login-attempt')
+									->withProperties([
+										'first_name' => $user->first_name,
+										'middle_name' => $user->middle_name,
+										'last_name' => $user->last_name,
+										'suffix' => $user->suffix,
+										'is_avatar_link' => $user->is_avatar_link,
+										'avatar' => $user->avatar,
+										'email' => $user->email,
+										'type_id' => $user->type,
+										'last_auth' => $user->last_auth
+									])
+									->log("Login attempt to {$user->email} after lockout");
 							}
 							
 							$args = [
@@ -125,6 +168,23 @@ class UserController extends Controller
 						$msg = 'Exceeded 5 tries, account locked';
 					}
 					$user->save();
+
+					activity('user')
+						->byAnonymous()
+						->on($user)
+						->event('login-attempt')
+						->withProperties([
+							'first_name' => $user->first_name,
+							'middle_name' => $user->middle_name,
+							'last_name' => $user->last_name,
+							'suffix' => $user->suffix,
+							'is_avatar_link' => $user->is_avatar_link,
+							'avatar' => $user->avatar,
+							'email' => $user->email,
+							'type_id' => $user->type,
+							'last_auth' => $user->last_auth
+						])
+						->log("Login attempted for {$user->email}.");
 					
 					DB::commit();
 				} catch (Exception $e) {
@@ -142,15 +202,30 @@ class UserController extends Controller
 	}
 
 	protected function logout() {
-		if (Auth::check()) {
+		if (auth()->check()) {
+			$auth = auth()->user();
+			$auth->tokens()->delete();
+			
 			auth()->logout();
-			Session::flush();
+			session()->flush();
 
-			ActivityLog::log(
-				"User logout.",
-				null,
-				true
-			);
+			// LOGGER
+			activity('user')
+				->by($auth)
+				->on($auth)
+				->event('logout')
+				->withProperties([
+					'first_name' => $auth->first_name,
+					'middle_name' => $auth->middle_name,
+					'last_name' => $auth->last_name,
+					'suffix' => $auth->suffix,
+					'is_avatar_link' => $auth->is_avatar_link,
+					'avatar' => $auth->avatar,
+					'email' => $auth->email,
+					'type_id' => $auth->type,
+					'last_auth' => $auth->last_auth
+				])
+				->log("User {$auth->email} logout");
 
 			return redirect(route('home'))->with('flash_success', 'Logged out!');
 		}
@@ -166,7 +241,7 @@ class UserController extends Controller
 		]);
 	}
 
-	protected function create() {
+	protected function create(Request $req) {
 		$types = Type::get();
 		$password = str_shuffle(Str::random(25) . str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT));
 
@@ -251,9 +326,27 @@ class UserController extends Controller
 				'subject' => 'Account Created',
 				'req' => $reqArgs,
 				'email' => $req->email,
-				'recipients' => [$req->email, Auth::user()->email]
+				'recipients' => [$req->email, auth()->user()->email]
 			];
 			AccountNotification::dispatch($user, "creation", $args)->afterCommit();
+
+			// LOGGER
+			activity('user')
+				->by(auth()->user())
+				->on($user)
+				->event('create')
+				->withProperties([
+					'first_name' => $user->first_name,
+					'middle_name' => $user->middle_name,
+					'last_name' => $user->last_name,
+					'suffix' => $user->suffix,
+					'is_avatar_link' => $user->is_avatar_link,
+					'avatar' => $user->avatar,
+					'email' => $user->email,
+					'type_id' => $user->type,
+					'last_auth' => $user->last_auth
+				])
+				->log("User '" . trim($user->getName()) . "' created under the email of '{$user->email}' as {$user->type->name}.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -265,18 +358,29 @@ class UserController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
-		ActivityLog::log(
-			"User '" . trim($user->getName()) . "' created.",
-			null,
-			true
-		);
-
 		return redirect()
 			->route('admin.users.index')
 			->with('flash_success', 'Successfully added "' . trim($user->getName()) . '"');
 	}
 
-	protected function edit($id) {
+	protected function show(Request $req, $id) {
+		$user = User::withTrashed()->find($id);
+
+		if ($user == null) {
+			return redirect()
+				->route('admin.users.index')
+				->with('flash_error', 'The account either does not exists or is already deleted.');
+		}
+
+		$format = User::LOG_FORMAT;
+
+		return view('admin.users.show', [
+			'user' => $user,
+			'format' => $format
+		]);
+	}
+
+	protected function edit(Request $req, $id) {
 		$user = User::withTrashed()->find($id);
 		$types = Type::get();
 
@@ -364,6 +468,24 @@ class UserController extends Controller
 			$user->type_id = $req->type;
 			$user->save();
 
+			// LOGGER
+			activity('user')
+				->by(auth()->user())
+				->on($user)
+				->event('update')
+				->withProperties([
+					'first_name' => $user->first_name,
+					'middle_name' => $user->middle_name,
+					'last_name' => $user->last_name,
+					'suffix' => $user->suffix,
+					'is_avatar_link' => $user->is_avatar_link,
+					'avatar' => $user->avatar,
+					'email' => $user->email,
+					'type_id' => $user->type,
+					'last_auth' => $user->last_auth
+				])
+				->log("User '{$user->email}' updated.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -373,12 +495,6 @@ class UserController extends Controller
 				->route('admin.users.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"User '{trim($user->getName())}' updated.",
-			null,
-			true
-		);
 
 		return redirect()
 			->route('admin.users.index')
@@ -433,6 +549,24 @@ class UserController extends Controller
 
 			$user->save();
 
+			// LOGGER
+			activity('user')
+				->by(auth()->user())
+				->on($user)
+				->event('update')
+				->withProperties([
+					'first_name' => $user->first_name,
+					'middle_name' => $user->middle_name,
+					'last_name' => $user->last_name,
+					'suffix' => $user->suffix,
+					'is_avatar_link' => $user->is_avatar_link,
+					'avatar' => $user->avatar,
+					'email' => $user->email,
+					'type_id' => $user->type,
+					'last_auth' => $user->last_auth
+				])
+				->log("User '{$user->email}' changed password.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -444,12 +578,6 @@ class UserController extends Controller
 					'message' => 'Something went wrong, please try again later.',
 				]);
 		}
-
-		ActivityLog::log(
-			"User '{$user->getName()}' changed password.",
-			null,
-			true
-		);
 
 		return response()
 			->json([
@@ -494,6 +622,24 @@ class UserController extends Controller
 				->where('user_id', '=', $user->id)
 				->delete();
 
+			// LOGGER
+			activity('user')
+				->by(auth()->user())
+				->on($user)
+				->event('update')
+				->withProperties([
+					'first_name' => $user->first_name,
+					'middle_name' => $user->middle_name,
+					'last_name' => $user->last_name,
+					'suffix' => $user->suffix,
+					'is_avatar_link' => $user->is_avatar_link,
+					'avatar' => $user->avatar,
+					'email' => $user->email,
+					'type_id' => $user->type,
+					'last_auth' => $user->last_auth
+				])
+				->log("User '{$user->email}' reverted back to using their type permissions ({$user->type->name}).");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -503,12 +649,6 @@ class UserController extends Controller
 				->route('admin.users.manage-permissions', [$user->id, 'from' => $from ? $from : null])
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"User '{$user->getName()}' reverted back to type permissions.",
-			null,
-			true
-		);
 
 		return redirect()
 			->route('admin.users.manage-permissions', [$user->id, 'from' => $from ? $from : null])
@@ -603,6 +743,24 @@ class UserController extends Controller
 					->delete();
 			}
 
+			// LOGGER
+			activity('user')
+				->by(auth()->user())
+				->on($user)
+				->event('update')
+				->withProperties([
+					'first_name' => $user->first_name,
+					'middle_name' => $user->middle_name,
+					'last_name' => $user->last_name,
+					'suffix' => $user->suffix,
+					'is_avatar_link' => $user->is_avatar_link,
+					'avatar' => $user->avatar,
+					'email' => $user->email,
+					'type_id' => $user->type,
+					'last_auth' => $user->last_auth
+				])
+				->log("User '{$user->email}' permissions' updated.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -612,12 +770,6 @@ class UserController extends Controller
 				->to($from)
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"User '{$user->getName()}' updated permissions.",
-			null,
-			true
-		);
 
 		return redirect()
 			->to($from)
@@ -634,8 +786,28 @@ class UserController extends Controller
 		}
 
 		try {
-			DB::beginTransaction();			
+			DB::beginTransaction();
+
 			$user->delete();
+
+			// LOGGER
+			activity('user')
+				->by(auth()->user())
+				->on($user)
+				->event('deactivate')
+				->withProperties([
+					'first_name' => $user->first_name,
+					'middle_name' => $user->middle_name,
+					'last_name' => $user->last_name,
+					'suffix' => $user->suffix,
+					'is_avatar_link' => $user->is_avatar_link,
+					'avatar' => $user->avatar,
+					'email' => $user->email,
+					'type_id' => $user->type,
+					'last_auth' => $user->last_auth
+				])
+				->log("User '{$user->email}' deactivated account.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -645,12 +817,6 @@ class UserController extends Controller
 				->route('admin.user.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"User '{$user->getName()}' deactivated account.",
-			null,
-			true
-		);
 
 		return redirect()
 			->back()
@@ -673,7 +839,27 @@ class UserController extends Controller
 
 		try {
 			DB::beginTransaction();
+
 			$user->restore();
+
+			// LOGGER
+			activity('user')
+				->by(auth()->user())
+				->on($user)
+				->event('activate')
+				->withProperties([
+					'first_name' => $user->first_name,
+					'middle_name' => $user->middle_name,
+					'last_name' => $user->last_name,
+					'suffix' => $user->suffix,
+					'is_avatar_link' => $user->is_avatar_link,
+					'avatar' => $user->avatar,
+					'email' => $user->email,
+					'type_id' => $user->type,
+					'last_auth' => $user->last_auth
+				])
+				->log("User '{$user->email()}' reactivated account.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -683,12 +869,6 @@ class UserController extends Controller
 				->route('admin.user.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"User '{$user->getName()}' reactivated account.",
-			null,
-			true
-		);
 
 		return redirect()
 			->back()
@@ -709,7 +889,35 @@ class UserController extends Controller
 
 			if ($user->avatar != 'default.png')
 					File::delete(public_path() . '/uploads/users/' . $user->avatar);
+			
+			$first_name = $user->first_name;
+			$middle_name = $user->middle_name;
+			$last_name = $user->last_name;
+			$suffix = $user->suffix;
+			$is_avatar_link = $user->is_avatar_link;
+			$avatar = $user->avatar;
+			$email = $user->email;
+			$type = $user->type;
+			$last_auth = $user->last_auth;
+
 			$user->forceDelete();
+
+			activity('user')
+				->by(auth()->user())
+				->on($user)
+				->event('logout')
+				->withProperties([
+					'first_name' => $first_name,
+					'middle_name' => $middle_name,
+					'last_name' => $last_name,
+					'suffix' => $suffix,
+					'is_avatar_link' => $is_avatar_link,
+					'avatar' => $avatar,
+					'email' => $email,
+					'type_id' => $type,
+					'last_auth' => $last_auth
+				])
+				->log("User '{$email}' permanently deleted.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -720,12 +928,6 @@ class UserController extends Controller
 				->route('admin.users.index')
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
-
-		ActivityLog::log(
-			"User '{$user->getName()}' permanently deleted.",
-			null,
-			true
-		);
 
 		return redirect()
 			->route('admin.users.index')

@@ -24,9 +24,9 @@ class TypePermissionsTableSeeder extends Seeder
 			]);
 
 		// Manager
-		$reservationAcc = Permission::where('slug', '=', 'reservations_tab_access')->first();
-		$reservationPerm = Permission::where('parent_permission', '=', $reservationAcc->id)->orWhere('slug', '=', $reservationAcc->slug)->get();
-		foreach ($reservationPerm as $r)
+		$bookingAcc = Permission::where('slug', '=', 'bookings_tab_access')->first();
+		$bookingPerm = Permission::where('parent_permission', '=', $bookingAcc->id)->orWhere('slug', '=', $bookingAcc->slug)->get();
+		foreach ($bookingPerm as $r)
 			TypePermission::insert([
 				'type_id' => 2,
 				'permission_id' => $r->id
@@ -48,6 +48,14 @@ class TypePermissionsTableSeeder extends Seeder
 				'permission_id' => $m->id
 			]);
 
+		$menuVarAcc = Permission::where('slug', '=', 'menu_var_tab_access')->first();
+		$menuVarPerm = Permission::where('parent_permission', '=', $menuVarAcc->id)->orWhere('slug', '=', $menuVarAcc->slug)->get();
+		foreach ($menuVarPerm as $mv)
+			TypePermission::insert([
+				'type_id' => 2,
+				'permission_id' => $mv->id
+			]);
+
 		$announcementsAcc = Permission::where('slug', '=', 'announcements_tab_access')->first();
 		$announcementsPerm = Permission::where('parent_permission', '=', $announcementsAcc->id)->orWhere('slug', '=', $announcementsAcc->slug)->get();
 		foreach ($announcementsPerm as $a)
@@ -57,11 +65,14 @@ class TypePermissionsTableSeeder extends Seeder
 			]);
 
 		// Staff
-		$staffAccess = [
-			Permission::where('slug', '=', 'inventory_tab_access')->first(),
-			Permission::where('slug', '=', 'inventory_tab_create')->first(),
-			Permission::where('slug', '=', 'inventory_tab_edit')->first()
-		];
+		$staffAccess = Permission::whereIn('slug', [
+			'inventory_tab_access',
+			'inventory_tab_create',
+			'inventory_tab_edit',
+			'bookings_tab_access',
+			'bookings_tab_create',
+			'bookings_tab_respond',
+		])->get();
 
 		foreach ($staffAccess as $s)
 			TypePermission::insert([

@@ -15,7 +15,7 @@ class CreateContactInformationTable extends Migration
 	{
 		Schema::create('contact_information', function (Blueprint $table) {
 			$table->id();
-			$table->bigInteger('reservation_id')->unsigned();
+			$table->bigInteger('booking_id')->unsigned();
 			$table->string('contact_name');
 			$table->string('email')->nullable();
 			$table->timestamps();

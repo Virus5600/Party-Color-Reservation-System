@@ -16,9 +16,16 @@
 				<div class="col-12 col-md-8">
 					<div class="row">
 						{{-- ADD --}}
-						@if (Auth::user()->hasPermission('announcements_tab_create'))
+						@if (Auth::user()->hasPermission('menu_tab_create'))
 						<div class="col-12 col-md text-center text-md-right ml-md-auto">
-							<a href="{{ route('admin.menu.create') }}" class="btn btn-success m-auto"><i class="fa fa-plus-circle mr-2"></i>Add Item</a>
+							<a href="javascript:void(0);" class="btn btn-success m-auto"
+								data-scf="Menu Name"
+								data-scf-name="menu_name"
+								data-scf-custom-title="Add a Menu"
+								data-scf-target-uri="{{ route('admin.menu.store') }}"
+								data-scf-reload="true">
+								<i class="fa fa-plus-circle mr-2"></i>Add Item
+							</a>
 						</div>
 						@endif
 
@@ -36,6 +43,7 @@
 			<thead>
 				<tr>
 					<th class="text-center">Menu Name</th>
+					<th class="text-center">Variations</th>
 					<th class="text-center">Status</th>
 					<th class="text-center"></th>
 				</tr>
@@ -45,20 +53,27 @@
 				@forelse ($menus as $m)
 				<tr class="enlarge-on-hover">
 					<td class="text-center align-middle mx-auto font-weight-bold">{{ $m->name }}</td>
+					<td class="text-center align-middle mx-auto">{{ $m->menu_variations_count }}</td>
 					<td class="text-center align-middle mx-auto"><i class="fas fa-circle {{ $m->trashed() ? 'text-danger' : 'text-success' }} mr-2"></i>{{ $m->trashed() ? 'Inactive' : 'Active'}}</td>
-					<td class="align-middle">
-						<div class="dropdown ">
+					<td class="text-center align-middle mx-auto">
+						<div class="dropdown">
 							<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="dropdown{{$m->id}}" aria-haspopup="true" aria-expanded="false">
 								Action
 							</button>
 
 							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown{{$m->id}}">
 								{{-- SHOW --}}
-								<a href="{{ route('admin.menu.show', [$m->id]) }}" class="dropdown-item"><i class="fas fa-eye mr-2"></i>View</a>
+								<a href="{{ route('admin.menu.variation.index', [$m->id]) }}" class="dropdown-item"><i class="fas fa-eye mr-2"></i>View</a>
 
 								{{-- EDIT --}}
 								@if (Auth::user()->hasPermission('menu_tab_edit'))
-								<a href="{{ route('admin.menu.edit', [$m->id]) }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>
+								<a href="javascript:void(0);" class="dropdown-item"
+									data-scf="Menu Name"
+									data-scf-name="menu_name"
+									data-scf-target-uri="{{ route('admin.menu.update', [$m->id]) }}"
+									data-scf-reload="true">
+									<i class="fas fa-pen-to-square mr-2"></i>Change Name
+								</a>
 								@endif
 								
 								{{-- DELETE --}}

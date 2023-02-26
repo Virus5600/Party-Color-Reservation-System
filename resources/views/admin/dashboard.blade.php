@@ -43,7 +43,7 @@
 			</div>
 
 			<div class="col-12 col-lg-6">
-				@livewire('dashboard.tables', $tables['pending_reservations'])
+				@livewire('dashboard.tables', $tables['pending_bookings'])
 			</div>
 		</div>
 	</div>
@@ -87,7 +87,7 @@
 		borderColor: '#707070',
 		backgroundColor: '#707070',
 	}];
-	const reservationFetchURL = `{{ route('api.admin.reservations.fetch', ["$1"]) }}`;
+	const bookingFetchURL = `{{ route('api.admin.bookings.fetch', ["$1"]) }}`;
 </script>
 {{-- Graph Initialization --}}
 <script type="text/javascript" src="{{ asset('js/views/admin/dashboard.js') }}"></script>

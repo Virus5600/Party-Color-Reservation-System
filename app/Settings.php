@@ -74,4 +74,9 @@ class Settings extends Model
 
 		return $toRet;
 	}
+
+	// STATIC FUNCTIONS
+	public static function showRoute() {
+		return route('admin.settings.index');
+	}
 }

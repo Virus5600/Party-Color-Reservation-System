@@ -22,7 +22,7 @@ class Permission extends Model
 	}
 
 	public function parentPermission() {
-		return Permission::where('id', '=', $this->parent_permission)->get();
+		return Permission::where('id', '=', $this->parent_permission)->first();
 	}
 
 	public function allUsers() {
@@ -38,5 +38,10 @@ class Permission extends Model
 			->whereIn('id', $userIds, 'or');
 
 		return $users->get();
+	}
+
+	// STATIC FUNCTIONS
+	public static function showRoute($id) {
+		return route('admin.permissions.show', [Permission::find($id)->slug]);
 	}
 }

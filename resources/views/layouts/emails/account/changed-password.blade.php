@@ -1,4 +1,4 @@
-@extends('layouts.emails.account.layout')
+@extends('layouts.emails.layout')
 
 @section('title')
 You're password has been updated!

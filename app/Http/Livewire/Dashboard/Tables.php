@@ -29,6 +29,7 @@ class Tables extends Component
 	public $urlNamespace;
 	public $paginate;
 	public $fnFirst;
+	public $hasShow;
 
 	public function mount(
 			$clazz,
@@ -42,7 +43,8 @@ class Tables extends Component
 			string $urlNamespace = null,
 			bool $hasActions = true,
 			int $paginate = 10,
-			bool $fnFirst = false) {
+			bool $fnFirst = false,
+			bool $hasShow = true) {
 		
 		$this->clazz = $clazz;
 		$this->name = $name ? $name : $this->getShortName($clazz);
@@ -55,6 +57,7 @@ class Tables extends Component
 		$this->urlNamespace = $urlNamespace ? $urlNamespace : strtolower($this->getShortName($clazz));
 		$this->paginate = $paginate;
 		$this->fnFirst = $fnFirst;
+		$this->hasShow = $hasShow;
 
 		$this->hasActions = $hasActions;
 
@@ -108,7 +111,7 @@ class Tables extends Component
 				// If the condition is * (all), query then break the loop immediately.
 				if ($c == "*") {
 					$clazz = $this->clazz;
-					$clazz = $clazz::select("id");
+					$clazz = $clazz::select("*");
 
 					// Re-adds all SELECT queries
 					foreach ($this->columns as $c) {
@@ -138,10 +141,15 @@ class Tables extends Component
 				else if (strlen($c) > 0) {
 					// Splice the condition.
 					$splice = explode(" ", preg_replace("/(\s+)/", " ", $c));
-					$clazz = $clazz->where($splice[0], $splice[1], $splice[2]);
+					$splice[3] = count($splice) >= 4 ? $splice[3] : false;
+					
+					// Identifies if the comparison is between columns or not.
+					if ($splice[3])
+						$clazz = $clazz->whereColumn($splice[0], $splice[1], $splice[2]);
+					else
+						$clazz = $clazz->where($splice[0], $splice[1], $splice[2]);
 				}
 			}
-
 			$data = $clazz->paginate(10);
 		}
 		else {
@@ -149,14 +157,17 @@ class Tables extends Component
 		}
 
 		return view('livewire.dashboard.tables', [
+			'clazz' => $this->clazz,
 			'data' => $data,
+			'hiddenColumns' => $this->hiddenColumns,
 			'columns' => $this->columns,
 			'namespace' => $this->urlNamespace,
 			'name' => $this->name,
 			'hasActions' => $this->hasActions,
 			'columnsFn' => $this->columnsFn,
 			'aliasFn' => $this->aliasFn,
-			'fnFirst' => $this->fnFirst
+			'fnFirst' => $this->fnFirst,
+			'hasShow' => $this->hasShow
 		]);
 	}
 

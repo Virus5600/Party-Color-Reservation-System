@@ -10,13 +10,13 @@
 		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.dashboard') }}" aria-hidden="false" aria-label="Dashboard"><i class="fas fa-tachometer-alt mr-2"></i>Dashboard</a>
 		@endif
 
-		{{-- RESERVATION --}}
-		@if (\Request::is('admin/reservation'))
-		<span class="bg-secondary text-white"><i class="fas fa-calendar-alt mr-2"></i>Reservations</span>
-		@elseif (\Request::is('admin/reservation*'))
-		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.reservations.index') }}" aria-hidden="false" aria-label="Reservation"><i class="fas fa-calendar-alt mr-2"></i>Reservation</a>
+		{{-- BOOKINGS --}}
+		@if (\Request::is('admin/bookings'))
+		<span class="bg-secondary text-white"><i class="fas fa-calendar-alt mr-2"></i>Bookings</span>
+		@elseif (\Request::is('admin/bookings*'))
+		<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.bookings.index') }}" aria-hidden="false" aria-label="Booking"><i class="fas fa-calendar-alt mr-2"></i>Booking</a>
 		@else
-		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.reservations.index') }}" aria-hidden="false" aria-label="Reservation"><i class="fas fa-calendar-alt mr-2"></i>Reservation</a>
+		<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.bookings.index') }}" aria-hidden="false" aria-label="Booking"><i class="fas fa-calendar-alt mr-2"></i>Booking</a>
 		@endif
 
 		{{-- INVENTORY --}}
@@ -49,6 +49,7 @@
 		{{-- ADMIN SETTING AREA --}}
 		@php
 		$userAccess = Auth::user()->hasPermission('users_tab_access');
+		$typesAccess = Auth::user()->hasPermission('types_tab_access');
 		$permsAccess = Auth::user()->hasPermission('permissions_tab_access');
 		$logsAccess = Auth::user()->hasPermission('activity_logs_tab_access');
 		$settingsAccess = Auth::user()->hasPermission('settings_tab_access');
@@ -65,6 +66,17 @@
 				<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.users.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-user-alt mr-2"></i>Users</a>
 				@else
 				<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.users.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-user-alt mr-2"></i>Users</a>
+				@endif
+			@endif
+
+			{{-- TYPES --}}
+			@if ($typesAccess)
+				@if (\Request::is('admin/types'))
+				<span class="bg-secondary text-white"><i class="fas fa-user-alt mr-2"></i>(Role) Types</span>
+				@elseif (\Request::is('admin/types*'))
+				<a class="text-decoration-none bg-secondary text-white aria-link" href="{{ route('admin.types.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-circle-user mr-2"></i>(Role) Types</a>
+				@else
+				<a class="text-decoration-none text-dark aria-link" href="{{ route('admin.types.index') }}" aria-hidden="false" aria-label="Users"><i class="fas fa-circle-user mr-2"></i>(Role) Types</a>
 				@endif
 			@endif
 

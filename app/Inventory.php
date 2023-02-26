@@ -19,7 +19,8 @@ class Inventory extends Model
 	protected $fillable = [
 		'item_name',
 		'quantity',
-		'measurement_unit'
+		'measurement_unit',
+		'critical_level',
 	];
 
     protected $casts = [
@@ -34,8 +35,25 @@ class Inventory extends Model
 			try {
 				DB::beginTransaction();
 
-				if ($inventory->quantity <= 0)
+				if ($inventory->quantity <= 0) {
+					$id = $inventory->id;
+					$name = $inventory->name;
+					$mu = $item->measurement_unit;
+
 					$inventory->delete();
+
+					activity('inventory')
+						->byAnonymous()
+						->on($inventory)
+						->event('inactive')
+						->withProperties([
+							'item_name' => $inventory->item_name,
+							'quantity' => $inventory->quantity,
+							'measurement_unit' => $inventory->measurement_unit,
+							'critical_level' => $inventory->critical_level
+						])
+						->log("Item {$name} set to inactive after stock has reached less than or equals to 0{$mu}.");
+				}
 
 				DB::commit();
 			} catch (Exception $e) {
@@ -46,8 +64,8 @@ class Inventory extends Model
 	}
 
 	// Relationships
-	public function menus() { return $this->belongsToMany('App\Menu', 'menu_items', 'inventory_id', 'menu_id'); }
-	public function menuItem() { return $this->belongsTo('App\MenuItem', 'id', 'inventory_id'); }
+	public function menus() { return $this->belongsToMany('App\MenuVariation', 'menu_variation_items', 'inventory_id', 'menu_variation_id'); }
+	public function variationItem() { return $this->belongsTo('App\MenuVariationItem', 'id', 'inventory_id'); }
 
 	// Custom Functions
 	public function getInStock() {
@@ -58,11 +76,17 @@ class Inventory extends Model
 		try {
 			DB::beginTransaction();
 
-			ActivityLog::log(
-				"Item '{$this->item_name}' permanently deleted.",
-				null,
-				true
-			);
+			activity('inventory')
+				->byAnonymous()
+				->on($this)
+				->event('deleted')
+				->withProperties([
+					'item_name' => $this->item_name,
+					'quantity' => $this->quantity,
+					'measurement_unit' => $this->measurement_unit,
+					'critical_level' => $this->critical_level
+				])
+				->log("Item '{$this->item_name}' permanently deleted.");
 
 			$this->forceDelete();
 			$this->save();
@@ -74,7 +98,12 @@ class Inventory extends Model
 		}
 	}
 
+	// STATIC FUNCTIONS
 	public static function getForDeletion() {
-		return Inventory::withTrashed()->whereDate('updated_at', '<', now()->subYears(5))->get();
+		return Inventory::onlyTrashed()->whereDate('updated_at', '<', now()->subYears(5))->get();
+	}
+
+	public static function showRoute($id) {
+		return route('admin.inventory.show', [$id]);
 	}
 }

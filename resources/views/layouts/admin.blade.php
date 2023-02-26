@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en-US">
 	<head>
-
 		@php
 		$webName = App\Settings::getValue('web-name');
 		$webDesc = App\Settings::getValue('web-desc');
@@ -41,6 +40,7 @@
 		{{-- CSS --}}
 		<link href="{{ asset('css/lib-styles.css') }}" rel="stylesheet">
 		<link href="{{ asset('css/style.css') }}" rel="stylesheet">
+		<link href="{{ asset('css/components.css') }}" rel="stylesheet">
 		<link href="{{ asset('css/admin.css') }}" rel="stylesheet">
 
 		@yield('css')
@@ -114,6 +114,7 @@
 		<script type="text/javascript">const fiFallbackImage = '{{ asset("uploads/users/default.png") }}';</script>
 		<script type="text/javascript" src="{{ asset('js/admin.js') }}"></script>
 		<script type="text/javascript" src="{{ asset('js/util/fallback-image.js') }}"></script>
+		<script type="text/javascript" src="{{ asset('js/util/swal-flash.js') }}"></script>
 		<script type="text/javascript">
 			@if (Session::has('flash_error'))
 			Swal.fire({
@@ -166,12 +167,22 @@
 			@endif
 
 			$(document).ready(function(){
+				$(document).on('livewire:load', () => {
+					Livewire.onPageExpired((r, m) => {
+						console.info(r);
+						Swal.fire({
+							icon: `info`,
+							title: `The page has expired`,
+							message: m
+						});
+					});
+				});
+
 				$(".col-a").click(function(){
 					$('.collapse.show').collapse('hide');
 				});
 			});
 		</script>
 		@yield('scripts')
-		
 	</body>
 </html>
