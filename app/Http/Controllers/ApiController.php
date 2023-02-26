@@ -326,17 +326,15 @@ class ApiController extends Controller
 	protected function fetchBookingFromRange(Request $req, $monthYear = null) {
 		if ($monthYear == null)
 			$monthYear = now()->format("F") . ' ' . now()->format("Y");
-		else
-			$monthYear = Carbon::parse(strtotime($monthYear))->format("F Y");
 
 		$monthYear = explode(" ", $monthYear);
 		$month = $monthYear[0];
 		$year = $monthYear[1];
 
-		$bookings = Booking::with('contactInformation:id,booking_id,contact_name', 'menus:id,name')
+		$bookings = Booking::with('contactInformation', 'menus', 'menus.menu')
 			->where('created_at', '>=', Carbon::parse("$month 01, $year"))
 			->where('created_at', '<=', Carbon::parse("$month $year")->endOfMonth())
-			->where('status', '=', ApprovalStatus::Approved)
+			->where('status', '=', ApprovalStatus::Approved->value)
 			->get();
 
 		return response()

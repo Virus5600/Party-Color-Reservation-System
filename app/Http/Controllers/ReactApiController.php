@@ -307,7 +307,8 @@ class ReactApiController extends Controller
 
 			// CREATE MAILER HERE TO NOTIFY CLIENT OF THEIR CANCELLATION
 			$args = [
-				'subject' => 'Requested Reservation Cancellation'
+				'subject' => 'Requested Reservation Cancellation',
+				'reason' => $booking->cancel_request_reason
 			];
 			BookingNotification::dispatch($booking, "cancellation request", $args);
 

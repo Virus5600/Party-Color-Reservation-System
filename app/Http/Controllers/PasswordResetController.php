@@ -56,6 +56,9 @@ class PasswordResetController extends Controller
 				$pr = PasswordReset::where('email', '=', $user->email)->first();
 				$pr->generateToken()->generateExpiration();
 			}
+			else if (now()->gte($pr->expires_at)) {
+				$pr->generateToken()->generateExpiration();
+			}
 
 			$args = [
 				'subject' => 'Password Reset Request',
