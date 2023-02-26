@@ -15,8 +15,6 @@
 	@endif
 </p>
 
-<p>If you did not this action, please contact us:</p>
-
 @if ($type == 'creation')
 	<p style="font-size: 1.5em;">Control Number: #{{ $booking->control_no }}</p>
 
