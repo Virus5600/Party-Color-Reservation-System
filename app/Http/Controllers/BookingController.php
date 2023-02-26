@@ -7,6 +7,8 @@ use Illuminate\Support\Str;
 
 use Carbon\Carbon;
 
+use App\Jobs\BookingCancellationNotification;
+
 use App\Enum\ApprovalStatus;
 use App\Enum\Status;
 
@@ -827,6 +829,11 @@ class BookingController extends Controller
 			$booking->save();
 
 			// Mailer to customer that his cancellation is approved
+			$args = [
+				'subject' => 'Reservation Cancellation Accepted',
+				'reason' => $booking->reason
+			];
+			BookingCancellationNotification::dispatch($booking, "accept", $args);
 
 			// Logger
 			activity('booking')
@@ -904,7 +911,12 @@ class BookingController extends Controller
 			$booking->reason = $req->reason;
 			$booking->save();
 
-			// Mailer to customer that his cancellation is approved
+			// Mailer to customer that his cancellation is rejected
+			$args = [
+				'subject' => 'Reservation Cancellation Rejected',
+				'reason' => $booking->reason
+			];
+			BookingCancellationNotification::dispatch($booking, "reject", $args);
 
 			// LOGGER
 			activity('booking')

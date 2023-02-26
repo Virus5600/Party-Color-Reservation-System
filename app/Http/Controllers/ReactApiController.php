@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 use Carbon\Carbon;
 
+use App\Jobs\BookingNotification;
+
 use App\Enum\ApprovalStatus;
 use App\Enum\Status;
 
@@ -115,6 +117,10 @@ class ReactApiController extends Controller
 			}
 			
 			// CREATE MAILER TO THE CONTACT PERSON
+			$args = [
+				'subject' => 'Reservation Created'
+			];
+			BookingNotification::dispatch($booking, "creation", $args);
 
 			// Logger
 			activity('react-api')
@@ -295,6 +301,10 @@ class ReactApiController extends Controller
 			$booking->save();
 
 			// CREATE MAILER HERE TO NOTIFY CLIENT OF THEIR CANCELLATION
+			$args = [
+				'subject' => 'Requested Reservation Cancellation'
+			];
+			BookingNotification::dispatch($booking, "cancellation request", $args);
 
 			$status_types = [];
 			$sn = array_merge(array_column(Status::cases(), "name"), array_column(ApprovalStatus::cases(), "name"));
@@ -390,9 +400,14 @@ class ReactApiController extends Controller
 
 			$booking->cancel_requested = 0;
 			$booking->cancel_request_reason = null;
+			$booking->reason = null;
 			$booking->save();
 
 			// CREATE MAILER HERE TO NOTIFY CLIENT OF THE RETRACTION OF CANCELLATION
+			$args = [
+				'subject' => 'Revoked Reservation Cancellation'
+			];
+			BookingNotification::dispatch($booking, "cancellation revoke", $args);
 
 			// LOGGER
 			activity('react-api')
@@ -489,9 +504,12 @@ class ReactApiController extends Controller
 			$doNotReturn = true;
 		}
 
+		if (in_array($booking->getOverallStatus(), [Status::Cancelled, Status::Happening, Status::Done, Status::Ghosted, Status::NonExistent, ApprovalStatus::Rejected]))
+			$doNotReturn = true;
+
 		return [
 			"doNotReturn" => $doNotReturn,
-			"status" => $status
+			"status" => strtolower($booking->getStatusText($booking->getOverallStatus()))
 		];
 	}
 }

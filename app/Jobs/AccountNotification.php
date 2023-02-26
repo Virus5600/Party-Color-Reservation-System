@@ -27,8 +27,7 @@ class AccountNotification implements ShouldQueue
 	 *
 	 * @return void
 	 */
-	public function __construct(User $user, $type, $args)
-	{
+	public function __construct(User $user, $type, $args) {
 		$this->user = $user;
 		$this->type = $type;
 		$this->args = $args;
@@ -39,8 +38,7 @@ class AccountNotification implements ShouldQueue
 	 *
 	 * @return void
 	 */
-	public function handle()
-	{
+	public function handle() {
 		// Set subject
 		if (!isset($this->args['subject']))
 			$this->args['subject'] = "Account Update";
@@ -48,7 +46,7 @@ class AccountNotification implements ShouldQueue
 			$this->args['subject'] = ($this->args['subject'] == null) ? "Account Update" : $this->args['subject'];
 
 		// Send email to every single one of the recipients
-		foreach ($this->args['recipients'] as $r)
+		foreach ($this->args['recipients'] as $r) {
 			Mail::send(
 				"layouts.emails.account.{$this->type}",
 				[
@@ -62,5 +60,18 @@ class AccountNotification implements ShouldQueue
 						->subject($this->args['subject']);
 				}
 			);
+
+			activity('mailer')
+				->byAnonymous()
+				->on($this->user)
+				->event('mail-sent')
+				->withProperties([
+					'subject' => $this->args["subject"],
+					'recipients' => $this->args["recipients"],
+					'email' => $this->args["email"],
+					'type' => $this->args["type"],
+				])
+				->log("Account mail notification sent to {$this->user->getName()}");
+		}
 	}
 }
