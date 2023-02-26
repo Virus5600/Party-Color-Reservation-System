@@ -378,6 +378,8 @@ class ReactApiController extends Controller
 		try {
 			DB::beginTransaction();
 
+			$booking = Booking::where('control_no', '=', $req->control_no)->first();
+
 			if ($booking == null) {
 				return response()
 					->json([
@@ -386,11 +388,9 @@ class ReactApiController extends Controller
 						'errors' => "Reservation either does not exists or is already deleted"
 					]);
 			}
-
-			$booking = Booking::where('control_no', '=', $req->control_no)->first();
-
-			extract($this->isValidForFetch($booking));
 			
+			extract($this->isValidForFetch($booking));
+
 			if ($doNotReturn) {
 				return response()
 					->json([
