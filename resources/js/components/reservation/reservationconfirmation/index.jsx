@@ -118,7 +118,7 @@ export default function ReservationConfirmation(props) {
 // this is used in reservation confirm page
 const ReservationButtons = (props) => {
 
-	const [disabled, setDisabled] = useState(false);
+	const [disabled, setDisabled] = React.useState(false);
 	/**
 	 * current solution
 	 * 1. send the data in sessionStorage to backend
@@ -137,16 +137,13 @@ const ReservationButtons = (props) => {
 	const handleReserveClick = () => {
 
 		props.onReserveClick();
-
-
-		// check later
 		setDisabled(true);
 
 	}
 
 	return (
 		<div className='text-end mt-4'>
-			<Link to='/reservation'><button className='btn btn-danger mx-2'>Edit</button></Link>
+			<Link to='/reservation' style={disabled == true ? { pointerEvents: 'none' } : null}><button className='btn btn-danger mx-2' disabled={disabled}>Edit</button></Link>
 			<button className='btn btn-success mx-2' type='button' onClick={handleReserveClick} disabled={disabled}>Reserve</button>
 		</div>
 	);
@@ -158,6 +155,7 @@ const ReservationButtonsForView = (props) => {
 
 
 	const [textAreaContent, setTextAreaContent] = React.useState(props.cancel_request_reason);
+	const [disabled, setDisabled] = React.useState(false);
 
 	const handleTextAreaInput = (event) => {
 		sessionStorage.setItem('cancellation_reason', event.target.value);
@@ -166,10 +164,12 @@ const ReservationButtonsForView = (props) => {
 
 	const handleCancelRequestButton = () => {
 		props.onCancelRequestClick();
+		setDisabled(true);
 	}
 
 	const handleUndoCancelRequestButton = () => {
 		props.onUndoCancelRequestClick();
+		setDisabled(true);
 	}
 
 	return (
@@ -193,12 +193,12 @@ const ReservationButtonsForView = (props) => {
 
 			{/* undo cancel request button */}
 			<div className='text-end mt-4'>
-				<button className='btn btn-secondary' type='button' onClick={handleUndoCancelRequestButton} disabled={!props.isCancelled ? true : false}>Undo Cancel Request</button>
+				<button className='btn btn-secondary' type='button' onClick={handleUndoCancelRequestButton} disabled={disabled == true ? true : !props.isCancelled ? true : false}>Undo Cancel Request</button>
 			</div>
 
 			{/* cancel request button */}
 			<div className='text-end mt-4'>
-				<button className='btn btn-danger' type='button' onClick={handleCancelRequestButton} disabled={props.isCancelled ? true : false}>Cancel Request</button>
+				<button className='btn btn-danger' type='button' onClick={handleCancelRequestButton} disabled={disabled == true ? true : props.isCancelled ? true : false}>Cancel Request</button>
 			</div>
 		</>
 
