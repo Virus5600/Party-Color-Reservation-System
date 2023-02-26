@@ -7,7 +7,7 @@ import axios from 'axios';
 // Components
 import ReservationConfirmation from '../reservationconfirmation/index';
 
-import ReservationStatus from '../reservationsuccess';
+import ReservationStatus from '../reservationsuccess/index';
 
 // Under Development
 export async function action() {
@@ -97,7 +97,8 @@ export default function ReservationView() {
 			return res;
 		});
 
-		set_cancel_request(response.data.sucess);
+		console.log('response.data.success', response.data.success);
+		set_cancel_request(response.data.success);
 	}
 
 	const handleUndoCancelRequest = async () => {
@@ -119,7 +120,7 @@ export default function ReservationView() {
 			return res;
 		});
 
-		set_undo_cancel_request(response.data.sucess);
+		set_undo_cancel_request(response.data.success);
 	}
 
 	const handleViewClick = (control_number) => {
@@ -224,7 +225,7 @@ export default function ReservationView() {
 			link={'/reservationselection'}
 			bg_style={{ backgroundColor: '#B83939' }}
 			icon_style={{ color: '#871A1A' }}
-		/>
+		/>;
 	} else if (undo_cancel_request) {
 		return <ReservationStatus
 			title={'Your cancel request has been cancelled!'}
@@ -233,7 +234,7 @@ export default function ReservationView() {
 			link={'/reservationselection'}
 			bg_style={{ backgroundColor: '#1D7B3E' }}
 			icon_style={{ color: '#00ff59a1' }}
-		/>
+		/>;
 	}
 	return (
 		<div>
