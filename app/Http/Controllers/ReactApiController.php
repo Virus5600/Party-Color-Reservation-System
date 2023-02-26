@@ -121,7 +121,7 @@ class ReactApiController extends Controller
 				'subject' => 'Reservation Created',
 				'reason' => null
 			];
-			BookingNotification::dispatchAfterResponse($booking, "creation", $args);
+			BookingNotification::dispatch($booking, "creation", $args);
 
 			// Logger
 			activity('react-api')
@@ -306,7 +306,7 @@ class ReactApiController extends Controller
 				'subject' => 'Requested Reservation Cancellation',
 				'reason' => $booking->cancel_request_reason
 			];
-			BookingNotification::dispatchAfterResponse($booking, "cancellation request", $args);
+			BookingNotification::dispatch($booking, "cancellation request", $args);
 
 			$status_types = [];
 			$sn = array_merge(array_column(Status::cases(), "name"), array_column(ApprovalStatus::cases(), "name"));
@@ -409,7 +409,7 @@ class ReactApiController extends Controller
 			$args = [
 				'subject' => 'Revoked Reservation Cancellation'
 			];
-			BookingNotification::dispatchAfterResponse($booking, "cancellation revoke", $args);
+			BookingNotification::dispatch($booking, "cancellation revoke", $args);
 
 			$status_types = [];
 			$sn = array_merge(array_column(Status::cases(), "name"), array_column(ApprovalStatus::cases(), "name"));

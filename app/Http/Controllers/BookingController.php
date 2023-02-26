@@ -555,7 +555,7 @@ class BookingController extends Controller
 				'subject' => 'Reservation Accepted',
 				'reason' => null
 			];
-			BookingNotification::dispatchAfterResponse($booking, "accept", $args);
+			BookingNotification::dispatch($booking, "accept", $args);
 
 			// Logger
 			activity('booking')
@@ -660,7 +660,7 @@ class BookingController extends Controller
 				'subject' => 'Reservation Rejected',
 				'reason' => $booking->reason
 			];
-			BookingNotification::dispatchAfterResponse($booking, "reject", $args);
+			BookingNotification::dispatch($booking, "reject", $args);
 
 			// Logger
 			activity('booking')
@@ -749,7 +749,7 @@ class BookingController extends Controller
 				'subject' => 'Reservation Moved back to Pending',
 				'reason' => null
 			];
-			BookingNotification::dispatchAfterResponse($booking, "pending", $args);
+			BookingNotification::dispatch($booking, "pending", $args);
 
 			// Logger
 			activity('booking')
@@ -855,7 +855,7 @@ class BookingController extends Controller
 				'subject' => 'Reservation Cancellation Accepted',
 				'reason' => $booking->reason
 			];
-			BookingCancellationNotification::dispatchAfterResponse($booking, "accept", $args);
+			BookingCancellationNotification::dispatch($booking, "accept", $args);
 
 			// Logger
 			activity('booking')
@@ -938,7 +938,7 @@ class BookingController extends Controller
 				'subject' => 'Reservation Cancellation Rejected',
 				'reason' => $booking->reason
 			];
-			BookingCancellationNotification::dispatchAfterResponse($booking, "reject", $args);
+			BookingCancellationNotification::dispatch($booking, "reject", $args);
 
 			// LOGGER
 			activity('booking')
