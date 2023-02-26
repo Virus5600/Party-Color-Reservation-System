@@ -16,3 +16,5 @@ yarn-error.log
 .DS_Store
 db-management.sh
 *.sql
+composer.lock
+package-lock.json
