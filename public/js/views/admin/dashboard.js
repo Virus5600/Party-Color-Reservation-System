@@ -29,12 +29,18 @@ $(document).ready(() => {
 					const ctx = points[0].element.$context;
 					let htmlContent = `<div class="spinner-border text-dark" role="status"><span class="sr-only">Loading...</span></div>`;
 
-					// Send an AJAX request to the server to fetch the list of reservations for this particular month
-					$.get(reservationFetchURL.replace('%241', ctx.raw.date), (response) => {
+					// Send an AJAX request to the server to fetch the list of bookings for this particular month
+					$.ajaxSetup({
+						headers: {
+							'Authorization': `Bearer ${$("meta[name=bearer]").attr('content')}`
+						}
+					});
+					
+					$.get(bookingFetchURL.replace('%241', ctx.raw.date), (response) => {
 						// If success
 						if (response.success) {
 							// Build the view...
-							let reservations = response.reservations;
+							let bookings = response.bookings;
 							htmlContent = `
 								<div class="overflow-y-auto overflow-x-auto custom-scrollbar">
 									<table class="table table-striped my-0">
@@ -50,7 +56,7 @@ $(document).ready(() => {
 
 										<tbody id="table-content">`;
 
-							for (let r of reservations) {
+							for (let r of bookings) {
 								let now = new Date(); now = `${now.getMonth()+1}/${now.getDate()}/${now.getFullYear()}`;
 								let duration = new Date(`${now} ${r.end_at}`).getHours() - new Date(`${now} ${r.start_at}`).getHours();
 
@@ -64,7 +70,7 @@ $(document).ready(() => {
 
 								for (let m of r.menus) {
 									htmlContent += `
-											<span class="badge badge-pill badge-secondary m-1">${m.name}</span>
+											<span class="badge badge-pill badge-secondary m-1">${m.menu.name} - ${m.name}</span>
 									`;
 								}
 
@@ -115,12 +121,14 @@ $(document).ready(() => {
 				canvas.css('width', newWidth)
 					.css('height', newHeight);
 				chart.resize(newWidth, newHeight);
+
+				chart.update();
 			}
 		}
 	});
 
 	window.addEventListener('beforeprint', () => {
-		monthlyIncomeChart.resize(600, 600);
+		monthlyIncomeChart.resize();
 	});
 
 	window.addEventListener('afterprint', () => {

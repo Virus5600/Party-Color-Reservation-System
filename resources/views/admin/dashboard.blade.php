@@ -3,6 +3,9 @@
 @section('title', 'Dashboard')
 
 @section('content')
+
+@php($logsAccess = Auth::user()->hasPermission('activity_logs_tab_access'))
+
 <div class="row my-3">
 	{{-- TOTALS --}}
 	<div class="col-12 col-lg-6 d-flex">
@@ -26,13 +29,13 @@
 </div>
 
 <div class="row my-3">
-	<div class="col-12 col-lg-8">
+	<div class="col-12 col-lg-{{ $logsAccess ? "8" : "12" }}">
 		<div class="row h-100">
 			{{-- WEEKLY INCOME --}}
 			<div class="col-12 my-3">
 				<div class="card h-100">
 					<div class="card-body position-relative">
-						<canvas id="monthlyEarnings" class="rounded m-auto"></canvas>
+						<canvas id="monthlyEarnings" class="rounded m-auto" style=""></canvas>
 					</div>
 				</div>
 			</div>
@@ -48,10 +51,12 @@
 		</div>
 	</div>
 
+	@if ($logsAccess)
 	{{-- LATEST ACTIVITIES --}}
 	<div class="col-12 col-lg-4">
 		@livewire('dashboard.tables', $tables['latest_activities'])
 	</div>
+	@endif
 </div>
 
 <div class="row my-3">
@@ -63,6 +68,10 @@
 		@livewire('dashboard.tables', $tables['latest_announcements'])
 	</div>
 </div>
+@endsection
+
+@section('meta')
+<meta name="bearer" content="{{ session('bearer') }}">
 @endsection
 
 @section('css')
