@@ -44,6 +44,27 @@ export default function Reservation() {
 const ReservationDetails = () => {
 	const reservationInfo = useLoaderData();
 
+	function getCurrentDate() {
+		// return the current string date
+		// e.g. '2023-02-27'
+		const current_date = new Date();
+
+
+		// setting the date tomorrow
+		current_date.setDate(current_date.getDate() + 1);
+
+
+		let year = current_date.getFullYear();
+		let month = current_date.getMonth() + 1;
+		let date = current_date.getDate();
+
+		if (month < 10) month = '0' + month.toString();
+
+		if (Number(date) < 10) date = '0' + date;
+
+		return year + '-' + month + '-' + date;
+	}
+
 	return (
 		<Form method='post' className='px-sm-5 p-4'>
 			{/* 
@@ -97,16 +118,16 @@ const ReservationDetails = () => {
 
 			<InputRow inputs={[
 				// Adult / Senior
-				{ type: 'number', name: 'adult_senior', label: 'Adult/Senior', placeholder: 'pax', min_value: 0, isRequired: false, reservationInfo, },
+				{ type: 'number', name: 'adult_senior', label: 'Adult/Senior', placeholder: 'pax', min_value: 0, isRequired: true, reservationInfo, },
 				// Junior
-				{ type: 'number', name: 'junior', label: 'Junior', placeholder: 'pax', min_value: 0, isRequired: false, reservationInfo, },
+				{ type: 'number', name: 'junior', label: 'Junior', placeholder: 'pax', min_value: 0, isRequired: true, reservationInfo, },
 				// Elementary
-				{ type: 'number', name: 'elementary', label: 'Elementary', placeholder: 'pax', min_value: 0, isRequired: false, reservationInfo, },
+				{ type: 'number', name: 'elementary', label: 'Elementary', placeholder: 'pax', min_value: 0, isRequired: true, reservationInfo, },
 			]} />
 
 			<InputRow inputs={[
 				// Date
-				{ type: 'date', name: 'date', label: 'Date', isRequired: true, reservationInfo, },
+				{ type: 'date', name: 'date', label: 'Date', min_value: getCurrentDate(), isRequired: true, reservationInfo, },
 				// Time
 				{ type: 'time', name: 'starting_time', label: 'Start Time', min_value: '17:00', max_value: '19:00', isRequired: true, reservationInfo, },
 			]} />
