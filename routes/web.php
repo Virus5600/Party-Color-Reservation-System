@@ -20,9 +20,9 @@ Route::group(['prefix' => 'admin'], function() {
 	// FORGOT PASSWORD
 	Route::group(['prefix' => 'forgot-password'], function() {
 		// Index
-		Route::get('forgot-password/', 'PasswordResetController@index')->name('forgot-password.index');
+		Route::get('/', 'PasswordResetController@index')->name('forgot-password.index');
 		// Submit
-		Route::post('forgot-password/submit', 'PasswordResetController@submit')->name('forgot-password.submit');
+		Route::post('/submit', 'PasswordResetController@submit')->name('forgot-password.submit');
 		
 	});
 
