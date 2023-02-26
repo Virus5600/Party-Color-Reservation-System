@@ -366,7 +366,7 @@ class BookingController extends Controller
 			// Return the inventory for realtime update
 			if ($booking->items_returned == 0) {
 				foreach ($booking->menus as $m) {
-					$response = $m->returnInventory($m->pivot->count);
+					$response = $m->returnInventory($m->pivot->count, $booking);
 
 					if (!$response->success) {
 						throw new Exception($response->message);
@@ -375,7 +375,7 @@ class BookingController extends Controller
 
 				foreach ($booking->additionalOrders as $o) {
 					foreach ($o->menus as $m) {
-						$response = $m->returnInventory($m->pivot->count);
+						$response = $m->returnInventory($m->pivot->count, $booking);
 
 						if (!$response->success)
 							throw new Exception($response->message);
@@ -447,7 +447,7 @@ class BookingController extends Controller
 			if (!($booking->getOverallStatus() == Status::Happening || $booking->getOverallStatus() == Status::Done)) {
 				if ($booking->items_returned == 0) {
 					foreach ($booking->menus as $m) {
-						$response = $m->returnInventory($m->pivot->count);
+						$response = $m->returnInventory($m->pivot->count, $booking);
 
 						if (!$response->success) {
 							throw new Exception($response->message);
@@ -456,7 +456,7 @@ class BookingController extends Controller
 
 					foreach ($booking->additionalOrders as $o) {
 						foreach ($o->menus as $m) {
-							$response = $m->returnInventory($m->pivot->count);
+							$response = $m->returnInventory($m->pivot->count, $booking);
 
 							if (!$response->success)
 								throw new Exception($response->message);
@@ -526,7 +526,7 @@ class BookingController extends Controller
 			if ($booking->items_returned == 1) {
 				// Reduce the inventoy for realtime update
 				foreach ($booking->menus as $m) {
-					$response = $m->reduceInventory($m->pivot->count);
+					$response = $m->reduceInventory($m->pivot->count, $booking);
 
 					if (!$response->success) {
 						throw new Exception($response->message);
@@ -535,7 +535,7 @@ class BookingController extends Controller
 
 				foreach ($booking->additionalOrders as $o) {
 					foreach ($o->menus as $m) {
-						$response = $m->reduceInventory($m->pivot->count);
+						$response = $m->reduceInventory($m->pivot->count, $booking);
 
 						if (!$response->success)
 							throw new Exception($response->message);
@@ -624,7 +624,7 @@ class BookingController extends Controller
 			if ($booking->items_returned == 0) {
 				// Return the inventory for realtime update
 				foreach ($booking->menus as $m) {
-					$response = $m->returnInventory($m->pivot->count);
+					$response = $m->returnInventory($m->pivot->count, $booking);
 
 					if (!$response->success) {
 						throw new Exception($response->message);
@@ -633,7 +633,7 @@ class BookingController extends Controller
 
 				foreach ($booking->additionalOrders as $o) {
 					foreach ($o->menus as $m) {
-						$response = $m->returnInventory($m->pivot->count);
+						$response = $m->returnInventory($m->pivot->count, $booking);
 
 						if (!$response->success)
 							throw new Exception($response->message);
@@ -706,7 +706,7 @@ class BookingController extends Controller
 			if ($booking->items_returned == 0) {
 				// Reduce the inventoy for realtime update
 				foreach ($booking->menus as $m) {
-					$response = $m->returnInventory($m->pivot->count);
+					$response = $m->returnInventory($m->pivot->count, $booking);
 
 					if (!$response->success) {
 						throw new Exception($response->message);
@@ -715,7 +715,7 @@ class BookingController extends Controller
 
 				foreach ($booking->additionalOrders as $o) {
 					foreach ($o->menus as $m) {
-						$response = $m->returnInventory($m->pivot->count);
+						$response = $m->returnInventory($m->pivot->count, $booking);
 
 						if (!$response->success)
 							throw new Exception($response->message);
@@ -804,7 +804,7 @@ class BookingController extends Controller
 			if ($booking->items_returned == 0) {
 				// Return the inventory for realtime update
 				foreach ($booking->menus as $m) {
-					$response = $m->returnInventory($m->pivot->count);
+					$response = $m->returnInventory($m->pivot->count, $booking);
 
 					if (!$response->success) {
 						throw new Exception($response->message);
@@ -813,7 +813,7 @@ class BookingController extends Controller
 
 				foreach ($booking->additionalOrders as $o) {
 					foreach ($o->menus as $m) {
-						$response = $m->returnInventory($m->pivot->count);
+						$response = $m->returnInventory($m->pivot->count, $booking);
 
 						if (!$response->success)
 							throw new Exception($response->message);

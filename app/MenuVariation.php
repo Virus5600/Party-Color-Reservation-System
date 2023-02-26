@@ -53,7 +53,7 @@ class MenuVariation extends Model
 		return Carbon::parse($this->duration)->format($format);
 	}
 
-	public function reduceInventory($count = 1) {
+	public function reduceInventory($count = 1, Booking $booking = null) {
 		$notReduced = [];
 		$response = json_decode(json_encode([
 			"success" => true,
@@ -73,7 +73,7 @@ class MenuVariation extends Model
 
 			// LOGGER
 			activity('menu-variation')
-				->by(auth()->user())
+				->by($booking)
 				->on($this)
 				->event('update')
 				->withProperties([
@@ -98,7 +98,7 @@ class MenuVariation extends Model
 		return $response;
 	}
 
-	public function returnInventory($count = 1) {
+	public function returnInventory($count = 1, Booking $booking = null) {
 		$notReturned = [];
 		$response = json_decode(json_encode([
 			"success" => true,
@@ -135,7 +135,7 @@ class MenuVariation extends Model
 
 			// LOGGER
 			activity('menu-variation')
-				->byAnonymous()
+				->by($booking)
 				->on($this)
 				->event('update')
 				->withProperties([
