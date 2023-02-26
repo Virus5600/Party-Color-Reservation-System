@@ -59,7 +59,8 @@ class PasswordResetController extends Controller
 
 			$args = [
 				'subject' => 'Password Reset Request',
-				'recipients' => [$user->email],
+				'email' => $user->email,
+				'recipients' => [$pr->email],
 				'token' => $pr->token
 			];
 
@@ -68,7 +69,7 @@ class PasswordResetController extends Controller
 			// LOGGER
 			activity('password-reset')
 				->byAnonymous()
-				->on($pr)
+				->on($user)
 				->event('renew')
 				->withProperties([
 					'email' => $pr->email,
