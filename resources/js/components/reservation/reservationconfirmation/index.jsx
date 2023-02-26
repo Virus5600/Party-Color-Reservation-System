@@ -118,6 +118,7 @@ export default function ReservationConfirmation(props) {
 // this is used in reservation confirm page
 const ReservationButtons = (props) => {
 
+	const [disabled, setDisabled] = useState(false);
 	/**
 	 * current solution
 	 * 1. send the data in sessionStorage to backend
@@ -134,13 +135,19 @@ const ReservationButtons = (props) => {
 	 */
 
 	const handleReserveClick = () => {
+
 		props.onReserveClick();
+
+
+		// check later
+		setDisabled(true);
+
 	}
 
 	return (
 		<div className='text-end mt-4'>
 			<Link to='/reservation'><button className='btn btn-danger mx-2'>Edit</button></Link>
-			<button className='btn btn-success mx-2' type='button' onClick={handleReserveClick}>Reserve</button>
+			<button className='btn btn-success mx-2' type='button' onClick={handleReserveClick} disabled={disabled}>Reserve</button>
 		</div>
 	);
 }
