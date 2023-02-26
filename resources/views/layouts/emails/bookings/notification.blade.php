@@ -31,8 +31,8 @@
 				@endif
 				
 				<tr style="width: 100%; border-bottom: 1px solid #6c757d; padding-top: 1em; padding-bottom: 1em;">
-					<td style="text-align: center; padding-left: 1em; padding-right: 1em; border-bottom: 1px solid #6c757d;">{{ ucwords(str_replace("_", " ", $k)) }}</div>
-					<td style="text-align: center; padding-left: 1em; padding-right: 1em; border-bottom: 1px solid #6c757d;">{{ $v }}</div>
+					<td style="text-align: center; padding-left: 1em; padding-right: 1em; border-bottom: 1px solid #6c757d;">{{ ucwords(str_replace("_", " ", $k)) }}</td>
+					<td style="text-align: center; padding-left: 1em; padding-right: 1em; border-bottom: 1px solid #6c757d;">{{ $v }}</td>
 				</tr>
 			@endforeach
 		</tbody>
