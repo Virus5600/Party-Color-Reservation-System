@@ -7,6 +7,8 @@ import axios from 'axios';
 // Components
 import ReservationConfirmation from '../reservationconfirmation/index';
 
+import ReservationStatus from '../reservationsuccess';
+
 // Under Development
 export async function action() {
 
@@ -59,6 +61,66 @@ export async function action() {
 export default function ReservationView() {
 	const [reservationInfo, setReservationInfo] = useState();
 	const [validationError, setValidationError] = useState();
+
+	const [cancel_request, set_cancel_request] = useState(false);
+	const [undo_cancel_request, set_undo_cancel_request] = useState(false);
+
+	function getSessionItem() {
+		return {
+			control_number: sessionStorage.getItem('control_number'),
+			cancellation_reason: sessionStorage.getItem('cancellation_reason'),
+		};
+	}
+
+	function removeSessionItem() {
+		sessionStorage.removeItem('control_number');
+		sessionStorage.removeItem('cancellation_reason');
+	}
+
+	const handleCancelRequest = async () => {
+		const API = '/api/react/bookings/cancel-request';
+
+		const token = document.querySelector('meta[name=csrf-token]').content;
+
+		const { control_number, cancellation_reason } = getSessionItem();
+
+		const response = await axios.post(`${API}`, {
+			_token: token,
+			control_no: control_number,
+			reason: cancellation_reason,
+		}).then(res => {
+			console.log('after sending cancellation request:', res);
+			removeSessionItem();
+			return res;
+		}).catch(res => {
+			console.log('error cancelling request:', res);
+			return res;
+		});
+
+		set_cancel_request(response.data.sucess);
+	}
+
+	const handleUndoCancelRequest = async () => {
+		const API = '/api/react/bookings/cancel-request/retract';
+
+		const token = document.querySelector('meta[name=csrf-token]').content;
+
+		const { control_number } = getSessionItem();
+
+		const response = await axios.post(`${API}`, {
+			_token: token,
+			control_no: control_number,
+		}).then(res => {
+			console.log('after sending undo cancellation request:', res);
+			removeSessionItem();
+			return res;
+		}).catch(res => {
+			console.log('error cancelling request:', res);
+			return res;
+		});
+
+		set_undo_cancel_request(response.data.sucess);
+	}
 
 	const handleViewClick = (control_number) => {
 		getReservationInfo(control_number).then((response) => {
@@ -154,12 +216,39 @@ export default function ReservationView() {
 		return reservationInfo;
 	}
 
+	if (cancel_request) {
+		return <ReservationStatus
+			title={'Your cancel request has been sent!'}
+			description={'We will inform you about your cancel request sooner'}
+			link_label={'go back to reservation'}
+			link={'/reservationselection'}
+			bg_style={{ backgroundColor: '#B83939' }}
+			icon_style={{ color: '#871A1A' }}
+		/>
+	} else if (undo_cancel_request) {
+		return <ReservationStatus
+			title={'Your cancel request has been cancelled!'}
+			description={'We will continue preparing your reservation'}
+			link_label={'go back to reservation'}
+			link={'/reservationselection'}
+			bg_style={{ backgroundColor: '#1D7B3E' }}
+			icon_style={{ color: '#00ff59a1' }}
+		/>
+	}
 	return (
 		<div>
 			<ViewReservation onViewClick={handleViewClick} validationError={validationError} />
 			<hr />
 			{
-				reservationInfo == null ? <></> : <ReservationConfirmation forViewReservation={true} reservationInfo={reservationInfo} />
+				reservationInfo == null ?
+					<></>
+					:
+					<ReservationConfirmation
+						forViewReservation={true}
+						reservationInfo={reservationInfo}
+						onCancelRequestClick={handleCancelRequest}
+						onUndoCancelRequestClick={handleUndoCancelRequest}
+					/>
 			}
 		</div>
 	);

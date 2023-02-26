@@ -97,7 +97,15 @@ export default function ReservationConfirmation(props) {
 						<span className='fs-1 fw-bold'>¥{compute_price(Number(adult_senior), Number(junior), Number(elementary))}</span>
 					</div>
 					{
-						props.forViewReservation ? <ReservationButtonsForView cancel_request_reason={props.reservationInfo.cancel_request_reason} isCancelled={props.reservationInfo.isCancelled} /> : <ReservationButtons onReserveClick={sendReserveRequest} />
+						props.forViewReservation ?
+							<ReservationButtonsForView
+								cancel_request_reason={props.reservationInfo.cancel_request_reason}
+								isCancelled={props.reservationInfo.isCancelled}
+								onCancelRequestClick={props.onCancelRequestClick}
+								onUndoCancelRequestClick={props.onUndoCancelRequestClick}
+							/>
+							:
+							<ReservationButtons onReserveClick={sendReserveRequest} />
 					}
 				</Form>
 			</div>
@@ -149,13 +157,13 @@ const ReservationButtonsForView = (props) => {
 		setTextAreaContent(event.target.value);
 	}
 
-	const handleUndoButton = (event) => {
-		alert('not implemented yet');
+	const handleCancelRequestButton = () => {
+		props.onCancelRequestClick();
 	}
 
-	// console.log('ReservationButtonsForView mounted!!');
-	// console.log('props.cancel_request_reason:', props.cancel_request_reason);
-	// console.log(props.cancel_request_reason === null ? '' : props.cancel_request_reason);
+	const handleUndoCancelRequestButton = () => {
+		props.onUndoCancelRequestClick();
+	}
 
 	return (
 		<>
@@ -178,12 +186,12 @@ const ReservationButtonsForView = (props) => {
 
 			{/* undo cancel request button */}
 			<div className='text-end mt-4'>
-				<button className='btn btn-secondary' type='button' onClick={handleUndoButton} disabled={!props.isCancelled ? true : false}>Undo Cancel Request</button>
+				<button className='btn btn-secondary' type='button' onClick={handleUndoCancelRequestButton} disabled={!props.isCancelled ? true : false}>Undo Cancel Request</button>
 			</div>
 
 			{/* cancel request button */}
 			<div className='text-end mt-4'>
-				<button className='btn btn-danger' type='submit' onClick={handleUndoButton} disabled={props.isCancelled ? true : false}>Cancel Request</button>
+				<button className='btn btn-danger' type='button' onClick={handleCancelRequestButton} disabled={props.isCancelled ? true : false}>Cancel Request</button>
 			</div>
 		</>
 
