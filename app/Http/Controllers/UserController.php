@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
-
 use App\Jobs\AccountNotification;
 
 use App\PasswordReset;
@@ -256,7 +256,7 @@ class UserController extends Controller
 			'first_name' => array('required', 'string', 'max:255'),
 			'middle_name' => array('string', 'max:255', 'nullable'),
 			'last_name' => array('required', 'string', 'max:255'),
-			'email' => 'required|email|string|max:255',
+			'email' => 'required|email|string|max:255|unique:users,email',
 			'type' => 'required|numeric|exists:types,id',
 			'password' => array('required', 'string', 'min:8', 'max:255', 'regex:/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]*$/'),
 			'avatar' => 'max:5120|mimes:jpeg,jpg,png,webp|nullable',
@@ -273,6 +273,7 @@ class UserController extends Controller
 			'email.email' => 'Invalid email address',
 			'email.string' => 'Inavlid email address',
 			'email.max' => 'Emails must not exceed 255 characters',
+			'email.unique' => 'Email already registered',
 			'type.required' => 'Please select the department where the user works under',
 			'type.numeric' => 'Please refrain from modifying the form',
 			'type.exists' => 'Unknown department',
@@ -372,7 +373,14 @@ class UserController extends Controller
 				->with('flash_error', 'The account either does not exists or is already deleted.');
 		}
 
-		$format = User::LOG_FORMAT;
+		$format = [
+			'first_name',
+			'middle_name',
+			'last_name',
+			'suffix',
+			'email',
+			'last_auth',
+		];
 
 		return view('admin.users.show', [
 			'user' => $user,
@@ -409,7 +417,7 @@ class UserController extends Controller
 			'first_name' => array('required', 'string', 'max:255'),
 			'middle_name' => array('string', 'max:255', 'nullable'),
 			'last_name' => array('required', 'string', 'max:255'),
-			'email' => 'required|email|string|max:255',
+			'email' => array('required', 'email', 'string', 'max:255', Rule::unique('users', 'email')->ignore($user->id)),
 			'type' => 'required|numeric|exists:types,id',
 			'avatar' => 'max:5120|mimes:jpeg,jpg,png,webp|nullable',
 		], [
@@ -425,6 +433,7 @@ class UserController extends Controller
 			'email.email' => 'Invalid email address',
 			'email.string' => 'Inavlid email address',
 			'email.max' => 'Emails must not exceed 255 characters',
+			'email.unique' => 'Email already registered',
 			'type.required' => 'Please select the department where the user works under',
 			'type.numeric' => 'Please refrain from modifying the form',
 			'type.exists' => 'Unknown department',

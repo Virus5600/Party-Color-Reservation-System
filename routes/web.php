@@ -204,27 +204,6 @@ Route::group(['prefix' => 'admin'], function() {
 			Route::get('/', 'MenuController@index')->name('admin.menu.index');
 		});
 
-		// ACTIVITY LOG
-		Route::group(['prefix' => 'activity-log', 'middleware' => ['permissions:activity_logs_tab_access']], function() {
-			// Index
-			Route::get('/', 'ActivityLogController@index')->name('admin.activity-log.index');
-
-			Route::group(['prefix' => '{id}', 'middleware' => ['permissions:activity_logs_tab_manage']], function() {
-				// Show
-				Route::get('/', 'ActivityLogController@show')->name('admin.activity-log.show');
-
-				// Update
-				Route::post('update', 'ActivityLogController@update')->name('admin.activity-log.update');
-
-				// Mark
-				Route::post('mark', 'ActivityLogController@mark')->name('admin.activity-log.mark');
-				
-				// Unmark
-				Route::post('unmark', 'ActivityLogController@unmark')->name('admin.activity-log.unmark');
-			});
-		});
-
-
 		// ANNOUNCEMENTS
 		Route::group(['prefix' => 'announcements', 'middleware' => ['permissions:announcements_tab_access']], function() {
 			// Create
@@ -343,6 +322,26 @@ Route::group(['prefix' => 'admin'], function() {
 
 			// Index
 			Route::get('/', 'PermissionController@index')->name('admin.permissions.index');
+		});
+
+		// ACTIVITY LOG
+		Route::group(['prefix' => 'activity-log', 'middleware' => ['permissions:activity_logs_tab_access']], function() {
+			// Index
+			Route::get('/', 'ActivityLogController@index')->name('admin.activity-log.index');
+
+			Route::group(['prefix' => '{id}', 'middleware' => ['permissions:activity_logs_tab_manage']], function() {
+				// Show
+				Route::get('/', 'ActivityLogController@show')->name('admin.activity-log.show');
+
+				// Update
+				Route::post('update', 'ActivityLogController@update')->name('admin.activity-log.update');
+
+				// Mark
+				Route::post('mark', 'ActivityLogController@mark')->name('admin.activity-log.mark');
+				
+				// Unmark
+				Route::post('unmark', 'ActivityLogController@unmark')->name('admin.activity-log.unmark');
+			});
 		});
 
 		// SETTINGS
