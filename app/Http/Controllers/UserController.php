@@ -694,9 +694,9 @@ class UserController extends Controller
 			$typePerms = sort($typePerms);
 
 			if ($userPerms == $typePerms)
-				$user->userPerms->detach();
+				$user->userPerms()->detach();
 			else
-				$user->userPerms->sync($req->permissions);
+				$user->userPerms()->sync($req->permissions);
 
 			// LOGGER
 			activity('user')
