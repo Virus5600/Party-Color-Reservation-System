@@ -106,13 +106,13 @@ $extensionFee = App\Settings::getValue('extension_fee');
 											<span class="input-group-text">Hour</span>
 										</div>
 
-										<input class="form-control has-spinner text-right" title="Hour" type="number" name="time_hour" id="time_hour" min="17" max="19" value="{{ \Carbon\Carbon::createFromFormat("H:i", $booking->start_at)->format("H") }}" required />
+										<input class="form-control has-spinner text-right" title="Hour" type="number" name="time_hour" id="time_hour" min="17" max="19" value="{{ \Carbon\Carbon::createFromFormat("h:i A", $booking->start_at)->format("H") }}" required />
 										
 										<div class="input-group-prepend input-group-append">
 											<span class="input-group-text">:</span>
 										</div>
 										
-										<input class="form-control has-spinner text-left" title="Minutes" type="number" name="time_min" id="time_min" min="0" max="59" value="{{ \Carbon\Carbon::createFromFormat("H:i", $booking->start_at)->format("i") }}" required />
+										<input class="form-control has-spinner text-left" title="Minutes" type="number" name="time_min" id="time_min" min="0" max="59" value="{{ \Carbon\Carbon::createFromFormat("h:i A", $booking->start_at)->format("i") }}" required />
 
 										<div class="input-group-append">
 											<span class="input-group-text">Minute</span>
