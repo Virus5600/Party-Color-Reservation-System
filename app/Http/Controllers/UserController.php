@@ -687,8 +687,8 @@ class UserController extends Controller
 		try {
 			DB::beginTransaction();
 
-			$userPerms = sort($user->userPerms->pluck(['id'])->toArray());
-			$typePerms = sort($user->type->permissions->pluck(['id'])->toArray());
+			$userPerms = sort($user->userPerms == null ? [] : $user->userPerms->pluck(['id'])->toArray());
+			$typePerms = sort($user->type->permissions == null ? [] : $user->type->permissions->pluck(['id'])->toArray());
 
 			if ($userPerms == $typePerms)
 				$user->userPerm->detach();
