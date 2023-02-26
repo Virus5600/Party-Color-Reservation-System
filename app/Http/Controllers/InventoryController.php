@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
 use App\Inventory;
 
+use Auth;
 use DB;
 use Log;
 use Exception;
@@ -36,6 +38,7 @@ class InventoryController extends Controller
 			'item_name' => 'required|string|max:255',
 			'quantity' => 'required|integer|max:4294967295',
 			'measurement_unit' => 'required|string|max:50',
+			'critical_level' => 'integer|min:0',
 		], [
 			'item_name.required' => 'Item name is required',
 			'item_name.string' => 'Item name should be a string',
@@ -46,6 +49,8 @@ class InventoryController extends Controller
 			'measurement_unit.required' => 'A unit of measurement is required',
 			'measurement_unit.string' => 'Unit of measurement should be a string',
 			'measurement_unit.max' => 'Unit of measurement should not be longer than 50 characters',
+			'critical_level.integer' => 'Critical level should be a number',
+			'critical_level.min' => 'Critical level should not be below 0',
 		]);
 
 		if ($validator->fails()) {
@@ -66,11 +71,25 @@ class InventoryController extends Controller
 			$item = Inventory::create([
 				'item_name' => $req->item_name,
 				'quantity' => $req->quantity,
-				'measurement_unit' => $req->measurement_unit
+				'measurement_unit' => $req->measurement_unit,
+				'critical_level' => $req->critical_level
 			]);
 
 			if (!$req->is_active)
 				$item->delete();
+
+			// LOGGER
+			activity('inventory')
+				->by(auth()->user())
+				->on($item)
+				->event('create')
+				->withProperties([
+					'item_name' => $item->item_name,
+					'quantity' => $item->quantity,
+					'measurement_unit' => $item->measurement_unit,
+					'critical_level' => $item->critical_level
+				])
+				->log("Item '{$item->item_name}' created.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -85,6 +104,28 @@ class InventoryController extends Controller
 		return redirect()
 			->route('admin.inventory.index')
 			->with('flash_success', 'Successfully added ' . $req->item_name);
+	}
+
+	protected function show(Request $req, $id) {
+		$item = Inventory::withTrashed()->find($id);
+
+		if ($item == null) {
+			return redirect()
+				->route('admin.inventory.index')
+				->with('flash_error', 'The item either does not exists or is already deleted.');
+		}
+
+		$format = [
+			'item_name',
+			'quantity',
+			'critical_level',
+			'updated_at'
+		];
+
+		return view('admin.inventory.show', [
+			'item' => $item,
+			'format' => $format
+		]);
 	}
 
 	protected function edit(Request $req, $id) {
@@ -119,6 +160,7 @@ class InventoryController extends Controller
 			'item_name' => 'required|string|max:255',
 			'quantity' => 'required|integer|max:4294967295',
 			'measurement_unit' => 'required|string|max:50',
+			'critical_level' => 'integer|min:0',
 		], [
 			'item_name.required' => 'Item name is required',
 			'item_name.string' => 'Item name should be a string',
@@ -129,6 +171,8 @@ class InventoryController extends Controller
 			'measurement_unit.required' => 'A unit of measurement is required',
 			'measurement_unit.string' => 'Unit of measurement should be a string',
 			'measurement_unit.max' => 'Unit of measurement should not be longer than 50 characters',
+			'critical_level.integer' => 'Critical level should be a number',
+			'critical_level.min' => 'Critical level should not be below 0',
 		]);
 
 		if ($validator->fails()) {
@@ -145,14 +189,28 @@ class InventoryController extends Controller
 			$item->item_name = $req->item_name;
 			$item->quantity = $req->quantity;
 			$item->measurement_unit = $req->measurement_unit;
+			$item->critical_level = $req->critical_level;
 			
-			if ($req->is_active == null) {
+			if ($req->is_active == null || $req->quantity <= 0) {
 				$item->delete();
 			} else {
 				$item->restore();
 			}
 
 			$item->save();
+
+			// LOGGER
+			activity('inventory')
+				->by(auth()->user())
+				->on($item)
+				->event('update')
+				->withProperties([
+					'item_name' => $item->item_name,
+					'quantity' => $item->quantity,
+					'measurement_unit' => $item->measurement_unit,
+					'critical_level' => $item->critical_level
+				])
+				->log("Item '{$item->item_name}' updated.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -194,11 +252,26 @@ class InventoryController extends Controller
 				]);
 		}
 
+		$prevCount = 0;
 		try {
 			DB::beginTransaction();
+			$prevCount = $item->quantity;
 
-			$item->quantity = $item->quantity + $req->quantity;
+			$item->quantity = $prevCount + $req->quantity;
 			$item->save();
+
+			// LOGGER
+			activity('inventory')
+				->by(auth()->user())
+				->on($item)
+				->event('update')
+				->withProperties([
+					'item_name' => $item->item_name,
+					'quantity' => $item->quantity,
+					'measurement_unit' => $item->measurement_unit,
+					'critical_level' => $item->critical_level
+				])
+				->log("Item '{$item->item_name}' increased by '{$req->quantity}' from '{$prevCount}' to '{$item->quantity}'.");
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -226,8 +299,23 @@ class InventoryController extends Controller
 		}
 
 		try {
-			DB::beginTransaction();			
+			DB::beginTransaction();
+
 			$item->delete();
+
+			// LOGGER
+			activity('inventory')
+				->by(auth()->user())
+				->on($item)
+				->event('delete')
+				->withProperties([
+					'item_name' => $item->item_name,
+					'quantity' => $item->quantity,
+					'measurement_unit' => $item->measurement_unit,
+					'critical_level' => $item->critical_level
+				])
+				->log("Item '{$item->item_name}' deactivated.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -259,7 +347,21 @@ class InventoryController extends Controller
 
 		try {
 			DB::beginTransaction();
+
 			$item->restore();
+
+			activity('inventory')
+				->by(auth()->user())
+				->on($item)
+				->event('delete')
+				->withProperties([
+					'item_name' => $item->item_name,
+					'quantity' => $item->quantity,
+					'measurement_unit' => $item->measurement_unit,
+					'critical_level' => $item->critical_level
+				])
+				->log("Item '{$item->item_name}' activated.");
+
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -286,7 +388,26 @@ class InventoryController extends Controller
 
 		try {
 			DB::beginTransaction();
+			
+			$item_name = $item->item_name;
+			$quantity = $item->quantity;
+			$measurement_unit = $item->measurement_unit;
+			$critical_level = $item->critical_level;
+
 			$item->forceDelete();
+
+			activity('inventory')
+				->by(auth()->user())
+				->on($item)
+				->event('delete')
+				->withProperties([
+					'item_name' => $item_name,
+					'quantity' => $quantity,
+					'measurement_unit' => $measurement_unit,
+					'critical_level' => $critical_level
+				])
+				->log("Item '{$item->item_name}' permanently deleted.");
+			
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();

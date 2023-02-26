@@ -16,7 +16,7 @@ class CreateSettingsTable extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->string('value');
+            $table->mediumText('value');
             $table->tinyInteger('is_file')->default(0);
             $table->timestamps();
         });

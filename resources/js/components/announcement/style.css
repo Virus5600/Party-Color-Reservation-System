@@ -1,0 +1,32 @@
+.Announcement {
+    background-color: white;
+}
+
+.Announcement hr {
+    width: 80%;
+    color: black;
+}
+
+
+.AnnouncementItem {
+    cursor: pointer;
+    background-color: rgb(243, 240, 240);
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.AnnouncementItem:hover {
+    opacity: 0.5;
+}
+
+.AnnouncementItem-image {
+    background-color: rgb(227, 222, 222);
+}
+
+.AnnouncementItem-image img {
+    object-fit: contain;
+}
+
+a {
+    text-decoration: none;
+}

@@ -1,0 +1,19 @@
+.nav-bg {
+  background-image: url('./img/main_background.png');
+  background-repeat: repeat;
+}
+
+.nav-bg a {
+  color: #A52A2A;
+
+
+  text-decoration: none;
+}
+
+.Nav a:hover {
+  color: #945555;
+}
+
+a.nav-active {
+  text-decoration: underline;
+}

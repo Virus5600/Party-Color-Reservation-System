@@ -15,40 +15,40 @@ class PermissionsTableSeeder extends Seeder
 	 */
 	public function run()
 	{
-		// RESERVATIONS
-		$reservationPerm = Permission::create([
-			'name' => 'Reservations Tab Access',
-			'slug' => 'reservations_tab_access'
+		// BOOKINGS
+		$bookingPerm = Permission::create([
+			'name' => 'Bookings Tab Access',
+			'slug' => 'bookings_tab_access'
 		]);
 
 		Permission::create([
-			'parent_permission' => $reservationPerm->id,
-			'name' => 'Reservations Tab Create',
-			'slug' => 'reservations_tab_create'
+			'parent_permission' => $bookingPerm->id,
+			'name' => 'Bookings Tab Create',
+			'slug' => 'bookings_tab_create'
 		]);
 
 		Permission::create([
-			'parent_permission' => $reservationPerm->id,
-			'name' => 'Reservations Tab Edit',
-			'slug' => 'reservations_tab_edit'
+			'parent_permission' => $bookingPerm->id,
+			'name' => 'Bookings Tab Edit',
+			'slug' => 'bookings_tab_edit'
 		]);
 
 		Permission::create([
-			'parent_permission' => $reservationPerm->id,
-			'name' => 'Reservations Tab Respond',
-			'slug' => 'reservations_tab_respond'
+			'parent_permission' => $bookingPerm->id,
+			'name' => 'Bookings Tab Respond',
+			'slug' => 'bookings_tab_respond'
 		]);
 
 		Permission::create([
-			'parent_permission' => $reservationPerm->id,
-			'name' => 'Reservations Tab Delete',
-			'slug' => 'reservations_tab_delete'
+			'parent_permission' => $bookingPerm->id,
+			'name' => 'Bookings Tab Delete',
+			'slug' => 'bookings_tab_delete'
 		]);
 
 		Permission::create([
-			'parent_permission' => $reservationPerm->id,
-			'name' => 'Reservations Tab Perma Delete',
-			'slug' => 'reservations_tab_perma_delete'
+			'parent_permission' => $bookingPerm->id,
+			'name' => 'Bookings Tab Perma Delete',
+			'slug' => 'bookings_tab_perma_delete'
 		]);
 
 		// INVENTORY
@@ -75,12 +75,6 @@ class PermissionsTableSeeder extends Seeder
 			'slug' => 'inventory_tab_delete'
 		]);
 
-		Permission::create([
-			'parent_permission' => $invPerm->id,
-			'name' => 'Inventory Tab Perma Delete',
-			'slug' => 'inventory_tab_perma_delete'
-		]);
-
 		// MENU
 		$menuPerm = Permission::create([
 			'name' => 'Menu Tab Access',
@@ -105,10 +99,29 @@ class PermissionsTableSeeder extends Seeder
 			'slug' => 'menu_tab_delete'
 		]);
 
-		Permission::create([
+		// MENU VARIATION
+		$menuVarPerm = Permission::create([
 			'parent_permission' => $menuPerm->id,
-			'name' => 'Menu Tab Perma Delete',
-			'slug' => 'menu_tab_perma_delete'
+			'name' => 'Menu Variation Tab Access',
+			'slug' => 'menu_var_tab_access'
+		]);
+
+		Permission::create([
+			'parent_permission' => $menuVarPerm->id,
+			'name' => 'Menu Variation Tab Create',
+			'slug' => 'menu_var_tab_create'
+		]);
+
+		Permission::create([
+			'parent_permission' => $menuVarPerm->id,
+			'name' => 'Menu Variation Tab Edit',
+			'slug' => 'menu_var_tab_edit'
+		]);
+
+		Permission::create([
+			'parent_permission' => $menuVarPerm->id,
+			'name' => 'Menu Variation Tab Delete',
+			'slug' => 'menu_var_tab_delete'
 		]);
 
 		// ANNOUNCEMENTS
@@ -195,7 +208,43 @@ class PermissionsTableSeeder extends Seeder
 			'slug' => 'users_tab_perma_delete'
 		]);
 
-		// PERMISSION
+		// TYPE
+		$typePerm = Permission::create([
+			'name' => 'Types Tab Access',
+			'slug' => 'types_tab_access'
+		]);
+
+		Permission::create([
+			'parent_permission' => $typePerm->id,
+			'name' => 'Types Tab Create',
+			'slug' => 'types_tab_create'
+		]);
+
+		Permission::create([
+			'parent_permission' => $typePerm->id,
+			'name' => 'Types Tab Edit',
+			'slug' => 'types_tab_edit'
+		]);
+
+		Permission::create([
+			'parent_permission' => $typePerm->id,
+			'name' => 'Types Tab Delete',
+			'slug' => 'types_tab_delete'
+		]);
+
+		Permission::create([
+			'parent_permission' => $typePerm->id,
+			'name' => 'Types Tab Perma Delete',
+			'slug' => 'types_tab_perma_delete'
+		]);
+
+		Permission::create([
+			'parent_permission' => $typePerm->id,
+			'name' => 'Types Tab Permissions',
+			'slug' => 'types_tab_permissions'
+		]);
+
+		// PERMISSIONS
 		$permsPerm = Permission::create([
 			'name' => 'Permissions Tab Access',
 			'slug' => 'permissions_tab_access'
@@ -205,6 +254,18 @@ class PermissionsTableSeeder extends Seeder
 			'parent_permission' => $permsPerm->id,
 			'name' => 'Permissions Tab Manage',
 			'slug' => 'permissions_tab_manage'
+		]);
+
+		// ACTIVITY LOGS
+		$logsPerm = Permission::create([
+			'name' => 'Activity Log Access',
+			'slug' => 'activity_logs_tab_access'
+		]);
+
+		Permission::create([
+			'parent_permission' => $logsPerm->id,
+			'name' => 'Activity Log Manage',
+			'slug' => 'activity_logs_tab_manage'
 		]);
 
 		// SETTINGS

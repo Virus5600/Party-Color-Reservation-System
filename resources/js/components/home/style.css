@@ -1,0 +1,22 @@
+.Home {
+    margin-top: 50px;
+}
+
+
+/* .Home .main-image img {
+    width: 100%;
+    height: 25vw;
+    object-fit: cover;
+} */
+
+
+
+.moredetails {
+    color: black;
+
+    text-decoration: underline;
+}
+
+.moredetails:hover {
+    color: rgb(53, 52, 52);
+}

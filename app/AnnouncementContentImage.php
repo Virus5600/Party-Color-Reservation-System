@@ -18,4 +18,9 @@ class AnnouncementContentImage extends Model
 	public function getImage() {
 		return asset('uploads/announcements/'.$this->announcement_id.'/'.$this->image_name);
 	}
+
+	// STATIC FUNCTIONS
+	public static function showRoute($id) {
+		return route('admin.announcements.show', [AnnouncementContentImage::find($id)->announcement_id]);
+	}
 }

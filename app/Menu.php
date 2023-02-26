@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 
 use Carbon\Carbon;
 
-use NumberFormatter;
+use DB;
+use Exception;
+use Log;
 
 class Menu extends Model
 {
@@ -16,33 +18,50 @@ class Menu extends Model
 
 	protected $fillable = [
 		'name',
-		'price',
-		'duration'
 	];
 	
 	protected $casts = [
 		'created_at' => 'datetime: M d, Y h:i A',
 		'updated_at' => 'datetime: M d, Y h:i A',
 		'deleted_at' => 'datetime: M d, Y h:i A',
-		'duration' => 'datetime: H:i'
 	];
 
-	// Accessor
-	public function getDurationAttribute($value) {
-		return Carbon::createFromFormat('H:i:s', $value)->format("H:i");
+	protected $with = [
+		'menuVariations'
+	];
+
+	// Booted
+	protected static function booted() {
+		static::retrieved(function($menu) {
+			try {
+				DB::beginTransaction();
+
+				// Deletes the menu only if its inactive for a year or more, and if all its variation is inactive.
+				if (now()->gte($menu->deleted_at) && count($menu->menuVariations) <= 0) {
+					$menu->forceDelete();
+
+					ActivityLog::log(
+						"Menu {$menu->name} removed permanently after being inactive for more than an entire year.",
+						null,
+						"Menu",
+						null,
+						true
+					);
+				}
+
+				DB::commit();
+			} catch (Exception $e) {
+				DB::rollback();
+				Log::error($e);
+			}
+		});
 	}
 
 	// Relationships
-	public function items() { return $this->belongsToMany('App\Inventory', 'menu_items', 'menu_id', 'inventory_id'); }
-	public function menuItems() { return $this->hasMany('App\MenuItem', 'menu_id', 'id'); }
+	public function menuVariations() { return $this->hasMany('App\MenuVariation', 'menu_id', 'id'); }
 
-	// Custom Functions
-	public function getPrice() {
-		$locale = app()->currentLocale();
-		return (new NumberFormatter("{$locale}@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) . number_format($this->price, 2);
-	}
-
-	public function getFromDuration($format = "H:i") {
-		return Carbon::parse($this->duration)->format($format);
+	// STATIC FUNCTIONS
+	public static function showRoute($id) {
+		return route('admin.menu.variation.index', [$id]);
 	}
 }

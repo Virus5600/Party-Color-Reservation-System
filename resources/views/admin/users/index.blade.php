@@ -74,6 +74,10 @@
 							</button>
 
 							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown{{$u->id}}">
+								{{-- SHOW --}}
+								<a href="{{ route('admin.users.show', [$u->id]) }}" class="dropdown-item"><i class="fas fa-eye mr-2"></i>View</a>
+
+
 								{{-- EDIT --}}
 								@if (Auth::user()->hasPermission('users_tab_edit'))
 								<a href="{{ route('admin.users.edit', [$u->id]) }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>

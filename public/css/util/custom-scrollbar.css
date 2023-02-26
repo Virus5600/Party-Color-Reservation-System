@@ -1,0 +1,20 @@
+/* CUSTOM SCROLLER */
+/* Width */
+.custom-scrollbar::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+
+/* Handle */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+	background: rgb(125, 125, 125);
+	opacity: 0.75;
+	border-radius: 10px;
+}
+
+/* Handle on hover */
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+	background: rgb(100, 100, 100);
+	opacity: 0.5;
+}
+/* CUSTOM SCROLLER END */

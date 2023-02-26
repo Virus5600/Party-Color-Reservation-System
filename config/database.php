@@ -51,7 +51,7 @@ return [
 			'strict' => true,
 			'engine' => 'InnoDB ROW_FORMAT=DYNAMIC',
 			'max_allowed_packet' => '5M',
-			'modes'  => [
+			'modes' => [
 				'ONLY_FULL_GROUP_BY',
 				'STRICT_TRANS_TABLES',
 				'NO_ZERO_IN_DATE',
@@ -157,7 +157,7 @@ return [
 
 	'redis' => [
 
-		'client' => env('REDIS_CLIENT', 'phpredis'),
+		'client' => env('REDIS_CLIENT', 'predis'),
 
 		'options' => [
 			'cluster' => env('REDIS_CLUSTER', 'redis'),

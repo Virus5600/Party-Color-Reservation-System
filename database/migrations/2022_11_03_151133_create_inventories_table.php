@@ -16,8 +16,9 @@ class CreateInventoriesTable extends Migration
         Schema::create('inventories', function (Blueprint $table) {
             $table->id();
             $table->string('item_name')->unique();
-            $table->integer('quantity')->unsigned();
+            $table->integer('quantity');
             $table->string('measurement_unit', 50);
+            $table->integer('critical_level')->unsigned()->default(10);
             $table->softDeletes();
             $table->timestamps();
         });

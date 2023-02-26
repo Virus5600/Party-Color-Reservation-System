@@ -2,18 +2,15 @@
 @import url('https://fonts.googleapis.com/css?family=Nunito');
 @import url("https://fonts.googleapis.com/css?family=Raleway:300,400,600");
 
-// Variables
-@import 'variables';
-
-// Bootstrap
+// Bootstrap 4
 @import "node_modules/bootstrap4/dist/css/bootstrap.min";
 @import "node_modules/bootstrap-select/dist/css/bootstrap-select.min";
 
 // jQuery UI
 @import "node_modules/jquery-ui/dist/themes/base/jquery-ui.min";
 
-// jQuery Input Tags
-@import "node_modules/taggingJS/example/tag-basic-style";
+// Taggify
+@import "node_modules/@yaireo/tagify/src/tagify";
 
 // Sweetalert 2
 @import "node_modules/sweetalert2/dist/sweetalert2.min";

@@ -16,25 +16,25 @@ class InventoryTableSeeder extends Seeder
 	public function run()
 	{
 		Inventory::create([
-			'item_name' => 'pork',
+			'item_name' => 'Pork',
 			'quantity' => 50,
 			'measurement_unit' => 'kg'
 		]);
 
 		Inventory::create([
-			'item_name' => 'beef',
+			'item_name' => 'Beef',
 			'quantity' => 50,
 			'measurement_unit' => 'kg'
 		]);
 
 		Inventory::create([
-			'item_name' => 'chicken',
+			'item_name' => 'Chicken',
 			'quantity' => 50,
 			'measurement_unit' => 'kg'
 		]);
 
 		Inventory::create([
-			'item_name' => 'coke',
+			'item_name' => 'Coke',
 			'quantity' => 10,
 			'measurement_unit' => 'L'
 		]);

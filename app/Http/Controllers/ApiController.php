@@ -4,13 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Carbon\Carbon;
+
+use App\Enum\ApprovalStatus;
+
 use App\Announcement;
+use App\Booking;
 use App\User;
 
+use Auth;
 use DB;
 use Exception;
+use Hash;
 use File;
 use Log;
+use Route;
 use Validator;
 
 class ApiController extends Controller
@@ -263,13 +271,30 @@ class ApiController extends Controller
 			}
 		}
 
-		if (!$emptyResponse)
+		if (!$emptyResponse) {
+			activity('api')
+				->by(auth()->user())
+				->on($user)
+				->event('update')
+				->withProperties([
+					'first_name' => $user->first_name,
+					'middle_name' => $user->middle_name,
+					'last_name' => $user->last_name,
+					'suffix' => $user->suffix,
+					'is_avatar_link' => $user->is_avatar_link,
+					'avatar' => $user->avatar,
+					'email' => $user->email,
+					'type_id' => $user->type
+				])
+				->log("{$user->getName()} removed avatar image ('{$req->type}').");
+
 			return response()
 				->json([
 					'type' => 'success',
 					'message' => 'Successfully removed image of ' . $req->type,
 					'fallback' => $fallback
 				]);
+		}
 
 		return response()->json([
 			'type' => 'empty',
@@ -277,11 +302,98 @@ class ApiController extends Controller
 		]);
 	}
 
-	protected function fetchAnnouncements(Request $req) {
-		$announcements = Announcement::get();
+	protected function fetchBookingEvent(Request $req, $id) {
+		$booking = Booking::with("menus")->find($id);
 
-		return response()->json([
-			'announcements' => $announcements
+		if ($booking == null) {
+			return response()
+				->json([
+					'success' => false,
+					'message' => 'The booking either does not exists or is already deleted'
+				]);
+		}
+
+		return response()
+			->json([
+				'success' => true,
+				'message' => $booking,
+				'props' => [
+					'statusColorCode' => $booking->getStatusColorCode($booking->getOverallStatus())
+				]
+			]);
+	}
+
+	protected function fetchBookingFromRange(Request $req, $monthYear = null) {
+		if ($monthYear == null)
+			$monthYear = now()->format("F") . ' ' . now()->format("Y");
+
+		$monthYear = explode(" ", $monthYear);
+		$month = $monthYear[0];
+		$year = $monthYear[1];
+
+		$bookings = Booking::with('contactInformation', 'menus', 'menus.menu')
+			->where('created_at', '>=', Carbon::parse("$month 01, $year"))
+			->where('created_at', '<=', Carbon::parse("$month $year")->endOfMonth())
+			->where('status', '=', ApprovalStatus::Approved->value)
+			->get();
+
+		return response()
+			->json([
+				'success' => true,
+				'bookings' => $bookings
+			]);
+	}
+
+	// CONFIRM PASSWORD MIDDLEWARE
+	protected function confirmPassword(Request $req) {
+		$controller = collect(Route::getRoutes())
+			->first(
+				function($route) {
+					return $route->matches(
+						request()->create(
+							session()->get("url")["intended"]
+						)
+					);
+				})
+			->action["uses"];
+
+		$controller = explode("@", $controller);
+		$msg = "";
+		
+		if (class_exists($controller[0]))
+			if (defined("{$controller[0]}::CONFIRM_PASS_MSG"))
+				$msg = $controller[0]::CONFIRM_PASS_MSG[$controller[1]];
+
+		activity('api')
+			->by(auth()->user())
+			->event('auth-confirm')
+			->log("Password confirmation requested for action authenticity");
+
+		return view('middleware.confirm-password', [
+			"message" => $msg
 		]);
+	}
+
+	protected function checkPassword(Request $req) {
+		if (!Hash::check($req->password, Auth::user()->password)) {
+			activity('api')
+				->by(auth()->user())
+				->event('auth-confirm')
+				->log("Password confirmation rejected.");
+
+			return back()
+				->with('flash_error', 'Incorrect password');
+		}
+
+		$req->session()->passwordConfirmed();
+
+		activity('api')
+			->by(auth()->user())
+			->event('auth-confirm')
+			->log("Password confirmation accepted. Valid for five (5) minutes");
+
+		session()->forget("confirmPassPrev");
+		return redirect()
+			->intended();
 	}
 }

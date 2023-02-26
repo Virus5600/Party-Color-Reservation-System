@@ -36,7 +36,6 @@
 	max-height: calc(100vh - 52.8px);
 	overflow-y: auto;
 	overflow-x: hidden;
-	white-space: nowrap;
 	
 	-webkit-transition: width 0.5s cubic-bezier(0.25, 0.45, 0.45, 1);
 	-moz-transition: width 0.5s cubic-bezier(0.25, 0.45, 0.45, 1);

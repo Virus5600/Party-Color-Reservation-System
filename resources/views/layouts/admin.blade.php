@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en-US">
 	<head>
+		@php
+		$webName = App\Settings::getValue('web-name');
+		$webDesc = App\Settings::getValue('web-desc');
+		$webLogoInstance = App\Settings::getInstance('web-logo');
+		$webLogo = $webLogoInstance->getImage(!$webLogoInstance->is_file);
+		@endphp
+
 		{{-- META DATA --}}
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta charset="utf-8">
@@ -9,23 +16,23 @@
 
 		{{-- SITE META --}}
 		<meta name="type" content="website">
-		<meta name="title" content="{{ env('APP_NAME') }}">
-		<meta name="description" content="{{ env('APP_DESC') }}">
+		<meta name="title" content="{{ $webName }}">
+		<meta name="description" content="{{ $webDesc }}">
 		<meta name="image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
 		<meta name="keywords" content="{{ env('APP_KEYW') }}">
-		<meta name="application-name" content="{{ env('APP_NAME') }}">
+		<meta name="application-name" content="{{ $webName }}">
 
 		{{-- TWITTER META --}}
 		<meta name="twitter:card" content="summary_large_image">
-		<meta name="twitter:title" content="{{ env('APP_NAME') }}">
-		<meta name="twitter:description" content="{{ env('APP_DESC') }}">
+		<meta name="twitter:title" content="{{ $webName }}">
+		<meta name="twitter:description" content="{{ $webDesc }}">
 		<meta name="twitter:image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
 
 		{{-- OG META --}}
 		<meta name="og:url" content="{{Request::url()}}">
 		<meta name="og:type" content="website">
-		<meta name="og:title" content="{{ env('APP_NAME') }}">
-		<meta name="og:description" content="{{ env('APP_DESC') }}">
+		<meta name="og:title" content="{{ $webName }}">
+		<meta name="og:description" content="{{ $webDesc }}">
 		<meta name="og:image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
 
 		@yield('meta')
@@ -33,6 +40,7 @@
 		{{-- CSS --}}
 		<link href="{{ asset('css/lib-styles.css') }}" rel="stylesheet">
 		<link href="{{ asset('css/style.css') }}" rel="stylesheet">
+		<link href="{{ asset('css/components.css') }}" rel="stylesheet">
 		<link href="{{ asset('css/admin.css') }}" rel="stylesheet">
 
 		@yield('css')
@@ -40,14 +48,18 @@
 		{{-- JQUERY / SWEETALERT 2 / SLICK CAROUSEL / FONTAWESOME 6 / SUMMERNOTE / TAGGING JS --}}
 		<script type="text/javascript" src="{{ asset('js/lib-scripts.js') }}"></script>
 
+		{{-- LIVEWIRE --}}
+		@livewireStyles
+		@livewireScripts
+
 		{{-- Removes the code that shows up when script is disabled/not allowed/blocked --}}
 		<script type="text/javascript" id="for-js-disabled-js">$('head').append('<style id="for-js-disabled">#js-disabled { display: none; }</style>');$(document).ready(function() {$('#js-disabled').remove();$('#for-js-disabled').remove();$('#for-js-disabled-js').remove();});</script>
 
 		{{-- FAVICON --}}
-		<link rel="icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">
-		<link rel="shortcut icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">
-		<link rel="apple-touch-icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">
-		<link rel="mask-icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">
+		<link rel="icon" href="{{ $webLogo }}">
+		<link rel="shortcut icon" href="{{ $webLogo }}">
+		<link rel="apple-touch-icon" href="{{ $webLogo }}">
+		<link rel="mask-icon" href="{{ $webLogo }}">
 
 		{{-- TITLE --}}
 		<title>@yield('title') - Party Color</title>
@@ -90,7 +102,7 @@
 						@include('components.admin.sidebar')
 						
 						{{-- CONTENT --}}
-						<div class="container-fluid content flex-fill m-0">
+						<div class="container-fluid content flex-fill m-0 pt-2 pb-5">
 							@yield('content')
 						</div>
 					</div>
@@ -102,6 +114,7 @@
 		<script type="text/javascript">const fiFallbackImage = '{{ asset("uploads/users/default.png") }}';</script>
 		<script type="text/javascript" src="{{ asset('js/admin.js') }}"></script>
 		<script type="text/javascript" src="{{ asset('js/util/fallback-image.js') }}"></script>
+		<script type="text/javascript" src="{{ asset('js/util/swal-flash.js') }}"></script>
 		<script type="text/javascript">
 			@if (Session::has('flash_error'))
 			Swal.fire({
@@ -154,12 +167,22 @@
 			@endif
 
 			$(document).ready(function(){
+				$(document).on('livewire:load', () => {
+					Livewire.onPageExpired((r, m) => {
+						console.info(r);
+						Swal.fire({
+							icon: `info`,
+							title: `The page has expired`,
+							message: m
+						});
+					});
+				});
+
 				$(".col-a").click(function(){
 					$('.collapse.show').collapse('hide');
 				});
 			});
 		</script>
 		@yield('scripts')
-		
 	</body>
 </html>

@@ -20,8 +20,8 @@ class Type extends Model
 	];
 
 	// Relationships
-	protected function users() { return $this->hasMany('App\User'); }
-	protected function permissions() { return $this->belongsToMany('App\Permission', 'type_permissions'); }
+	public function users() { return $this->hasMany('App\User'); }
+	public function permissions() { return $this->belongsToMany('App\Permission', 'type_permissions'); }
 
 	// Custom Functions
 	public function hasPermission(...$permissions) {
@@ -36,5 +36,10 @@ class Type extends Model
 		}
 
 		return $matches == count($permissions);
+	}
+
+	// STATIC FUNCTIONS
+	public static function showRoute($id) {
+		return route('admin.types.show', [$id]);
 	}
 }

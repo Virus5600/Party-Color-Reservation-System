@@ -1,4 +1,10 @@
 $(document).ready(() => {
+	let forSCFSwalFire = window.localStorage.getItem('forSCFSwalFire');
+	if (forSCFSwalFire != null && forSCFSwalFire != 'null') {
+		window.localStorage.removeItem('forSCFSwalFire');
+		Swal.fire(JSON.parse(forSCFSwalFire));
+	}
+
 	$(document).on('click', '[data-scf], .swal-change-field', (e) => {
 		const obj = $(e.currentTarget);
 
@@ -9,11 +15,14 @@ $(document).ready(() => {
 		let disableButton = obj.attr('data-scf-disable-button');
 		let useTextArea = obj.attr('data-scf-use-textarea');
 		let label = obj.attr('data-scf-label');
+		let reloadPage = obj.attr('data-scf-reload');
+		let callback = obj.attr('data-scf-callback');
 
 		fieldName = (typeof fieldName == 'undefined' ? field : fieldName);
 		customTitle = (typeof customTitle == 'undefined' ? `Update ${field}` : customTitle);
 		disableButton = (typeof disableButton == 'undefined' ? false : (disableButton.toLowerCase() === 'true'));
 		useTextArea = (typeof useTextArea == 'undefined' ? false : (useTextArea.toLowerCase() === 'true'));
+		reloadPage = (typeof reloadPage == 'undefined' ? false : (reloadPage.toLowerCase() === 'true'));
 
 		html = '';
 
@@ -67,17 +76,17 @@ $(document).ready(() => {
 
 				const dataPacket = {
 					"_token": $('meta[name="csrf-token"]').attr('content'),
-					[fieldName]: response.value.fieldVal
+					[fieldName]: response.value.inputVal
 				};
 
 				$.post(
 					targetURI,
 					dataPacket
 				).done((data) => {
+					let forSCFSwalFire;
+
 					if (data.success) {
-						Swal.fire({
-							title: `${data.title}`,
-							html: `${data.message}`,
+						forSCFSwalFire = {
 							position: `top`,
 							showConfirmButton: false,
 							toast: true,
@@ -88,12 +97,19 @@ $(document).ready(() => {
 								content: `text-white`,
 								popup: `px-3`
 							},
-						});
+						};
+						
+						if (typeof data.title != 'undefined') {
+							forSCFSwalFire.title = `${data.title}`;
+							forSCFSwalFire.html = `${data.message}`;
+						}
+						else
+							forSCFSwalFire.title = `${data.message}`;
+
+						Swal.fire(forSCFSwalFire);
 					}
 					else {
-						Swal.fire({
-							title: `${data.title}`,
-							html: `${data.message}`,
+						forSCFSwalFire = {
 							position: `top`,
 							showConfirmButton: false,
 							toast: true,
@@ -104,9 +120,30 @@ $(document).ready(() => {
 								content: `text-white`,
 								popup: `px-3`
 							},
-						});
+						};
+
+						if (typeof data.title != 'undefined') {
+							forSCFSwalFire.title = `${data.title}`;
+							forSCFSwalFire.html = `${data.message}`;
+						}
+						else
+							forSCFSwalFire.title = `${data.message}`;
+						
+						Swal.fire(forSCFSwalFire);
+					}
+
+					if (reloadPage && data.success) {
+						setTimeout(() => {
+							window.localStorage.setItem("forSCFSwalFire", JSON.stringify(forSCFSwalFire));
+							window.location.reload();
+						}, 2500);
+					}
+
+					if (typeof callback == 'string' && callback.length > 0 && data.success) {
+						setTimeout(callback, 0);
 					}
 				}).fail((data) => {
+
 					Swal.fire({
 						title: `${data.title}`,
 						html: `${data.message}`,

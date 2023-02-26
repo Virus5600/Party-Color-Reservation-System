@@ -1,0 +1,42 @@
+.background {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../aboutus/img/appearance.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+h1 {
+    font-weight: 900;
+    padding: 20px;
+    border-bottom: 1px solid white;
+}
+
+hr {
+    margin: 0;
+    color: white;
+}
+
+.ReservationDetailsConfirmation {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+    border: 1px solid white;
+    background-color: rgba(66, 32, 32, 0.7);
+}
+
+.ReservationDetailsConfirmation-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.container-small {
+    width: 800px;
+    max-width: 100%;
+}
+
+.outcome-price {
+    background-color: rgb(0, 0, 0, 0.2)
+}

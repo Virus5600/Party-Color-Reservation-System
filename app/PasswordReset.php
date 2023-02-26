@@ -76,4 +76,9 @@ class PasswordReset extends Model
 
 		return $this->expires_at->lte(Carbon::now()->timezone("Asia/Manila"));
 	}
+
+	// STATIC FUNCTIONS
+	public static function showRoute($id) {
+		return "javascript:SwalFlash.info(`Not Applicable`, `Automated action by the system.`, true, false, `center`, false);";
+	}
 }
