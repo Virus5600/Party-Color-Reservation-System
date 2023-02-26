@@ -92,9 +92,56 @@ export default function ReservationConfirmation(props) {
 						<FieldValue label={'Time Extension'} data={extension} />
 						<FieldValue label={'Special Requests'} data={special_request} />
 					</div>
-					<div className='text-white text-center '>
-						<span>total</span><br />
-						<span className='fs-1 fw-bold'>¥{compute_price(Number(adult_senior), Number(junior), Number(elementary))}</span>
+					<div className='text-white text-center outcome-price p-3'>
+						<div className='row'>
+							<div className='col-md-4'>
+								Adult/Senior:
+							</div>
+							<div className='col-md-4'>
+								{adult_senior}pax x ¥{static_prices['adult']}
+							</div>
+							<div className='col-md-4'>
+								¥{Number(adult_senior) * static_prices['adult']}
+							</div>
+						</div>
+						<div className='row'>
+							<div className='col-md-4'>
+								Junior:
+							</div>
+							<div className='col-md-4'>
+								{junior}pax x ¥{static_prices['junior']}
+							</div>
+							<div className='col-md-4'>
+								¥{Number(junior) * static_prices['junior']}
+							</div>
+						</div>
+						<div className='row'>
+							<div className='col-md-4'>
+								Elementary:
+							</div>
+							<div className='col-md-4'>
+								{elementary}pax x ¥{static_prices['elementary']}
+							</div>
+							<div className='col-md-4'>
+								¥{Number(elementary) * static_prices['elementary']}
+							</div>
+						</div>
+						<div className='row pt-3'>
+							<div className='col-md-4'>
+
+							</div>
+							<div className='col-md-4'>
+								Total
+							</div>
+							<div className='col-md-4 fw-bolder'>
+								¥{compute_price(Number(adult_senior), Number(junior), Number(elementary))}
+							</div>
+						</div>
+						{/* <span>Adult/Senior: {adult_senior}pax x ¥{static_prices['adult']} = ¥{Number(adult_senior) * static_prices['adult']}</span><br />
+						<span>Junior: {junior}pax x ¥{static_prices['junior']} = ¥{Number(junior) * static_prices['junior']}</span><br />
+						<span>Elementary: {elementary}pax x ¥{static_prices['elementary']} = ¥{Number(elementary) * static_prices['elementary']}</span><br />
+						<span>total:</span>
+						<span className='fw-bold'>¥{compute_price(Number(adult_senior), Number(junior), Number(elementary))}</span> */}
 					</div>
 					{
 						props.forViewReservation ?
