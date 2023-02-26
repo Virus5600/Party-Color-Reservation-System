@@ -93,7 +93,9 @@ class TypesController extends Controller
 	}
 
 	protected function show($id) {
-		$type = Type::withTrashed()->find($id);
+		$type = Type::withTrashed()
+			->with(['permissions'])
+			->find($id);
 
 		if ($type == null) {
 			return redirect()
