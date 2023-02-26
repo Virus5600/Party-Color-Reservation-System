@@ -41,6 +41,10 @@ class ActivityLogController extends Controller
 			$showRoute = "javascript:SwalFlash.info(`Not Applicable`, `Automated action by the system.`, true, false, `center`, false);";
 			$shorthand_subject_type = "System Process";
 		}
+		else if ($subject_type == null) {
+			$showRoute = "javascript:SwalFlash.info(`Item Deleted`, `Item is deleted already and has no way to provide a link.`, true, false, `center`, false);";
+			$shorthand_subject_type = ucfirst($log->log_name) . " Model";
+		}
 		else {
 			$shorthand_subject_type = (new ReflectionClass($subject_type))->getShortName();
 			if ($shorthand_subject_type == 'Activity')

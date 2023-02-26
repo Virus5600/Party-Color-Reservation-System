@@ -114,8 +114,6 @@ class AdditionalOrderController extends Controller
 				->with('flash_error', 'Something went wrong, please try again later');
 		}
 
-		
-
 		return redirect()
 			->route('admin.bookings.additional-orders.index', [$booking->id])
 			->with('flash_success', 'Successfully added additional order')

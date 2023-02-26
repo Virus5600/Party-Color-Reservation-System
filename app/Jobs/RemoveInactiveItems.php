@@ -47,9 +47,22 @@ class RemoveInactiveItems implements ShouldQueue
 			$items = [];
 			
 			foreach ($this->inventory as $i) {
+				activity('jobs')
+					->byAnonymous()
+					->on($i)
+					->event('deleted')
+					->withProperties([
+						'item_name' => $i->item_name,
+						'quantity' => $i->quantity,
+						'measurement_unit' => $i->measurement_unit,
+						'critical_level' => $i->critical_level
+					])
+					->log("Item {$i->item_name} is now deleted permanently after being inactive for 5 or more years");
+
 				array_push($items, $i->item_name);
 				$i->deletePermanently();
 				$count++;
+
 			}
 
 			Log::info("Finished deletion of {$count} " . Str::plural("item", $count) . ".", $items);

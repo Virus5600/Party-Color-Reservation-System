@@ -1,4 +1,4 @@
-@extends('layouts.emails.account.layout')
+@extends('layouts.emails.layout')
 
 @section('title')
 An attempt to access you account has been made!
