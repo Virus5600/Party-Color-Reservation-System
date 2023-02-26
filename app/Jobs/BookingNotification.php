@@ -43,7 +43,7 @@ class BookingNotification implements ShouldQueue
 		if (!isset($this->args['subject']))
 			$this->args['subject'] = "Reservation Notification";
 		else
-			$this->args['subject'] = ($this->args['subject'] == null) ? "Reservation Notification" : $this->args['subject'];
+			$this->args['subject'] = $this->args['subject'] ?? "Reservation Notification";
 
 		$recipient = $this->booking->contactInformation()->first();
 		$subject = $this->args['subject'];
@@ -53,7 +53,7 @@ class BookingNotification implements ShouldQueue
 			"layouts.emails.bookings.notification",
 			[
 				'subject' => $this->args['subject'],
-				'reason' => $this->args['reason'],
+				'reason' => $this->args['reason'] ?? null,
 				'type' => $this->type,
 				'booking' => $this->booking
 			],
