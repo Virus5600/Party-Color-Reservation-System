@@ -813,7 +813,7 @@ class UserController extends Controller
 					'type_id' => $user->type,
 					'last_auth' => $user->last_auth
 				])
-				->log("User '{$user->email()}' reactivated account.");
+				->log("User '{$user->getName()}' reactivated account.");
 
 			DB::commit();
 		} catch (Exception $e) {
