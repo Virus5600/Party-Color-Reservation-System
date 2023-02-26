@@ -687,16 +687,16 @@ class UserController extends Controller
 		try {
 			DB::beginTransaction();
 
-			$userPerms = ($user->userPerms == null ? [] : $user->userPerms->pluck(['id'])->toArray());
-			$typePerms = ($user->type->permissions == null ? [] : $user->type->permissions->pluck(['id'])->toArray());
+			$userPerms = ($user->userPerms == null ? array() : $user->userPerms->pluck(['id'])->toArray());
+			$typePerms = ($user->type->permissions == null ? array() : $user->type->permissions->pluck(['id'])->toArray());
 
 			$userPerms = sort($userPerms);
 			$typePerms = sort($typePerms);
 
 			if ($userPerms == $typePerms)
-				$user->userPerm->detach();
+				$user->userPerms->detach();
 			else
-				$user->userPerm->sync($req->permissions);
+				$user->userPerms->sync($req->permissions);
 
 			// LOGGER
 			activity('user')
