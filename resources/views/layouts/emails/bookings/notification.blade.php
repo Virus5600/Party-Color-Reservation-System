@@ -62,6 +62,13 @@
 	@endif
 @elseif ($type == 'pending')
 	<p>You're reservation with a control number #{{ $booking->control_no }} has been moved to pending.</p>
+
+	@if ($reason != null)
+	<p>Below is the reason why the you've made the cancellation:</p>
+	<div style="border: 1px #343A40 solid; border-radius: 0.5rem; margin: 0.5rem; padding: 0.25rem;">
+		<p>{{ $reason }}</p>
+	</div>
+	@endif
 @endif
 
 <p>If you have any concerns, feel free to contact us through our channels:</p>
