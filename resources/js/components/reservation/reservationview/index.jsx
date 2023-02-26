@@ -90,7 +90,10 @@ export default function ReservationView() {
 			reason: cancellation_reason,
 		}).then(res => {
 			console.log('after sending cancellation request:', res);
-			removeSessionItem();
+			if (res.data.success) {
+				removeSessionItem();
+			}
+
 			return res;
 		}).catch(res => {
 			console.log('error cancelling request:', res);
@@ -113,7 +116,10 @@ export default function ReservationView() {
 			control_no: control_number,
 		}).then(res => {
 			console.log('after sending undo cancellation request:', res);
-			removeSessionItem();
+			if (res.data.success) {
+				removeSessionItem();
+			}
+
 			return res;
 		}).catch(res => {
 			console.log('error cancelling request:', res);
