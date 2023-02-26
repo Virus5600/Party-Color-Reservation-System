@@ -16,27 +16,25 @@ use Illuminate\Support\Facades\Route;
 // Route::fallback('PageController@fallback')->name('fallback');
 Route::get('login', 'UserController@redirectLogin')->name('redirectLogin');
 
-// FORGOT PASSWORD
-Route::group(['prefix' => 'forgot-password'], function() {
-	// Index
-	Route::get('/', 'PasswordResetController@index')->name('forgot-password.index');
-
-	// Submit
-	Route::post('submit', 'PasswordResetController@submit')->name('forgot-password.submit');
-	
-});
-
-// CHANGE PASSWORD
-Route::group(['prefix' => 'change-password'], function() {
-	// Edit
-	Route::get('{token}', 'PasswordResetController@edit')->name('change-password.edit');
-
-	// Update
-	Route::post('{token}/update', 'PasswordResetController@update')->name('change-password.update');
-});
-
-
 Route::group(['prefix' => 'admin'], function() {
+	// FORGOT PASSWORD
+	Route::group(['prefix' => 'forgot-password'], function() {
+		// Index
+		Route::get('forgot-password/', 'PasswordResetController@index')->name('forgot-password.index');
+		// Submit
+		Route::post('forgot-password/submit', 'PasswordResetController@submit')->name('forgot-password.submit');
+		
+	});
+
+	// CHANGE PASSWORD
+	Route::group(['prefix' => 'change-password'], function() {
+		// Edit
+		Route::get('{token}', 'PasswordResetController@edit')->name('change-password.edit');
+
+		// Update
+		Route::post('{token}/update', 'PasswordResetController@update')->name('change-password.update');
+	});
+	
 	// AUTHENTICATION RELATED
 	Route::get('login', 'UserController@login')->name('login');
 	Route::get('logout', 'UserController@logout')->name('logout');
