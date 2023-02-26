@@ -73,4 +73,8 @@ class BookingNotification implements ShouldQueue
 			->withProperties(array_merge(['args' => $this->args], $recipient->toArray()))
 			->log("Creation of booking mail notification sent to \"{$recipient->contact_name}\" ({$recipient->email})");
 	}
+
+	public function __destruct() {
+		Artisan::call('queue:work --stop-when-empty');
+	}
 }

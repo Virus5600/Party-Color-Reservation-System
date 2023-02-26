@@ -69,4 +69,8 @@ class BookingCancellationNotification implements ShouldQueue
 			->withProperties(array_merge(['args' => $this->args], $recipient->toArray()))
 			->log("Booking cancellation mail notification sent to \"{$recipient->contact_name}\" ({$recipient->email})");
 	}
+
+	public function __destruct() {
+		Artisan::call('queue:work --stop-when-empty');
+	}
 }
