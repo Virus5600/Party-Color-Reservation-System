@@ -37,7 +37,7 @@ class Menu extends Model
 				DB::beginTransaction();
 
 				// Deletes the menu only if its inactive for a year or more, and if all its variation is inactive.
-				if (now()->gte($menu->deleted_at) && count($menu->menuVariations) <= 0) {
+				if ($menu->trashed() && now()->gte(Carbon::parse($menu->deleted_at)->addYear()) && count($menu->menuVariations) <= 0) {
 
 					activity('menu')
 						->byAnonymous()

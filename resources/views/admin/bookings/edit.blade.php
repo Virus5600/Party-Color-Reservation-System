@@ -8,6 +8,7 @@
 $datetime = now()->timezone('Asia/Tokyo');
 $isEightPM = $datetime->gt('08:00 PM');
 $new_contact_index = Session::get("new_contact_index");
+$new_menu_index = Session::get("new_menu_index");
 $maxCap = App\Settings::getValue('capacity');
 $extensionFee = App\Settings::getValue('extension_fee');
 @endphp
