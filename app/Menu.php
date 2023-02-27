@@ -64,6 +64,10 @@ class Menu extends Model
 
 	// STATIC FUNCTIONS
 	public static function showRoute($id) {
+		$menu = Menu::withTrashed()->find($id);
+
+		if ($menu == null)
+			return "javascript:SwalFlash.info(`Cannot Find Item`, `Item may already be deleted or an anonymous user.`, true, false, `center`, false);";
 		return route('admin.menu.variation.index', [$id]);
 	}
 }

@@ -21,6 +21,10 @@ class AnnouncementContentImage extends Model
 
 	// STATIC FUNCTIONS
 	public static function showRoute($id) {
-		return route('admin.announcements.show', [AnnouncementContentImage::find($id)->announcement_id]);
+		$announcementContentImage = AnnouncementContentImage::find($id);
+
+		if ($announcementContentImage == null)
+			return "javascript:SwalFlash.info(`Cannot Find Item`, `Item may already be deleted or an anonymous user.`, true, false, `center`, false);";
+		return route('admin.announcements.show', [$announcementContentImage->announcement_id]);
 	}
 }

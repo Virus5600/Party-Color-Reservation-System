@@ -133,6 +133,10 @@ class AdditionalOrder extends Model
 	}
 
 	public static function showRoute($id) {
-		return route('admin.bookings.additional-orders.show', [AdditionalOrder::withTrashed()->find($id)->booking_id, $id]);
+		$additionalOrder = AdditionalOrder::withTrashed()->find($id);
+
+		if ($additionalOrder == null)
+			return "javascript:SwalFlash.info(`Cannot Find Item`, `Item may already be deleted or an anonymous user.`, true, false, `center`, false);";
+		return route('admin.bookings.additional-orders.show', [$additionalOrder->booking_id, $id]);
 	}
 }

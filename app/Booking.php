@@ -228,7 +228,11 @@ class Booking extends Model
 	}
 
 	public static function showRoute($id) {
-		return route('admin.bookings.index', ['cn' => Booking::select(['id', 'control_no'])->withTrashed()->find($id)->control_no]);
+		$booking = Booking::select(['id', 'control_no'])->withTrashed()->find($id);
+
+		if ($booking == null)
+			return "javascript:SwalFlash.info(`Cannot Find Item`, `Item may already be deleted or an anonymous user.`, true, false, `center`, false);";
+		return route('admin.bookings.index', ['cn' => $booking->control_no]);
 	}
 
 	// Validation

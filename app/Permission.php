@@ -42,6 +42,10 @@ class Permission extends Model
 
 	// STATIC FUNCTIONS
 	public static function showRoute($id) {
-		return route('admin.permissions.show', [Permission::find($id)->slug]);
+		$permission = Permission::find($id);
+
+		if ($permission == null)
+			return "javascript:SwalFlash.info(`Cannot Find Item`, `Item may already be deleted or an anonymous user.`, true, false, `center`, false);";
+		return route('admin.permissions.show', [$permission->slug]);
 	}
 }
