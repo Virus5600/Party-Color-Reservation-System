@@ -61,7 +61,8 @@ class BookingController extends Controller
 				->back()
 				->withErrors($validator)
 				->withInput()
-				->with("new_contact_index",  $newContactIndex);
+				->with("new_contact_index",  $newContactIndex)
+				->with("new_menu_index",  $newMenuIndex);
 		}
 
 		try {
@@ -278,7 +279,8 @@ class BookingController extends Controller
 				->back()
 				->withErrors($validator)
 				->withInput()
-				->with("new_contact_index",  $newContactIndex);
+				->with("new_contact_index",  $newContactIndex)
+				->with("new_menu_index",  $newMenuIndex);
 		}
 
 		try {

@@ -18,7 +18,7 @@
 		<meta name="type" content="website">
 		<meta name="title" content="{{ $webName }}">
 		<meta name="description" content="{{ $webDesc }}">
-		<meta name="image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
+		<meta name="image" content="{{ asset('uploads/settings/meta-banner.png') }}">
 		<meta name="keywords" content="{{ env('APP_KEYW') }}">
 		<meta name="application-name" content="{{ $webName }}">
 
@@ -26,14 +26,14 @@
 		<meta name="twitter:card" content="summary_large_image">
 		<meta name="twitter:title" content="{{ $webName }}">
 		<meta name="twitter:description" content="{{ $webDesc }}">
-		<meta name="twitter:image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
+		<meta name="twitter:image" content="{{ asset('uploads/settings/meta-banner.png') }}">
 
 		{{-- OG META --}}
 		<meta name="og:url" content="{{Request::url()}}">
 		<meta name="og:type" content="website">
 		<meta name="og:title" content="{{ $webName }}">
 		<meta name="og:description" content="{{ $webDesc }}">
-		<meta name="og:image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
+		<meta name="og:image" content="{{ asset('uploads/settings/meta-banner.png') }}">
 
 		@yield('meta')
 
@@ -62,7 +62,7 @@
 		<link rel="mask-icon" href="{{ $webLogo }}">
 
 		{{-- TITLE --}}
-		<title>@yield('title') - Party Color</title>
+		<title>@yield('title') - {{ $webName }}</title>
 	</head>
 
 	<body style="max-height: 100vh; heigh: 100vh;" class="overflow-y-hidden">
