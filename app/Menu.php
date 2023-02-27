@@ -38,15 +38,17 @@ class Menu extends Model
 
 				// Deletes the menu only if its inactive for a year or more, and if all its variation is inactive.
 				if (now()->gte($menu->deleted_at) && count($menu->menuVariations) <= 0) {
-					$menu->forceDelete();
 
-					ActivityLog::log(
-						"Menu {$menu->name} removed permanently after being inactive for more than an entire year.",
-						null,
-						"Menu",
-						null,
-						true
-					);
+					activity('menu')
+						->byAnonymous()
+						->on($menu)
+						->event('delete')
+						->withProperties([
+							'name' => $menu->name
+						])
+						->log("Menu {$menu->name} removed permanently after being inactive for more than an entire year.");
+					
+					$menu->forceDelete();
 				}
 
 				DB::commit();
