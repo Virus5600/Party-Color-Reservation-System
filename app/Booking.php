@@ -311,7 +311,7 @@ class Booking extends Model
 			"contact_email.*.max" => "Contact email is capped at 255",
 			"special_request..nullable" => "",
 			"special_request.string" => "Malformed content...",
-			"special_request.max" => "A maximum of 100 characters is the allowed limit"
+			"special_request.max" => "A maximum of 1000 characters is the allowed limit"
 		];
 
 		$req->merge(['phone_numbers' => explode(",", $req->phone_numbers)]);
@@ -321,13 +321,13 @@ class Booking extends Model
 		$menuGroupNull = false;
 		if ($req->menu == null && $req->amount != null) {
 			for ($i = 0; $i < count($req->amount); $i++)
-				array_push($balancer, null);
+				array_push($balancer, '');
 			$req->merge(['menu' => $balancer]);
 			$menuGroupNull = true;
 		}
 		else if ($req->menu != null && $req->amount == null) {
 			for ($i = 0; $i < count($req->menu); $i++)
-				array_push($balancer, null);
+				array_push($balancer, '');
 			$req->merge(['amount' => $balancer]);
 			$menuGroupNull = true;
 		}
@@ -336,13 +336,13 @@ class Booking extends Model
 		$contactGroupNull = false;
 		if ($req->contact_name == null && $req->contact_email != null) {
 			for ($i = 0; $i < count($req->contact_email); $i++)
-				array_push($balancer, null);
+				array_push($balancer, '');
 			$req->merge(['contact_name' => $balancer]);
 			$contactGroupNull = true;
 		}
 		else if ($req->contact_name != null && $req->contact_email == null) {
 			for ($i = 0; $i < count($req->contact_name); $i++)
-				array_push($balancer, null);
+				array_push($balancer, '');
 			$req->merge(['contact_email' => $balancer]);
 			$contactGroupNull = true;
 		}
