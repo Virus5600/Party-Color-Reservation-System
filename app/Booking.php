@@ -314,9 +314,38 @@ class Booking extends Model
 			"special_request.max" => "A maximum of 100 characters is the allowed limit"
 		];
 
-		$req->merge([
-			'phone_numbers' => explode(",", $req->phone_numbers)
-		]);
+		$req->merge(['phone_numbers' => explode(",", $req->phone_numbers)]);
+
+		// Balancer
+		$balancer = [];
+		$menuGroupNull = false;
+		if ($req->menu == null && $req->amount != null) {
+			for ($i = 0; $i < count($req->amount); $i++)
+				array_push($balancer, null);
+			$req->merge(['menu' => $balancer]);
+			$menuGroupNull = true;
+		}
+		else if ($req->menu != null && $req->amount == null) {
+			for ($i = 0; $i < count($req->menu); $i++)
+				array_push($balancer, null);
+			$req->merge(['amount' => $balancer]);
+			$menuGroupNull = true;
+		}
+		
+		$balancer = [];
+		$contactGroupNull = false;
+		if ($req->contact_name == null && $req->contact_email != null) {
+			for ($i = 0; $i < count($req->contact_email); $i++)
+				array_push($balancer, null);
+			$req->merge(['contact_name' => $balancer]);
+			$contactGroupNull = true;
+		}
+		else if ($req->contact_name != null && $req->contact_email == null) {
+			for ($i = 0; $i < count($req->contact_name); $i++)
+				array_push($balancer, null);
+			$req->merge(['contact_email' => $balancer]);
+			$contactGroupNull = true;
+		}
 
 		// Validation for phone number
 		{
@@ -365,71 +394,75 @@ class Booking extends Model
 		$validator = Validator::make($req->all(), $validationRules, $validationMsg);
 
 		// Calculates how many minutes will be added to the booking (will be used using the addMinutes)
-		$menu = [];
-		$hoursToAdd = 0;
-		$minutesToAdd = 0;
-		foreach ($req->menu as $mi) {
-			$menu["{$mi}"] = MenuVariation::find($mi);
+		$start_at = null;
+		$end_at = null;
+		if (!$menuGroupNull) {
+			$menu = [];
+			$hoursToAdd = 0;
+			$minutesToAdd = 0;
+			foreach ($req->menu as $mi) {
+				$menu["{$mi}"] = MenuVariation::find($mi);
+				
+				// Compares what hour has the highest among the menus selected
+				$hoursComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("H");
+				$hoursToAdd = max(Carbon::parse($menu["{$mi}"]->duration)->format("H"), $hoursToAdd);
+
+				// Compares what minute has the highest among the menus selected
+				$minutesComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("i");
+				$minutesToAdd = max($minutesComparisonVal, $minutesToAdd);
+			}
+			// Adds the extension as minutes
+			$minutesToAdd += ($req->extension * 60);
+
+			// Calculates the duration of the booking
+			$closing = Carbon::parse("{$req->booking_date} 22:00:00");
+			$start_at = Carbon::parse("{$req->booking_date} {$req->time_hour}:{$req->time_min}");
+			$end_at = Carbon::parse("{$req->booking_date} {$req->time_hour}:{$req->time_min}")
+				->addHours($hoursToAdd)->addMinutes($minutesToAdd);
 			
-			// Compares what hour has the highest among the menus selected
-			$hoursComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("H");
-			$hoursToAdd = max(Carbon::parse($menu["{$mi}"]->duration)->format("H"), $hoursToAdd);
+			$validator->after(function ($validator) use ($req, $storeCap, $start_at, $end_at, $closing, $id) {
+				// Checks whether the booking exceeded the closing time
+				if ($end_at->gt($closing)) {
+					$toSubtract = $end_at->diffInMinutes($closing) / 60;
 
-			// Compares what minute has the highest among the menus selected
-			$minutesComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("i");
-			$minutesToAdd = max($minutesComparisonVal, $minutesToAdd);
+					$validator->errors()->add(
+						"extension",
+						"Extension made the booking exceed closing time. Remove {$toSubtract} " . Str::plural('hour', $toSubtract)
+					);
+				}
+
+				// Checks if the booking can still be accomodated (store capacity related)
+				{
+					$paxAccomodated = Booking::whereDate('reserved_at', '=', $req->booking_date)
+						->where('id', '<>', $id)
+						->where('status', '=', ApprovalStatus::Approved->value)
+						->whereTime('start_at', '<', $end_at)
+						->whereTime('end_at', '>', $start_at)
+						->sum('pax');
+
+					if ($paxAccomodated >= $storeCap) {
+						$end = $end_at->gt($closing) ? $closing : $end_at;
+						$validator->errors()->add(
+							"general",
+							"Sorry but booking cannot be accomodated. The restaurant is at full capacity for this time range <b>({$start_at->format('H:i')} - {$end->format('H:i')})</b>."
+						);
+					}
+
+					$totalPax = $paxAccomodated + $req->pax;
+					if ($totalPax > $storeCap) {
+						$validator->errors()->add(
+							"general",
+							"Sorry but booking cannot be accomodated. Current bookings is already at restaurant's capacity which is at <b>{$storeCap}</b> people. Adding the current reservaton will result to a total of <b>{$totalPax}</b> people reserved at the same time..."
+						);
+					}
+				}
+			});
 		}
-		// Adds the extension as minutes
-		$minutesToAdd += ($req->extension * 60);
-
-		// Calculates the duration of the booking
-		$closing = Carbon::parse("{$req->booking_date} 22:00:00");
-		$start_at = Carbon::parse("{$req->booking_date} {$req->time_hour}:{$req->time_min}");
-		$end_at = Carbon::parse("{$req->booking_date} {$req->time_hour}:{$req->time_min}")
-			->addHours($hoursToAdd)->addMinutes($minutesToAdd);
-
-		$validator->after(function ($validator) use ($req, $storeCap, $start_at, $end_at, $closing, $id) {
-			// Checks whether the booking exceeded the closing time
-			if ($end_at->gt($closing)) {
-				$toSubtract = $end_at->diffInMinutes($closing) / 60;
-
-				$validator->errors()->add(
-					"extension",
-					"Extension made the booking exceed closing time. Remove {$toSubtract} " . Str::plural('hour', $toSubtract)
-				);
-			}
-
-			// Checks if the booking can still be accomodated (store capacity related)
-			{
-				$paxAccomodated = Booking::whereDate('reserved_at', '=', $req->booking_date)
-					->where('id', '<>', $id)
-					->where('status', '=', ApprovalStatus::Approved->value)
-					->whereTime('start_at', '<', $end_at)
-					->whereTime('end_at', '>', $start_at)
-					->sum('pax');
-
-				if ($paxAccomodated >= $storeCap) {
-					$end = $end_at->gt($closing) ? $closing : $end_at;
-					$validator->errors()->add(
-						"general",
-						"Sorry but booking cannot be accomodated. The restaurant is at full capacity for this time range <b>({$start_at->format('H:i')} - {$end->format('H:i')})</b>."
-					);
-				}
-
-				$totalPax = $paxAccomodated + $req->pax;
-				if ($totalPax > $storeCap) {
-					$validator->errors()->add(
-						"general",
-						"Sorry but booking cannot be accomodated. Current bookings is already at restaurant's capacity which is at <b>{$storeCap}</b> people. Adding the current reservaton will result to a total of <b>{$totalPax}</b> people reserved at the same time..."
-					);
-				}
-			}
-		});
 
 		return [
 			'validator' => $validator,
-			'newContactIndex' => $newContactIndex,
-			'newMenuIndex' => $newMenuIndex,
+			'newContactIndex' => count($newContactIndex) > 0 ? $newContactIndex : null,
+			'newMenuIndex' => count($newMenuIndex) > 0 ? $newMenuIndex : null,
 			'start_at' => $start_at,
 			'end_at' => $end_at
 		];
