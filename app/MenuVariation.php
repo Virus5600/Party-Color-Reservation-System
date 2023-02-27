@@ -234,6 +234,10 @@ class MenuVariation extends Model
 	}
 
 	public static function showRoute($vid) {
-		return route('admin.menu.variation.show', [MenuVariation::find($vid)->menu_id, $vid]);
+		$menuVariation = MenuVariation::withTrashed()->find($vid);
+		
+		if ($menuVariation == null)
+			return "javascript:SwalFlash.info(`Cannot Find Item`, `Item may already be deleted or an anonymous user.`, true, false, `center`, false);";
+		return route('admin.menu.variation.show', [$menuVariation->menu_id, $vid]);
 	}
 }

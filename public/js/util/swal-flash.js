@@ -105,8 +105,6 @@ window.addEventListener('flash_success', (e) => {
 });
 
 const __setSwalFlashOptions = (options, flash, type) => {
-	console.log(flash);
-
 	if (flash.has_icon != undefined)
 		options["icon"] = `${type}`;
 
