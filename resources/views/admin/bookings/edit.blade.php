@@ -163,7 +163,10 @@ $extensionFee = App\Settings::getValue('extension_fee');
 							<div class="row card-body">
 								{{-- MENU ITEMS --}}
 								<div class="form-group col-12">
-									<p class="h5">Menus</p>
+									<p>
+										<span class="h5">Menus</span>
+										<span class="text-danger text-wrap validation float-right">a{{ $errors->first("menu") }}</span>
+									</p>
 
 									{{-- Dynamic form fields --}}
 									<div class="row" id="menuField">
@@ -177,7 +180,7 @@ $extensionFee = App\Settings::getValue('extension_fee');
 													<div class="form-group">
 														<label class="form-label" for="menu">Menu Name</label><br>
 
-														<select class="show-tick select-picker w-100 form-control" name="menu[]" required>
+														<select class="show-tick select-picker w-100 form-control" name="menu[]" title="Menu Name" aria-label="Menu Name" required>
 															<option class="d-none" data-subtext="" data-price="0" data-duration="00:00" disabled {{ count(old('menu') ? old('menu') : []) > 0 ? "" : "selected" }}>Select a Menu</option>
 															@foreach ($menus as $m)
 															<optgroup label="{{ $m->name }}">
@@ -196,7 +199,7 @@ $extensionFee = App\Settings::getValue('extension_fee');
 															</optgroup>
 															@endforeach
 														</select>
-														<br><span class="text-danger text-wrap validation">{{ $errors->first('menu') }}</span>
+														<br><span class="text-danger text-wrap validation">{{ $errors->first("menu.{$index}") }}</span>
 													</div>
 
 													{{-- AMOUNT --}}
@@ -224,7 +227,7 @@ $extensionFee = App\Settings::getValue('extension_fee');
 													<div class="form-group">
 														<label class="form-label" for="menu">Menu Name</label><br>
 
-														<select class="show-tick select-picker w-100 form-control" name="menu[]" required>
+														<select class="show-tick select-picker w-100 form-control" name="menu[]" title="Menu Name" aria-label="Menu Name" required>
 															<option class="d-none" data-subtext="" data-price="0" data-duration="00:00" disabled {{ count(old('menu') ? old('menu') : []) > 0 ? "" : "selected" }}>Select a Menu</option>
 															@foreach ($menus as $m)
 															<optgroup label="{{ $m->name }}">
