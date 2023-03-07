@@ -3,7 +3,7 @@
 @section('title', 'Inventory')
 
 @php
-$user = Auth::user();
+$user = auth()->user();
 $editAllow = $user->hasPermission('inventory_tab_edit');
 $deleteAllow = $user->hasPermission('inventory_tab_delete');
 @endphp
@@ -22,14 +22,14 @@ $deleteAllow = $user->hasPermission('inventory_tab_delete');
 				<div class="col-12 col-md-8">
 					<div class="row">
 						{{-- ADD --}}
-						@if (Auth::user()->hasPermission('inventory_tab_create'))
+						@if ($user->hasPermission('inventory_tab_create'))
 						<div class="col-12 col-md text-center text-md-right ml-md-auto">
 							<a href="{{ route('admin.inventory.create') }}" class="btn btn-success m-auto"><i class="fa fa-plus-circle mr-2"></i>Add Item</a>
 						</div>
 						@endif
 
 						{{-- SEARCH --}}
-						@include('components.admin.admin-search', ['type' => 'inventories'])
+						@include('components.admin.admin-search', ['type' => 'inventory'])
 					</div>
 				</div>
 				{{-- Controls End --}}
@@ -37,7 +37,7 @@ $deleteAllow = $user->hasPermission('inventory_tab_delete');
 		</div>
 	</div>
 
-	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3" id="inner-content">
+	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3 h-100 d-flex flex-column" id="inner-content">
 		<table class="table table-striped my-0">
 			<thead>
 				<tr>
@@ -48,7 +48,7 @@ $deleteAllow = $user->hasPermission('inventory_tab_delete');
 				</tr>
 			</thead>
 
-			<tbody id="table-content">
+			<tbody id="table-content" class="h-100">
 				@forelse ($items as $i)
 				<tr class="enlarge-on-hover">
 					<td class="text-center align-middle mx-auto font-weight-bold">{{ $i->item_name }}</td>
@@ -88,6 +88,10 @@ $deleteAllow = $user->hasPermission('inventory_tab_delete');
 				@endforelse
 			</tbody>
 		</table>
+
+		<div id="table-paginate" class="w-100 d-flex align-middle my-3">
+			{{ $items->onEachSide(5)->links() }}
+		</div>
 	</div>
 </div>
 @endsection

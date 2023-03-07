@@ -25,7 +25,7 @@
 						</div>
 
 						{{-- SEARCH --}}
-						@include('components.admin.admin-search', ['type' => 'additional-orders'])
+						@include('components.admin.admin-search', ['type' => 'additionalOrder', 'etcInput' => ['bid' => $booking_id]])
 					</div>
 				</div>
 				{{-- Controls End --}}
@@ -41,7 +41,7 @@
 		</span>
 	</div>
 
-	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3" id="inner-content">
+	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3 h-100 d-flex flex-column" id="inner-content">
 		<table class="table table-striped my-0">
 			<thead>
 				<tr>
@@ -99,6 +99,10 @@
 				@endforelse
 			</tbody>
 		</table>
+
+		<div id="table-paginate" class="w-100 d-flex align-middle my-3">
+			{{ $additional_orders->onEachSide(5)->links() }}
+		</div>
 	</div>
 </div>
 @endsection

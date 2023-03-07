@@ -15,7 +15,10 @@ use Validator;
 class TypesController extends Controller
 {
 	protected function index(Request $req) {
+		$search = "%" . request('search') . "%";
+		
 		$types = Type::withTrashed()
+			->where('name', 'LIKE', $search)
 			->withCount(['users', 'permissions'])
 			->paginate(10);
 

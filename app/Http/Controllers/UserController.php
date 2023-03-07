@@ -235,7 +235,17 @@ class UserController extends Controller
 
 	// PAGES
 	protected function index(Request $req) {
-		$users = User::withTrashed()->get();
+		$search = "%" . request('search') . "%";
+
+		$users = User::withTrashed()
+			->leftJoin('types', 'users.type_id', '=', 'types.id')
+			->where('first_name', 'LIKE', $search)
+			->orWhere('middle_name', 'LIKE', $search)
+			->orWhere('last_name', 'LIKE', $search)
+			->orWhere('email', 'LIKE', $search)
+			->orWhere('types.name', 'LIKE', $search)
+			->select(['users.*'])
+			->paginate(10);
 
 		return view('admin.users.index', [
 			'users' => $users

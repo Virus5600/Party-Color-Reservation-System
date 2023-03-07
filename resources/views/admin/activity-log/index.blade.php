@@ -26,7 +26,7 @@
 		</div>
 	</div>
 
-	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3" id="inner-content">
+	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3 h-100 d-flex flex-column" id="inner-content">
 		<table class="table table-striped my-0">
 			<thead>
 				<tr>
@@ -59,7 +59,7 @@
 						{{ $a->created_at->format("M d, Y h:i A") }}
 					</td>
 
-					<td class="align-middle">
+					<td class="align-middle align-middle mx-auto">
 						<div class="dropdown">
 							<button class="btn btn-{{ $a->is_marked == 1 ? "danger" : "primary" }} dropdown-toggle" type="button" data-toggle="dropdown" id="dropdown{{ $a->id }}" aria-haspopup="true" aria-expanded="false">
 								Actions
@@ -74,21 +74,15 @@
 				</tr>
 				@empty
 				<tr>
-					<td class="text-center" colspan="5">Nothing to show~</td>
+					<td class="text-center" colspan="4">Nothing to show~</td>
 				</tr>
 				@endforelse
 			</tbody>
-
-			<tfoot>
-				<tr>
-					<td colspan="4">
-						<div class="d-flex align-middle">
-							{{ $activity->onEachSide(5)->links() }}
-						</div>
-					</td>
-				</tr>
-			</tfoot>
 		</table>
+
+		<div id="table-paginate" class="w-100 d-flex align-middle my-3">
+			{{ $activity->onEachSide(5)->links() }}
+		</div>
 	</div>
 </div>
 @endsection

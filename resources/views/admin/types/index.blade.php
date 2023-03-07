@@ -2,6 +2,14 @@
 
 @section('title', 'Types')
 
+@php
+$user = auth()->user();
+$editAllow = $user->hasPermission('types_tab_edit');
+$permissionAllow = $user->hasPermission('types_tab_permissions');
+$deleteAllow = $user->hasPermission('types_tab_delete');
+$permaDeleteAllow = $user->hasPermission('users_tab_perma_delete');
+@endphp
+
 @section('content')
 <div class="container-fluid d-flex flex-column min-h-100">
 	<div class="row">
@@ -23,7 +31,7 @@
 						@endif
 
 						{{-- SEARCH --}}
-						@include('components.admin.admin-search', ['type' => 'types'])
+						@include('components.admin.admin-search', ['type' => 'type'])
 					</div>
 				</div>
 				{{-- Controls End --}}
@@ -31,7 +39,7 @@
 		</div>
 	</div>
 
-	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3" id="inner-content">
+	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3 h-100 d-flex flex-column" id="inner-content">
 		<table class="table table-striped my-0">
 			<thead>
 				<tr>
@@ -58,7 +66,7 @@
 						@endif
 					</td>
 
-					<td class="align-middle">
+					<td class="text-center align-middle mx-auto">
 						<div class="dropdown ">
 							<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="dropdown{{ $t->id }}" aria-haspopup="true" aria-expanded="false">
 								Actions
@@ -70,7 +78,7 @@
 
 
 								{{-- EDIT --}}
-								@if (Auth::user()->hasPermission('types_tab_edit'))
+								@if ($editAllow)
 								<button class="dropdown-item"
 									data-scf="New name..."
 									data-scf-name="name"
@@ -84,12 +92,12 @@
 								@endif
 
 								{{-- PERMISSIONS --}}
-								@if (Auth::user()->hasPermission('types_tab_permissions'))
+								@if ($permissionAllow)
 								<a href="{{ route('admin.types.manage-permissions', [$t->id]) }}" class="dropdown-item"><i class="fas fa-user-lock mr-2"></i>Manage Permissions</a>
 								@endif
 
 								{{-- STATUS [DELETE] --}}
-								@if (Auth::user()->hasPermission('types_tab_delete'))
+								@if ($deleteAllow)
 									@if ($t->trashed())
 									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.types.restore', [$t->id]) }}', undefined, 'Are you sure you want to activate this?');" class="dropdown-item"><i class="fas fa-toggle-on mr-2"></i>Activate</a>
 									@else
@@ -98,7 +106,7 @@
 								@endif
 
 								{{-- DELETE [PERMANENT DELETE] --}}
-								@if (Auth::user()->hasPermission('users_tab_perma_delete'))
+								@if ($permaDeleteAllow)
 								<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.types.permaDelete', [$t->id]) }}', undefined, 'Are you sure you want to delete this?')" class="dropdown-item"><i class="fas fa-trash mr-2"></i>Delete</a>
 								@endif
 							</div>
@@ -107,11 +115,15 @@
 				</tr>
 				@empty
 				<tr>
-					<td class="text-center" colspan="3">Nothing to show~</td>
+					<td class="text-center" colspan="5">Nothing to show~</td>
 				</tr>
 				@endforelse
 			</tbody>
 		</table>
+
+		<div id="table-paginate" class="w-100 d-flex align-middle my-3">
+			{{ $types->onEachSide(5)->links() }}
+		</div>
 	</div>
 </div>
 @endsection

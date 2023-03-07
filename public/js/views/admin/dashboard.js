@@ -95,7 +95,20 @@ $(document).ready(() => {
 							htmlContent = `
 								<h3 class="text-center">${response.message}</h3>
 							`;
+
+							// Then update the already fired up Swal...
+							Swal.update({
+								html: htmlContent
+							});
 						}
+					}).fail((response) => {
+						console.table(response);
+						htmlContent = `<div class="text-left">${response.responseText}</div>`;
+
+						// Then update the already fired up Swal...
+						Swal.update({
+							html: htmlContent
+						});
 					});
 
 					// Fire the Swal.

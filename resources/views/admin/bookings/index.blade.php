@@ -72,7 +72,6 @@ $extensionFee = App\Settings::getValue('extension_fee');
 
 @section('meta')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<meta name="bearer" content="{{ session('bearer') }}">
 @endsection
 
 @section('css')

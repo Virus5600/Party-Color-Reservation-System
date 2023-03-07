@@ -35,6 +35,7 @@
 		<meta name="og:description" content="{{ $webDesc }}">
 		<meta name="og:image" content="{{ asset('uploads/settings/meta-banner.png') }}">
 
+		<meta name="bearer" content="{{ session('bearer') }}">
 		@yield('meta')
 
 		{{-- CSS --}}
@@ -102,7 +103,7 @@
 						@include('components.admin.sidebar')
 						
 						{{-- CONTENT --}}
-						<div class="container-fluid content flex-fill m-0 pt-2 pb-5">
+						<div class="container-fluid content flex-fill m-0 pt-2 pb-5 h-100">
 							@yield('content')
 						</div>
 					</div>

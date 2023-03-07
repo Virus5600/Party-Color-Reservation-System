@@ -59,10 +59,19 @@ $(document).ready(() => {
 	$('select.selectpicker').selectpicker();
 
 	// Dropdown fix
-	$('.enlarge-on-hover .dropdown').on('show.bs.dropdown', (e) => {
+	$(document).on('show.bs.dropdown', '.enlarge-on-hover .dropdown', (e) => {
 		$(e.currentTarget).closest(".enlarge-on-hover").css("z-index", 1);
-	}).on('hide.bs.dropdown', (e) => {
+	}).on('hide.bs.dropdown', '.enlarge-on-hover .dropdown', (e) => {
 		$(e.currentTarget).closest(".enlarge-on-hover").css("z-index", 0);
 	});
 	$('.enlarge-on-hover .dropdown').trigger('hide.bs.dropdown');
+
+	$(document).on('show.bs.dropdown', '.dropdown', function(e) {
+		var dropdown = $(e.target).find('.dropdown-menu');
+
+			dropdown.appendTo('body');
+		$(this).on('hidden.bs.dropdown', function () {
+			dropdown.appendTo(e.target);
+		});
+	});
 });

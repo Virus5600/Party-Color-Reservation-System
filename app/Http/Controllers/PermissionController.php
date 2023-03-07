@@ -14,7 +14,10 @@ use Validator;
 class PermissionController extends Controller
 {
 	protected function index(Request $req) {
-		$permissions = Permission::paginate(10);
+		$search = "%" . request('search') . "%";
+		
+		$permissions = Permission::where('name', 'LIKE', $search)
+			->paginate(10);
 
 		return view('admin.permissions.index', [
 			'permissions' => $permissions
