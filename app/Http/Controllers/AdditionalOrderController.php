@@ -24,10 +24,20 @@ class AdditionalOrderController extends Controller
 	];
 
 	protected function index($id) {
-		$additionalOrders = Booking::find($id)
-			->additionalOrders()
+		$booking = Booking::withTrashed()
+			->find($id);
+
+		if ($booking == null) {
+			return redirect()
+				->route('admin.bookings.index')
+				->with('flash_error', 'Booking either does not exists or is already deleted');
+		}
+
+		$additionalOrders = $booking->additionalOrders()
+			->where('extension', 'LIKE', $search)
+			->orWhere('price', 'LIKE', $search)
 			->withTrashed()
-			->get();
+			->paginate(10);
 
 		return view('admin.bookings.additional-orders.index', [
 			'booking_id' => $id,
@@ -36,7 +46,8 @@ class AdditionalOrderController extends Controller
 	}
 
 	protected function create($id) {
-		$booking = Booking::find($id);
+		$booking = Booking::withTrashed()
+			->find($id);
 		
 		if ($booking == null) {
 			return redirect()
@@ -53,7 +64,8 @@ class AdditionalOrderController extends Controller
 	}
 
 	protected function store(Request $req, $id) {
-		$booking = Booking::find($id);
+		$booking = Booking::withTrashed()
+			->find($id);
 		
 		if ($booking == null) {
 			return redirect()
@@ -156,7 +168,9 @@ class AdditionalOrderController extends Controller
 	}
 
 	protected function edit($booking_id, $order_id) {
-		$booking = Booking::find($booking_id);
+		$booking = Booking::withTrashed()
+			->find($booking_id);
+
 		if ($booking == null) {
 			return redirect()
 				->route('admin.bookings.index')
@@ -181,7 +195,8 @@ class AdditionalOrderController extends Controller
 	}
 
 	protected function update(Request $req, $booking_id, $order_id) {
-		$booking = Booking::find($booking_id);
+		$booking = Booking::withTrashed()
+			->find($booking_id);
 		
 		if ($booking == null) {
 			return redirect()
@@ -261,7 +276,9 @@ class AdditionalOrderController extends Controller
 	}
 
 	protected function delete($booking_id, $order_id) {
-		$booking = Booking::find($booking_id);
+		$booking = Booking::withTrashed()
+			->find($booking_id);
+		
 		if ($booking == null) {
 			return redirect()
 				->route('admin.bookings.index')

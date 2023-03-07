@@ -2,6 +2,16 @@
 
 @section('title', 'Announcements')
 
+@php
+$user = auth()->user();
+$editAllow = $user->hasPermission('announcements_tab_edit');
+$publishViable = $user->hasSomePermission('announcements_tab_publish', 'announcements_tab_unpublish');
+$publishAllow = $user->hasPermission('announcements_tab_publish');
+$unpublishAllow = $user->hasPermission('announcements_tab_unpublish');
+$deleteAllow = $user->hasPermission('announcements_tab_delete');
+$permaDeleteAllow = $user->hasPermission('announcements_tab_perma_delete');
+@endphp
+
 @section('content')
 <div class="container-fluid d-flex flex-column min-h-100">
 	<div class="row">
@@ -23,7 +33,7 @@
 						@endif
 
 						{{-- SEARCH --}}
-						@include('components.admin.admin-search', ['type' => 'announcements', 'etcInput' => array('sd' => $show_softdeletes, 'd' => $show_drafts)])
+						@include('components.admin.admin-search', ['type' => 'announcement', 'etcInput' => array('sd' => $show_softdeletes, 'd' => $show_drafts)])
 					</div>
 				</div>
 				{{-- Controls End --}}
@@ -43,7 +53,7 @@
 		@endif
 	</h6>
 
-	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3" id="inner-content">
+	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3 h-100 d-flex flex-column" id="inner-content">
 		<table class="table table-striped my-0">
 			<thead>
 				<tr>
@@ -61,11 +71,15 @@
 					<td class="text-center align-middle mx-auto">
 						<img src="{{ $a->getPoster() }}" alt="{{ $a->title }}" class="img img-fluid user-icon mx-auto rounded" data-fallback-image="{{ asset('uploads/announcements/default.png') }}">
 					</td>
-					<td class="text-center align-middle mx-auto font-weight-bold"><i class="fas fa-circle {{ $a->is_draft ? 'text-info' : 'text-success' }} mr-2"></i>{{ $a->title }}</td>
+
+					<td class="text-center align-middle mx-auto font-weight-bold">
+						<i class="fas fa-circle {{ $a->trashed() ? 'text-danger' : ($a->is_draft ? 'text-info' : 'text-success') }} mr-2"></i>{{ $a->title }}
+					</td>
+
 					<td class="text-center align-middle mx-auto">{{ $a->created_at->locale('en_US')->translatedFormat('M d, Y') }}</td>
 					<td class="text-center align-middle mx-auto">{{ $a->user->getName() }}</td>
 
-					<td class="align-middle">
+					<td class="align-middle mx-auto">
 						<div class="dropdown ">
 							<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="dropdown{{$a->id}}" aria-haspopup="true" aria-expanded="false">
 								Actions
@@ -75,30 +89,30 @@
 								<a href="{{ route('admin.announcements.show', [$a->id]) }}?d={{ $show_drafts ? 1 : 0 }}&sd={{ $show_softdeletes ? 1 : 0 }}" class="dropdown-item"><i class="fas fa-eye mr-2"></i>View</a>
 
 								{{-- EDIT --}}
-								@if (Auth::user()->hasPermission('announcements_tab_edit'))
+								@if ($editAllow)
 								<a href="{{ route('admin.announcements.edit', [$a->id]) }}?d={{ $show_drafts ? 1 : 0 }}&sd={{ $show_softdeletes ? 1 : 0 }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>
 								@endif
 
 								{{-- PUBLISH/UNPUBLISH --}}
-								@if (Auth::user()->hasSomePermission('announcements_tab_publish', 'announcements_tab_unpublish'))
-									@if ($a->is_draft && Auth::user()->hasPermission('announcements_tab_publish'))
+								@if ($publishViable)
+									@if ($a->is_draft && $publishAllow)
 									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.publish', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Publish this announcement?');" class="dropdown-item"><i class="fas fa-upload mr-2"></i>Publish</a>
-									@elseif (!$a->is_draft && Auth::user()->hasPermission('announcements_tab_unpublish'))
+									@elseif (!$a->is_draft && $unpublishAllow)
 									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.unpublish', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Unpublish this announcement');" class="dropdown-item"><i class="fas fa-pencil-ruler mr-2"></i>Draft</a>
 									@endif
 								@endif
 								
 								{{-- DELETE --}}
-								@if (Auth::user()->hasPermission('announcements_tab_delete'))
+								@if ($deleteAllow)
 									@if ($a->trashed())
 									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.restore', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Are you sure you want to restore this?');" class="dropdown-item"><i class="fas fa-recycle mr-2"></i>Restore</a>
 									@else
-									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.delete', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Are you sure you want to delete this?');" class="dropdown-item"><i class="fas fa-trash mr-2"></i>Trash</a>
+									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.announcements.delete', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Are you sure you want to trash this?');" class="dropdown-item"><i class="fas fa-trash mr-2"></i>Trash</a>
 									@endif
 								@endif
 
 								{{-- PERMANENT DELETE --}}
-								@if (Auth::user()->hasPermission('announcements_tab_perma_delete'))
+								@if ($permaDeleteAllow)
 								<a onclick="confirmLeave('{{ route('admin.announcements.permaDelete', [$a->id, 'd' => $show_drafts, 'sd' => $show_softdeletes]) }}', undefined, 'Are you sure you want to permanently delete this?')" class="dropdown-item"><i class="fas fa-fire-alt mr-2"></i>Delete</a>
 								@endif
 							</div>
@@ -112,6 +126,10 @@
 				@endforelse
 			</tbody>
 		</table>
+
+		<div id="table-paginate" class="w-100 d-flex align-middle my-3">
+			{{ $announcements->onEachSide(5)->links() }}
+		</div>
 	</div>
 </div>
 @endsection

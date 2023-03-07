@@ -1,6 +1,6 @@
-@if ($paginator->hasPages())
-	<nav class="m-auto">
-		<ul class="pagination m-auto">
+<nav class="m-auto">
+	<ul class="pagination m-auto">
+		@if ($paginator->hasPages())
 			{{-- Previous Page Link --}}
 			@if ($paginator->onFirstPage())
 				<li class="page-item disabled" aria-disabled="true" aria-label="@lang('pagination.previous')">
@@ -41,6 +41,31 @@
 					<span class="page-link" aria-hidden="true"><i class="fas fa-caret-right"></i></span>
 				</li>
 			@endif
-		</ul>
-	</nav>
-@endif
+		@else
+			{{-- Previous Page Link --}}
+			@if ($paginator->onFirstPage())
+				<li class="page-item disabled" aria-disabled="true" aria-label="@lang('pagination.previous')">
+					<span class="page-link" aria-hidden="true"><i class="fas fa-caret-left"></i></span>
+				</li>
+			@else
+				<li class="page-item">
+					<a class="page-link" href="{{ $paginator->previousPageUrl() }}" rel="prev" aria-label="@lang('pagination.previous')"><i class="fas fa-caret-left"></i></a>
+				</li>
+			@endif
+
+			{{-- Pagination Elements --}}
+			<li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
+
+			{{-- Next Page Link --}}
+			@if ($paginator->hasMorePages())
+				<li class="page-item">
+					<a class="page-link" href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="@lang('pagination.next')"><i class="fas fa-caret-right"></i></a>
+				</li>
+			@else
+				<li class="page-item disabled" aria-disabled="true" aria-label="@lang('pagination.next')">
+					<span class="page-link" aria-hidden="true"><i class="fas fa-caret-right"></i></span>
+				</li>
+			@endif
+		@endif
+	</ul>
+</nav>

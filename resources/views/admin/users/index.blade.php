@@ -2,6 +2,15 @@
 
 @section('title', 'Users')
 
+@php
+$user = auth()->user();
+$deleteViable = $user->hasSomePermission('users_tab_delete', 'users_tab_perma_delete');
+$editAllow = $user->hasPermission('users_tab_edit');
+$permissionAllow = $user->hasPermission('users_tab_permissions');
+$deleteAllow = $user->hasPermission('users_tab_delete');
+$permaDeleteAllow = $user->hasPermission('users_tab_perma_delete');
+@endphp
+
 @section('content')
 <div class="container-fluid d-flex flex-column min-h-100">
 	<div class="row">
@@ -23,7 +32,7 @@
 						@endif
 
 						{{-- SEARCH --}}
-						@include('components.admin.admin-search', ['type' => 'users'])
+						@include('components.admin.admin-search', ['type' => 'user'])
 					</div>
 				</div>
 				{{-- Controls End --}}
@@ -31,7 +40,7 @@
 		</div>
 	</div>
 
-	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3" id="inner-content">
+	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3 h-100 d-flex flex-column" id="inner-content">
 		<table class="table table-striped my-0">
 			<thead>
 				<tr>
@@ -51,7 +60,7 @@
 					</td>
 
 					<td class="text-center align-middle mx-auto font-weight-bold">
-						@if (Auth::user()->hasSomePermission('users_tab_delete', 'users_tab_perma_delete'))
+						@if ($deleteViable)
 							<span class="{{ $u->deleted_at ? 'text-danger' : 'text-success' }}">
 								<i class="fas fa-circle small"></i>
 							</span>
@@ -79,17 +88,17 @@
 
 
 								{{-- EDIT --}}
-								@if (Auth::user()->hasPermission('users_tab_edit'))
+								@if ($editAllow)
 								<a href="{{ route('admin.users.edit', [$u->id]) }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>
 								@endif
 
 								{{-- PERMISSIONS --}}
-								@if (Auth::user()->hasPermission('users_tab_permissions'))
+								@if ($permissionAllow)
 								<a href="{{ route('admin.users.manage-permissions', [$u->id]) }}" class="dropdown-item"><i class="fas fa-user-lock mr-2"></i>Manage Permissions</a>
 								@endif
 								
 								{{-- CHANGE PASSWORD (EDIT) --}}
-								@if (Auth::user()->hasPermission('users_tab_edit') || Auth::user()->id == $u->id)
+								@if ($editAllow || $user->id == $u->id)
 								<a href="javascript:void(0);" class="dropdown-item change-password" id="scp-{{ $u->id }}">
 									<i class="fas fa-lock mr-2"></i>Change Password
 									<script type="text/javascript">
@@ -109,7 +118,7 @@
 								@endif
 
 								{{-- STATUS [DELETE] --}}
-								@if (Auth::user()->hasPermission('users_tab_delete'))
+								@if ($deleteAllow)
 									@if ($u->trashed())
 									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.users.restore', [$u->id]) }}', undefined, 'Are you sure you want to activate this?');" class="dropdown-item"><i class="fas fa-toggle-on mr-2"></i>Activate</a>
 									@else
@@ -118,7 +127,7 @@
 								@endif
 
 								{{-- DELETE [PERMANENT DELETE] --}}
-								@if (Auth::user()->hasPermission('users_tab_perma_delete'))
+								@if ($permaDeleteAllow)
 								<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.users.permaDelete', [$u->id]) }}', undefined, 'Are you sure you want to delete this?')" class="dropdown-item"><i class="fas fa-trash mr-2"></i>Delete</a>
 								@endif
 							</div>
@@ -132,6 +141,10 @@
 				@endforelse
 			</tbody>
 		</table>
+
+		<div id="table-paginate" class="w-100 d-flex align-middle my-3">
+			{{ $users->onEachSide(5)->links() }}
+		</div>
 	</div>
 </div>
 @endsection

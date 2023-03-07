@@ -3,7 +3,7 @@
 		{{ $name }}
 	</h4>
 
-	<div class="card-body overflow-x-auto">
+	<div class="card-body overflow-x-auto h-100 d-flex flex-column">
 		<table class="table table-striped my-0">
 			<thead>
 				<tr>
@@ -108,16 +108,12 @@
 				</tr>
 				@endforelse
 			</tbody>
-
-			@if (count($data) > 0)
-			<tfoot class="text-center">
-				<tr>
-					<td colspan="{{ count($columns) + count($columnsFn) + ($hasActions ? 1 : 0) + ($hasShow ? 1 : 0) }}">
-						<div class="d-flex align-middle justify-content-center">{{ $data->links() }}</div>
-					</td>
-				</tr>
-			</tfoot>
-			@endif
 		</table>
+
+		@if ($loadData)
+		<div id="table-paginate" class="w-100 d-flex align-middle mt-auto my-3">
+			{{ $data->links() }}
+		</div>
+		@endif
 	</div>
 </div>

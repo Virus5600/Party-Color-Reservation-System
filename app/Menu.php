@@ -30,39 +30,14 @@ class Menu extends Model
 		'menuVariations'
 	];
 
-	// Booted
-	protected static function booted() {
-		static::retrieved(function($menu) {
-			try {
-				DB::beginTransaction();
-
-				// Deletes the menu only if its inactive for a year or more, and if all its variation is inactive.
-				if ($menu->trashed() && now()->gte(Carbon::parse($menu->deleted_at)->addYear()) && count($menu->menuVariations) <= 0) {
-
-					activity('menu')
-						->byAnonymous()
-						->on($menu)
-						->event('delete')
-						->withProperties([
-							'name' => $menu->name
-						])
-						->log("Menu {$menu->name} removed permanently after being inactive for more than an entire year.");
-					
-					$menu->forceDelete();
-				}
-
-				DB::commit();
-			} catch (Exception $e) {
-				DB::rollback();
-				Log::error($e);
-			}
-		});
-	}
-
 	// Relationships
 	public function menuVariations() { return $this->hasMany('App\MenuVariation', 'menu_id', 'id'); }
 
 	// STATIC FUNCTIONS
+	public static function getForDeletion() {
+		return Menu::onlyTrashed()->whereDate('updated_at', '<', now()->subYears(5))->get();
+	}
+
 	public static function showRoute($id) {
 		$menu = Menu::withTrashed()->find($id);
 

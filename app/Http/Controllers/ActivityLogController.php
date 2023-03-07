@@ -19,7 +19,15 @@ use Validator;
 class ActivityLogController extends Controller
 {
 	protected function index(Request $req) {
+		$search = "%" . request('search') . "%";
+		
 		$activity = Activity::latest()
+			->orWhere('description', 'LIKE', $search)
+			->orWhere('event', 'LIKE', $search)
+			->orWhere('subject_type', 'LIKE', $search)
+			->orWhere('causer_type', 'LIKE', $search)
+			->orWhere('ip_address', 'LIKE', $search)
+			->orWhere('reason', 'LIKE', $search)
 			->paginate(25);
 
 		return view('admin.activity-log.index', [
