@@ -58,7 +58,7 @@ Route::group(['prefix' => 'admin'], function() {
 				Route::post('store', 'BookingController@store')->name('admin.bookings.store');
 			});
 
-			Route::group(['prefix' => '{id}'], function() {
+			Route::group(['prefix' => '{id}', 'middleware' => ['permissions:sanctum']], function() {
 				// Show
 				Route::get('/', 'BookingController@show')->name('admin.bookings.show');
 
