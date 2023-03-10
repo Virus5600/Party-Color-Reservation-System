@@ -15,6 +15,7 @@ use App\TypePermission;
 use App\User;
 use App\UserPermission;
 
+use Artisan;
 use DB;
 use Exception;
 use File;
@@ -87,8 +88,10 @@ class UserController extends Controller
 					Log::error($e);
 				}
 			}
-			$user->tokens()->delete();
+			
 			$token = $user->createToken('authenticated');
+			Artisan::call('sanctum:prune-expired');
+
 			session(["bearer" => $token->plainTextToken]);
 
 			return redirect()
@@ -205,7 +208,10 @@ class UserController extends Controller
 	protected function logout() {
 		if (auth()->check()) {
 			$auth = auth()->user();
-			$auth->tokens()->delete();
+
+			$token = $auth->currentAccessToken();
+			if ($token != null)
+				$token->delete();
 			
 			auth()->logout();
 			session()->flush();

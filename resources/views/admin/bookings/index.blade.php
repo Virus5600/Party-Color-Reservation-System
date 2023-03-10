@@ -205,6 +205,8 @@ $extensionFee = App\Settings::getValue('extension_fee');
 
 	const additionalOrdersIndex = '{{ route('admin.bookings.additional-orders.index', ['$1']) }}';
 
+	const logout = '{{ route('logout') }}';
+
 	const currencySymbol = '{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) }}';
 </script>
 
