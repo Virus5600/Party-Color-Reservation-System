@@ -73,6 +73,9 @@ class User extends Authenticatable
 		$usingTypePermissions = $this->isUsingTypePermissions();
 		$perms = $this->permissions();
 
+		if (is_array($permissions[0]))
+			$permissions = $permissions[0];
+
 		foreach ($perms as $p) {
 			if ($usingTypePermissions) {
 				if (in_array($p->slug, $permissions)) {
@@ -92,6 +95,9 @@ class User extends Authenticatable
 	public function hasSomePermission(...$permissions) {
 		$usingTypePermissions = $this->isUsingTypePermissions();
 		$perms = $this->permissions();
+
+		if (is_array($permissions[0]))
+			$permissions = $permissions[0];
 
 		foreach ($perms as $p) {
 			if ($usingTypePermissions) {

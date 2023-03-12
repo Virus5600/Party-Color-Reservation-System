@@ -4,6 +4,10 @@ namespace App\Http\Middleware;
 
 use Illuminate\Support\Facades\Input;
 
+use Carbon\Carbon;
+
+use Laravel\Sanctum\PersonalAccessToken;
+
 use Auth;
 use Closure;
 use Log;
@@ -17,38 +21,37 @@ class Permissions
 	 * @param  \Closure  $next
 	 * @return mixed
 	 */
-	public function handle($request, Closure $next, $permissions)
+	public function handle($request, Closure $next, ...$permissions)
 	{
 		if (!auth()->check()) 
 			return redirect()->intended();
 		
 		$user = auth()->user();
+		$sanctum = false;
 		
 		if (in_array('sanctum', $permissions)) {
 			if ($user->tokens()->count() <= 0) {
-				auth()->guard('web')->logout();
-				session()->flush();
-
-				$this->logSanctumActivity();
-				return redirect()->route("login");
+				return $this->logSanctumActivity($user);
 			}
 			else {
+				$token = PersonalAccessToken::findToken(session()->get('bearer'));
+
 				if ($token == null) {
-					$this->logSanctumActivity();
-					return redirect()->route("login");
+					return $this->logSanctumActivity($user);
 				}
 				else {
 					$expiration = config('sanctum.expiration');
 
-					if (Carbon::parse($token->created_at)->lte(now()->subMinutes($expiration))) {
-						$this->logSanctumActivity();
-						return redirect()->route("login");
+					if (Carbon::parse($token->created_at)->lte(now()->subMinutes($expiration)))
+						return $this->logSanctumActivity($user);
+					else {
+						$sanctum = true;
 					}
 				}
 			}
 		}
-		
-		if ($user->hasPermission($permissions)) {
+
+		if ($user->hasPermission($permissions) || $sanctum) {
 			return $next($request);
 		}
 		else {
@@ -77,9 +80,11 @@ class Permissions
 				->with('has_timer')
 				->with('duration', '5000');
 		}
+		
+		return $next($request);
 	}
 
-	private function logSanctumActivity() {
+	private function logSanctumActivity($user) {
 		activity('middleware')
 			->byAnonymous()
 			->on($user)
@@ -96,5 +101,10 @@ class Permissions
 				'last_auth' => $user->last_auth
 			])
 			->log("User {$user->email} was logged out due to missing PAT");
+
+		session()->flush();
+		auth()->logout();
+		
+		return redirect()->route("login");
 	}
 }
