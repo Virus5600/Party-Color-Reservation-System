@@ -6,6 +6,9 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+
+use Laravel\Sanctum\Sanctum;
+
 use App\Jobs\AccountNotification;
 
 use App\PasswordReset;
@@ -90,7 +93,10 @@ class UserController extends Controller
 			}
 			
 			$token = $user->createToken('authenticated');
-			Artisan::call('sanctum:prune-expired');
+			if ($expiration = config('sanctum.expiration')) {
+				$model = Sanctum::$personalAccessTokenModel;
+				$model::where('created_at', '<', now()->subMinutes($expiration))->delete();
+			}
 
 			session(["bearer" => $token->plainTextToken]);
 

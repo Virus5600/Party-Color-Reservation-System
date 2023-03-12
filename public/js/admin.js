@@ -66,7 +66,7 @@ $(document).ready(() => {
 	});
 	$('.enlarge-on-hover .dropdown').trigger('hide.bs.dropdown');
 
-	$(document).on('show.bs.dropdown', '.dropdown', function(e) {
+	$(document).on('show.bs.dropdown', '.enlarge-on-hover .dropdown', function(e) {
 		var dropdown = $(e.target).find('.dropdown-menu');
 
 			dropdown.appendTo('body');
