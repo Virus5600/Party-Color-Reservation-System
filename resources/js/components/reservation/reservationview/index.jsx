@@ -92,6 +92,12 @@ export default function ReservationView() {
 			console.log('after sending cancellation request:', res);
 			if (res.data.success) {
 				removeSessionItem();
+			} else {
+				SwalFlash.error(
+					"Input Error",
+					res.data.errors[Object.keys(res.data.errors)[0]][0],
+					true
+				);
 			}
 
 			return res;
@@ -101,6 +107,10 @@ export default function ReservationView() {
 		});
 
 		console.log('response.data.success', response.data.success);
+		if (!response.data.success) {
+			console.warn('meee');
+			return false;
+		}
 		set_cancel_request(response.data.success);
 	}
 

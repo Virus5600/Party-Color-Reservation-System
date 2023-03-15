@@ -211,9 +211,12 @@ const ReservationButtonsForView = (props) => {
 		setTextAreaContent(event.target.value);
 	}
 
-	const handleCancelRequestButton = () => {
-		props.onCancelRequestClick();
-		setDisabled(true);
+	const handleCancelRequestButton = async () => {
+		await setDisabled(true);
+		const flag = await props.onCancelRequestClick();
+		if (flag == false) {
+			setDisabled(false);
+		}
 	}
 
 	const handleUndoCancelRequestButton = () => {
@@ -247,7 +250,7 @@ const ReservationButtonsForView = (props) => {
 
 			{/* cancel request button */}
 			<div className='text-end mt-4'>
-				<button className='btn btn-danger' type='button' onClick={handleCancelRequestButton} disabled={disabled == true ? true : props.isCancelled ? true : false}>Cancel Request</button>
+				<button className='btn btn-danger ' type='button' onClick={handleCancelRequestButton} disabled={disabled == true ? true : props.isCancelled ? true : false}>Cancel Request</button>
 			</div>
 		</>
 
