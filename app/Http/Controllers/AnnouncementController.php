@@ -38,6 +38,7 @@ class AnnouncementController extends Controller
 			->orWhere('summary', 'LIKE', $search)
 			->orWhere('content', 'LIKE', $search)
 			->with(['user:id,first_name,middle_name,last_name,suffix'])
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		return view('admin.announcements.index', [
