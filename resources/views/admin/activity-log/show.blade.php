@@ -76,15 +76,21 @@
 										</button>
 										@endif
 
+										@if ($log["reason"] == null)
+										<button class="btn btn-primary" disabled>
+											Update Reason
+										</button>
+										@else
 										<button class="btn btn-primary"
 											data-scf="Reason"
 											data-scf-name="reason"
-											data-scf-custom-title="Update reason for suspicion"
+											data-scf-custom-title="Update reason{{ ($log["is_marked"] == 0) ? "" : " for suspicion"}}"
 											data-scf-target-uri="{{ route('admin.activity-log.update', [$log->id]) }}"
 											data-scf-reload="true"
 											data-scf-use-textarea="true">
-											Update Reason
+											Update Reason{{ ($log["is_marked"] == 0) ? "" : " for suspicion"}}
 										</button>
+										@endif
 									</div>
 									@endif
 								</li>

@@ -38,7 +38,7 @@ class UserPermission extends Model
 			$user = $user->id;
 		}
 		else if (gettype($user) != 'integer') {
-			\Log::warning('Inserted $user not an ID nor an instance of Permission...');
+			\Log::warning('Inserted $user not an ID nor an instance of User...');
 			return false;
 		}
 

@@ -2,13 +2,10 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Support\Facades\Input;
-
 use Carbon\Carbon;
 
 use Laravel\Sanctum\PersonalAccessToken;
 
-use Auth;
 use Closure;
 use Log;
 
