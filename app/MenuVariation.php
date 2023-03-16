@@ -162,7 +162,7 @@ class MenuVariation extends Model
 
 	// STATIC FUNCTIONS
 	// VALIDATION
-	public static function validate(Request $req, $vid = null) {
+	public static function validate(Request $req, Menu $menu, $vid = null) {
 		$variationItemValidation = [];
 		$amountValidation = [];
 
@@ -170,6 +170,9 @@ class MenuVariation extends Model
 			$variationItemValidation["variation_item.{$k}"] = "required_unless:amount.{$k},null|numeric|exists:inventories,id";
 			$amountValidation["amount.{$k}"] = "required_unless:variation_item.{$k},null|numeric" . ( $req->is_unlimited == 0 ? "|min:1" : "") . "|max:4294967295";
 		}
+
+		if (empty($req->variation_name) || !$req->has('variation_name'))
+			$req->merge(['variation_name' => "{$menu->name} - Default"]);
 		
 		$uniqueRule = Rule::unique("menu_variations", "name");
 		$validator = Validator::make($req->all(), array_merge([
