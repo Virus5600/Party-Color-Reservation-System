@@ -23,7 +23,7 @@ class AdditionalOrderController extends Controller
 		"delete" => "You are executing a sensitive action (voiding an order). This requires further authentication confirmation."
 	];
 
-	protected function index($id) {
+	protected function index(Request $req, $id) {
 		$booking = Booking::withTrashed()
 			->find($id);
 
@@ -33,10 +33,13 @@ class AdditionalOrderController extends Controller
 				->with('flash_error', 'Booking either does not exists or is already deleted');
 		}
 
+		$search = "%" . request("search") . "%";
+
 		$additionalOrders = $booking->additionalOrders()
 			->where('extension', 'LIKE', $search)
 			->orWhere('price', 'LIKE', $search)
 			->withTrashed()
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		return view('admin.bookings.additional-orders.index', [
