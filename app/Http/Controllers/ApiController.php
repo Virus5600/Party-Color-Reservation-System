@@ -259,14 +259,15 @@ class ApiController extends Controller
 			->orWhere('causer_type', 'LIKE', $search)
 			->orWhere('ip_address', 'LIKE', $search)
 			->orWhere('reason', 'LIKE', $search)
-			->paginate(10);
+			->orderBy('id', 'DESC')
+			->paginate(25);
 
 		$table = "";
 
 		if (count($items) > 0) {
 			foreach ($items as $i) {
 				$table .= "
-					<tr class=\"enlarge-on-hover" . ($i->is_marked == 1 ? "bg-warning text-dark" : "") . "\" id=\"tr-{$i->id}\">
+					<tr class=\"enlarge-on-hover" . ($i->is_marked == 1 ? " bg-warning text-dark" : "") . "\" id=\"tr-{$i->id}\">
 						<td class=\"text-center align-middle mx-auto\">";
 				
 				if ($i->causer != null)
@@ -280,7 +281,7 @@ class ApiController extends Controller
 						<td class=\"text-center align-middle mx-auto\">
 							{$i->description}";
 				if ($i->is_marked == 1)
-					$table .= "<span class=\"badge badge-danger\">Marked as Suspicious</span>";
+					$table .= " <span class=\"badge badge-danger\">Marked as Suspicious</span>";
 				
 				$table .="
 						</td>
@@ -346,45 +347,53 @@ class ApiController extends Controller
 		}
 
 		$items = $booking->additionalOrders()
+			->withTrashed()
 			->where('extension', 'LIKE', $search)
 			->orWhere('price', 'LIKE', $search)
-			->withTrashed()
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		$table = "";
 
 		if (count($items) > 0) {
 			foreach ($items as $i) {
+
+				$menus = [];
+				foreach ($i->menus as $k => $m) {
+					if ($k < 3)
+						array_push($menus, $m->name);
+					else
+						break;
+				}
+				$menus = implode(", ", $menus);
+
 				$table .= "
-					<tr class=\"enlarge-on-hover\">
-						<td class=\"text-center align-middle mx-auto font-weight-bold\">{$i->name}</td>
+					<tr class=\"enlarge-on-hover " . ($i->trashed() ? "bg-danger text-white" : "") .  "\">
+						<td class=\"text-center align-middle mx-auto font-weight-bold\">{$menus}</td>
+						<td class=\"text-center align-middle mx-auto\">{$i->fetchPrice()}</td>
+						<td class=\"text-center align-middle mx-auto\">" . ($i->extension * 60) . "min</td>
 						
-						<td class=\"text-center align-middle mx-auto\">
-							<i class=\"fas fa-circle " . ($i->trashed() ? 'text-danger' : 'text-success') . " mr-2\"></i>" . ($i->trashed() ? 'Inactive' : 'Active') . "
-						</td>
-						
-						<td class=\"text-center align-middle mx-auto\">
+						<td class=\"text-center align-middle mx-auto\">";
+				
+				if (!$i->trashed()) {
+					$table .= "
 							<div class=\"dropdown\">
 								<button class=\"btn btn-primary dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\" id=\"dropdown{$i->id}\" aria-haspopup=\"true\" aria-expanded=\"false\">
 									Action
 								</button>
 
 								<div class=\"dropdown-menu dropdown-menu-right\" aria-labelledby=\"dropdown{$i->id}\">
-									<a href=\"" . route('admin.menu.variation.show', [$menu->id, $i->id]) . "\" class=\"dropdown-item\"><i class=\"fas fa-eye mr-2\"></i>View</a>";
-
-				if ($editAllow)
-					$table .= 		"<a href=\"" . route('admin.menu.variation.edit', [$menu->id, $i->id]) . "\" class=\"dropdown-item\"><i class=\"fas fa-pencil-alt mr-2\"></i>Edit</a>";
-				
-				if ($deleteAllow) {
-					if ($i->trashed())
-						$table .=	"<a href=\"javascript:void(0);\" onclick=\"confirmLeave('" . route('admin.menu.variation.restore', [$menu->id, $i->id]) . "', undefined, 'Are you sure you want to activate this?');\" class=\"dropdown-item\"><i class=\"fas fa-toggle-on mr-2\"></i>Set Active</a>";
-					else
-						$table .=	"<a href=\"javascript:void(0);\" onclick=\"confirmLeave('" . route('admin.menu.variation.delete', [$menu->id, $i->id]) . "', undefined, 'Are you sure you want to deactivate this?');\" class=\"dropdown-item\"><i class=\"fas fa-toggle-off mr-2\"></i>Set Inactive</a>";
+									<a href=\"" . route('admin.bookings.additional-orders.show', [$bid, $i->id]) . "\" class=\"dropdown-item\"><i class=\"fas fa-eye mr-2\"></i>Show</a>
+									<a href=\"" . route('admin.bookings.additional-orders.edit', [$bid, $i->id]) . "\" class=\"dropdown-item\"><i class=\"fas fa-pencil-alt mr-2\"></i>Edit</a>
+									<a href=\"javascript:void(0);\" onclick=\"confirmLeave('" . route('admin.bookings.additional-orders.void', [$bid, $i->id]) . "', undefined, 'Are you sure you want to deactivate this?');\" class=\"dropdown-item\"><i class=\"fas fa-ban mr-2\"></i>Void Order</a>
+								</div>
+							</div>";
+				}
+				else {
+					$table .= "<a href=\"" . route('admin.bookings.additional-orders.show', [$bid, $i->id]) . "\" class=\"btn btn-light\"><i class=\"fas fa-eye mr-2\"></i>Show</a>";
 				}
 				
 				$table .= "
-								</div>
-							</div>
 						</td>
 					</tr>
 				";
@@ -432,6 +441,7 @@ class ApiController extends Controller
 			->orWhere('summary', 'LIKE', $search)
 			->orWhere('content', 'LIKE', $search)
 			->with(['user:id,first_name,middle_name,last_name,suffix'])
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		$table = "";
@@ -514,6 +524,7 @@ class ApiController extends Controller
 		$items = Inventory::withTrashed()
 			->where('item_name', 'LIKE', $search)
 			->orWhere('measurement_unit', 'LIKE', $search)
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		$table = "";
@@ -584,6 +595,7 @@ class ApiController extends Controller
 		$items = $items->where('name', 'LIKE', $search)
 			->without(['menuVariations'])
 			->withCount(['menuVariations'])
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		$table = "";
@@ -670,6 +682,7 @@ class ApiController extends Controller
 		$items = $menu->menuVariations()
 			->where('name', 'LIKE', $search)
 			->withTrashed()
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		$table = "";
@@ -734,6 +747,7 @@ class ApiController extends Controller
 		$items = Permission::query();
 
 		$items = $items->where('name', 'LIKE', $search)
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		$table = "";
@@ -781,6 +795,7 @@ class ApiController extends Controller
 
 		$items = $items->where('name', 'LIKE', $search)
 			->withCount(['users', 'permissions'])
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		$totalPerms = Permission::count();
@@ -806,23 +821,33 @@ class ApiController extends Controller
 								</button>
 
 								<div class=\"dropdown-menu dropdown-menu-right\" aria-labelledby=\"dropdown{$i->id}\">
-									<a href=\"" . route('admin.menu.variation.index', [$i->id]) . "\" class=\"dropdown-item\"><i class=\"fas fa-eye mr-2\"></i>View</a>";
+									<a href=\"" . route('admin.types.show', [$i->id]) . "\" class=\"dropdown-item\"><i class=\"fas fa-eye mr-2\"></i>View</a>";
 
 				if ($editAllow)
-					$table .= 		"<a href=\"javascript:void(0);\" class=\"dropdown-item\"
-										data-scf=\"Menu Name\"
-										data-scf-name=\"menu_name\"
-										data-scf-target-uri=\"" . route('admin.menu.update', [$i->id]) . "\"
+					$table .= 		"<button class=\"dropdown-item\"
+										data-scf=\"New name...\"
+										data-scf-name=\"name\"
+										data-scf-target-uri=\"" . route('admin.types.update', [$i->id]) . "\"
+										data-scf-custom-title=\"Change Name\"
+										data-scf-disable-button=\"true\"
+										data-scf-label=\"New name of (role) type\"
 										data-scf-reload=\"true\">
-										<i class=\"fas fa-pen-to-square mr-2\"></i>Change Name
-									</a>";
+										<i class=\"fas fa-pencil-alt mr-2\"></i>Edit
+									</button>";
+
+				if ($permissionAllow) {
+					$table .=		"<a href=\"" . route('admin.types.manage-permissions', [$i->id]) . " class=\"dropdown-item\"><i class=\"fas fa-user-lock mr-2\"></i>Manage Permissions</a>";
+				}
 				
 				if ($deleteAllow) {
 					if ($i->trashed())
-						$table .=	"<a href=\"javascript:void(0);\" onclick=\"confirmLeave('" . route('admin.menu.restore', [$i->id]) . "', undefined, 'Are you sure you want to activate this?');\" class=\"dropdown-item\"><i class=\"fas fa-toggle-on mr-2\"></i>Set Active</a>";
+						$table .=	"<a href=\"javascript:void(0);\" onclick=\"confirmLeave('" . route('admin.types.restore', [$i->id]) . "', undefined, 'Are you sure you want to activate this?');\" class=\"dropdown-item\"><i class=\"fas fa-toggle-on mr-2\"></i>Set Active</a>";
 					else
-						$table .=	"<a href=\"javascript:void(0);\" onclick=\"confirmLeave('" . route('admin.menu.delete', [$i->id]) . "', undefined, 'Are you sure you want to deactivate this?');\" class=\"dropdown-item\"><i class=\"fas fa-toggle-off mr-2\"></i>Set Inactive</a>";
+						$table .=	"<a href=\"javascript:void(0);\" onclick=\"confirmLeave('" . route('admin.types.delete', [$i->id]) . "', undefined, 'Are you sure you want to deactivate this?');\" class=\"dropdown-item\"><i class=\"fas fa-toggle-off mr-2\"></i>Set Inactive</a>";
 				}
+
+				if ($permaDeleteAllow)
+					$table .=		"<a href=\"javascript:void(0);\" onclick=\"confirmLeave('" . route('admin.types.permaDelete', [$t->id]) . "', undefined, 'Are you sure you want to delete this?')\" class=\"dropdown-item\"><i class=\"fas fa-trash mr-2\"></i>Delete</a>";
 				
 				$table .= "
 								</div>
@@ -866,6 +891,7 @@ class ApiController extends Controller
 			->orWhere('last_name', 'LIKE', $search)
 			->orWhere('email', 'LIKE', $search)
 			->orWhere('types.name', 'LIKE', $search)
+			->orderBy('users.id', 'DESC')
 			->paginate(10);
 
 		$table = "";

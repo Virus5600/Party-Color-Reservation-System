@@ -26,6 +26,7 @@ class MenuVariationController extends Controller
 		$variations = $menu->menuVariations()
 			->where('name', 'LIKE', $search)
 			->withTrashed()
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		return view('admin.menu.variation.index', [

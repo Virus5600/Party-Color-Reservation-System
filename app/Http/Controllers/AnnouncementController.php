@@ -34,9 +34,11 @@ class AnnouncementController extends Controller
 			$announcements = Announcement::where('is_draft', '=', '0');
 
 		$announcements = $announcements->where('title', 'LIKE', $search)
-			->orWhere('slug', 'LIKE', $search)
-			->orWhere('summary', 'LIKE', $search)
-			->orWhere('content', 'LIKE', $search)
+			->where(function($query) use ($search) {
+				$query->orWhere('slug', 'LIKE', $search)
+					->orWhere('summary', 'LIKE', $search)
+					->orWhere('content', 'LIKE', $search);
+			})
 			->with(['user:id,first_name,middle_name,last_name,suffix'])
 			->orderBy('id', 'DESC')
 			->paginate(10);

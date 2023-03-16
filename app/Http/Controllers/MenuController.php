@@ -25,6 +25,7 @@ class MenuController extends Controller
 			->where('name', 'LIKE', $search)
 			->without(['menuVariations'])
 			->withCount('menuVariations')
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		return view('admin.menu.index', [

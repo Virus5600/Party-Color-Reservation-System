@@ -257,6 +257,7 @@ class UserController extends Controller
 			->orWhere('email', 'LIKE', $search)
 			->orWhere('types.name', 'LIKE', $search)
 			->select(['users.*'])
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		return view('admin.users.index', [

@@ -22,12 +22,13 @@ class ActivityLogController extends Controller
 		$search = "%" . request('search') . "%";
 		
 		$activity = Activity::latest()
-			->orWhere('description', 'LIKE', $search)
+			->where('description', 'LIKE', $search)
 			->orWhere('event', 'LIKE', $search)
 			->orWhere('subject_type', 'LIKE', $search)
 			->orWhere('causer_type', 'LIKE', $search)
 			->orWhere('ip_address', 'LIKE', $search)
 			->orWhere('reason', 'LIKE', $search)
+			->orderBy('id', 'DESC')
 			->paginate(25);
 
 		return view('admin.activity-log.index', [

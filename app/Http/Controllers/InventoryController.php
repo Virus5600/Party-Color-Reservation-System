@@ -20,6 +20,7 @@ class InventoryController extends Controller
 		$items = Inventory::withTrashed()
 			->where('item_name', 'LIKE', $search)
 			->orWhere('measurement_unit', 'LIKE', $search)
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		return view('admin.inventory.index', [

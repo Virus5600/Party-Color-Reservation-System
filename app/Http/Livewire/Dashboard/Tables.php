@@ -158,7 +158,8 @@ class Tables extends Component
 				}
 			}
 			
-			$data = $clazz->paginate(10);
+			$data = $clazz->orderBy('id', 'DESC')
+				->paginate(10);
 		}
 		else {
 			$data = collect([]);

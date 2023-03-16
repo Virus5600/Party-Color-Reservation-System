@@ -17,6 +17,7 @@ class PermissionController extends Controller
 		$search = "%" . request('search') . "%";
 		
 		$permissions = Permission::where('name', 'LIKE', $search)
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		return view('admin.permissions.index', [

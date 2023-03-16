@@ -49,7 +49,6 @@ class BookingNotification implements ShouldQueue
 
 		$recipient = $this->booking->contactInformation()->first();
 		$subject = $this->args['subject'];
-
 		// Send email to every single one of the recipients
 		Mail::send(
 			"layouts.emails.bookings.notification",
