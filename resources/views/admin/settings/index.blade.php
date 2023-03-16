@@ -193,7 +193,7 @@
 
 			@if (Auth::user()->hasPermission('settings_tab_edit'))
 			<button type="submit" class="btn btn-success" data-action="update">Update</button>
-			<button type="button" class="btn btn-secondary" id="revert">Undo</button>
+			<button type="button" class="btn btn-secondary" id="revert">Reset Form</button>
 			@endif
 		</form>
 	</div>
