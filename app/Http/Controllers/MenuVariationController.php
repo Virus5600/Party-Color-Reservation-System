@@ -58,7 +58,7 @@ class MenuVariationController extends Controller
 				->with('flash_error', 'The menu either does not exists or is already deleted.');
 		}
 
-		extract(MenuVariation::validate($req));
+		extract(MenuVariation::validate($req, $menu));
 
 		if ($validator->fails()) {
 			return redirect()
@@ -171,7 +171,7 @@ class MenuVariationController extends Controller
 				->with('flash_error', 'The menu variation either does not exists or is already deleted.');
 		}
 
-		extract(MenuVariation::validate($req, $vid));
+		extract(MenuVariation::validate($req, $menu, $vid));
 
 		if ($validator->fails()) {
 			return redirect()
