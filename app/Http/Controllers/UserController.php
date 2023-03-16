@@ -710,8 +710,8 @@ class UserController extends Controller
 		try {
 			DB::beginTransaction();
 
-			$userPerms = ($user->userPerms == null ? array() : $user->userPerms->pluck(['id'])->toArray());
-			$typePerms = ($user->type->permissions == null ? array() : $user->type->permissions->pluck(['id'])->toArray());
+			$userPerms = ($user->userPerms == null ? array() : $user->userPerms()->pluck('id')->toArray());
+			$typePerms = ($user->type->permissions == null ? array() : $user->type->permissions()->pluck('id')->toArray());
 
 			sort($userPerms);
 			sort($typePerms);

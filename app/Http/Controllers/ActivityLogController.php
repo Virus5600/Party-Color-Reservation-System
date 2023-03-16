@@ -138,7 +138,7 @@ class ActivityLogController extends Controller
 		return response()
 			->json([
 				'success' => true,
-				'message' => "Successfully marked activity as suspicious"
+				'message' => "Successfully marked updated activity's reason"
 			]);
 	}
 
