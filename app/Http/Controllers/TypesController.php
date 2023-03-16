@@ -20,6 +20,7 @@ class TypesController extends Controller
 		$types = Type::withTrashed()
 			->where('name', 'LIKE', $search)
 			->withCount(['users', 'permissions'])
+			->orderBy('id', 'DESC')
 			->paginate(10);
 
 		$totalPerms = Permission::count();
