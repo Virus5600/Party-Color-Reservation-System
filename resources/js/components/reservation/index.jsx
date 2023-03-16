@@ -131,9 +131,9 @@ const ReservationDetails = () => {
 				// Adult / Senior
 				{ type: 'number', name: 'adult_senior', label: 'Adult/Senior', placeholder: 'pax', min_value: 1, isRequired: true, reservationInfo, },
 				// Junior
-				{ type: 'number', name: 'junior', label: 'Junior', placeholder: 'pax', min_value: 0, isRequired: true, reservationInfo, },
+				{ type: 'number', name: 'junior', label: 'Junior', placeholder: 'pax', min_value: 0, isRequired: false, reservationInfo, },
 				// Elementary
-				{ type: 'number', name: 'elementary', label: 'Elementary', placeholder: 'pax', min_value: 0, isRequired: true, reservationInfo, },
+				{ type: 'number', name: 'elementary', label: 'Elementary', placeholder: 'pax', min_value: 0, isRequired: false, reservationInfo, },
 			]} />
 
 			<InputRow inputs={[
