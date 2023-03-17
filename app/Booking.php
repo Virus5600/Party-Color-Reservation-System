@@ -404,17 +404,20 @@ class Booking extends Model
 			$menu = [];
 			$hoursToAdd = 0;
 			$minutesToAdd = 0;
+			$time = null;
 			foreach ($req->menu as $mi) {
 				$menu["{$mi}"] = MenuVariation::find($mi);
-				
-				// Compares what hour has the highest among the menus selected
-				$hoursComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("H");
-				$hoursToAdd = max(Carbon::parse($menu["{$mi}"]->duration)->format("H"), $hoursToAdd);
 
-				// Compares what minute has the highest among the menus selected
-				$minutesComparisonVal = (int) Carbon::parse($menu["{$mi}"]->duration)->format("i");
-				$minutesToAdd = max($minutesComparisonVal, $minutesToAdd);
+				if ($time == null)
+					$time = Carbon::parse($menu["{$mi}"]->duration);
+
+				// Compares what time is highest among the menus selected
+				if ($time->lt($newTime = Carbon::parse($menu["{$mi}"]->duration)))
+					$time = $newTime;
 			}
+			$hoursToAdd = $time->format("H");
+			$minutesToAdd = $time->format("i");
+
 			// Adds the extension as minutes
 			$minutesToAdd += ($req->extension * 60);
 
