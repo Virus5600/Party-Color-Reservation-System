@@ -99,7 +99,8 @@ class Permissions
 			])
 			->log("User {$user->email} was logged out due to missing PAT");
 
-		auth()->logout();
+		if (auth()->check())
+			auth()->guard('web')->logout();
 		session()->flush();
 		
 		return redirect()->route("login");
