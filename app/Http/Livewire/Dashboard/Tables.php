@@ -188,8 +188,4 @@ class Tables extends Component
 	private function getShortName($clazz) {
 		return (new ReflectionClass($clazz))->getShortName();
 	}
-
-	public function paginationView() {
-		return 'vendor.pagination.bootstrap-4';
-	}
 }
