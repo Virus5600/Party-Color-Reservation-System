@@ -1,4 +1,4 @@
-<div class="card my-3 h-100" wire:init="loadData">
+<div class="card my-3 h-100" wire:init="loadData" wire:key="{{ Str::camel($name) }}">
 	<h4 class="text-center mt-3 mb-0">
 		{{ $name }}
 	</h4>
