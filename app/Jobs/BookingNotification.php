@@ -74,7 +74,7 @@ class BookingNotification implements ShouldQueue
 	}
 
 	public function __destruct() {
-		Log::info("[BookingNotification] Running Queue [Driver: " . config('queue.driver') . "]");
+		Log::info("[BookingNotification] Running Queue");
 
 		Artisan::call('queue:work', [
 			'--stop-when-empty' => true,
