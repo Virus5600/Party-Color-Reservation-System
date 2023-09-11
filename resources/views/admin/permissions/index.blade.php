@@ -21,7 +21,7 @@
 						</div>
 
 						{{-- SEARCH --}}
-						@include('components.admin.admin-search', ['type' => 'permissions'])
+						@include('components.admin.admin-search', ['type' => 'permission'])
 					</div>
 				</div>
 				{{-- Controls End --}}
@@ -29,7 +29,7 @@
 		</div>
 	</div>
 
-	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3" id="inner-content">
+	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3 h-100 d-flex flex-column" id="inner-content">
 		<table class="table table-striped my-0">
 			<thead>
 				<tr>
@@ -55,17 +55,11 @@
 				</tr>
 				@endforelse
 			</tbody>
-
-			@if (count($permissions) > 0)
-			<tfoot class="text-center">
-				<tr>
-					<td colspan="3">
-						<div class="d-flex align-middle justify-content-center">{{ $permissions->links() }}</div>
-					</td>
-				</tr>
-			</tfoot>
-			@endif
 		</table>
+
+		<div id="table-paginate" class="w-100 d-flex align-middle my-3">
+			{{ $permissions->onEachSide(5)->links() }}
+		</div>
 	</div>
 </div>
 @endsection

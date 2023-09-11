@@ -71,7 +71,7 @@ class PageController extends Controller
 			'pending_bookings' => [
 				'clazz' => Booking::class,
 				'name' => 'Pending Bookings',
-				'conditions' => ['status = ' . ApprovalStatus::Pending->value],
+				'conditions' => ['status = ' . ApprovalStatus::Pending->value, 'reserved_at > ' . now()->format('Y-m-d') . ' date'],
 				'hiddenColumns' => ['price'],
 				'columns' => ['pax'],
 				'columnsFn' => ['booking_for', 'price'],
@@ -111,6 +111,7 @@ class PageController extends Controller
 			array_push($monthly_earnings,
 				Booking::where('created_at', '>=', Carbon::parse(now()->format('Y') . '-' . $i . '-01'))
 					->where('created_at', '<=', Carbon::parse(now()->format('Y') . '-' . $i)->endOfMonth())
+					->where('status', '=', ApprovalStatus::Approved->value)
 					->where(function($query) {
 						return $query->where(DB::raw('CONCAT(reserved_at, " ", start_at)'), '<=', now()->format("Y-m-d H:i:s"));
 					})

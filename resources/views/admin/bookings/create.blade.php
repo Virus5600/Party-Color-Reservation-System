@@ -8,6 +8,7 @@
 $datetime = now()->timezone('Asia/Tokyo');
 $isEightPM = $datetime->gt('08:00 PM');
 $new_contact_index = Session::get("new_contact_index");
+$new_menu_index = Session::get("new_menu_index");
 $maxCap = App\Settings::getValue('capacity');
 $extensionFee = App\Settings::getValue('extension_fee');
 @endphp
@@ -158,7 +159,10 @@ $extensionFee = App\Settings::getValue('extension_fee');
 							<div class="row card-body">
 								{{-- MENU ITEMS --}}
 								<div class="form-group col-12">
-									<p class="h5">Menus</p>
+									<p>
+										<span class="h5">Menus</span>
+										<span class="text-danger text-wrap validation float-right">{{ $errors->first("menu") }}</span>
+									</p>
 
 									{{-- Dynamic form fields --}}
 									<div class="row" id="menuField">
@@ -174,8 +178,8 @@ $extensionFee = App\Settings::getValue('extension_fee');
 														<div class="form-group">
 															<label class="form-label" for="menu">Menu Name</label><br>
 
-															<select class="show-tick select-picker w-100 form-control" name="menu[]" required>
-																<option class="d-none" data-subtext="" data-price="0" data-duration="00:00" disabled {{ count(old('menu') ? old('menu') : []) > 0 ? "" : "selected" }}>Select a Menu</option>
+															<select class="show-tick select-picker w-100 form-control" name="menu[]" title="Menu Name" aria-label="Menu Name" required>
+																<option class="d-none" data-subtext="" data-price="0" data-duration="00:00" disabled {{ count(old('menu') ?? array()) <= 0 ? "" : "selected" }}>Select a Menu</option>
 																@foreach ($menus as $m)
 																<optgroup label="{{ $m->name }}">
 																	@foreach ($m->menuVariations as $v)
@@ -185,7 +189,7 @@ $extensionFee = App\Settings::getValue('extension_fee');
 																		data-price="{{ $v->price }}"
 																		data-duration="{{ $v->getFromDuration() }}"
 																		data-tokens="{{ $m->name }} {{ $v->name }}"
-																		{{ in_array($v->id, (old('menu') ? old('menu') : [])) ? 'selected' : '' }}
+																		{{ in_array($v->id, (old("menu") ?? array())) ? 'selected' : '' }}
 																		>
 																		{{ $v->name }}
 																	</option>
@@ -193,7 +197,7 @@ $extensionFee = App\Settings::getValue('extension_fee');
 																</optgroup>
 																@endforeach
 															</select>
-															<br><span class="text-danger text-wrap validation">{{ $errors->first('menu') }}</span>
+															<br><span class="text-danger text-wrap validation">{{ $errors->first("menu.{$index}") }}</span>
 														</div>
 
 														{{-- AMOUNT --}}
@@ -222,7 +226,7 @@ $extensionFee = App\Settings::getValue('extension_fee');
 													<div class="form-group">
 														<label class="form-label" for="menu">Menu Name</label><br>
 
-														<select class="show-tick select-picker w-100 form-control" name="menu[]" required>
+														<select class="show-tick select-picker w-100 form-control" name="menu[]" title="Menu Name" aria-label="Menu Name" required>
 															<option class="d-none" data-subtext="" data-price="0" data-duration="00:00" disabled {{ count(old('menu') ? old('menu') : []) > 0 ? "" : "selected" }}>Select a Menu</option>
 															@foreach ($menus as $m)
 															<optgroup label="{{ $m->name }}">

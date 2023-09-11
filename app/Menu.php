@@ -30,38 +30,19 @@ class Menu extends Model
 		'menuVariations'
 	];
 
-	// Booted
-	protected static function booted() {
-		static::retrieved(function($menu) {
-			try {
-				DB::beginTransaction();
-
-				// Deletes the menu only if its inactive for a year or more, and if all its variation is inactive.
-				if (now()->gte($menu->deleted_at) && count($menu->menuVariations) <= 0) {
-					$menu->forceDelete();
-
-					ActivityLog::log(
-						"Menu {$menu->name} removed permanently after being inactive for more than an entire year.",
-						null,
-						"Menu",
-						null,
-						true
-					);
-				}
-
-				DB::commit();
-			} catch (Exception $e) {
-				DB::rollback();
-				Log::error($e);
-			}
-		});
-	}
-
 	// Relationships
 	public function menuVariations() { return $this->hasMany('App\MenuVariation', 'menu_id', 'id'); }
 
 	// STATIC FUNCTIONS
+	public static function getForDeletion() {
+		return Menu::onlyTrashed()->whereDate('updated_at', '<', now()->subYears(5))->get();
+	}
+
 	public static function showRoute($id) {
+		$menu = Menu::withTrashed()->find($id);
+
+		if ($menu == null)
+			return "javascript:SwalFlash.info(`Cannot Find Item`, `Item may already be deleted or an anonymous user.`, true, false, `center`, false);";
 		return route('admin.menu.variation.index', [$id]);
 	}
 }

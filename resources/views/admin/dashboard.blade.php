@@ -70,10 +70,6 @@
 </div>
 @endsection
 
-@section('meta')
-<meta name="bearer" content="{{ session('bearer') }}">
-@endsection
-
 @section('css')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/util/custom-scrollbar.css') }}">
 @endsection

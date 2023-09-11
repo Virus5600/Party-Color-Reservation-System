@@ -19,7 +19,16 @@ use Validator;
 class ActivityLogController extends Controller
 {
 	protected function index(Request $req) {
+		$search = "%" . request('search') . "%";
+		
 		$activity = Activity::latest()
+			->where('description', 'LIKE', $search)
+			->orWhere('event', 'LIKE', $search)
+			->orWhere('subject_type', 'LIKE', $search)
+			->orWhere('causer_type', 'LIKE', $search)
+			->orWhere('ip_address', 'LIKE', $search)
+			->orWhere('reason', 'LIKE', $search)
+			->orderBy('id', 'DESC')
 			->paginate(25);
 
 		return view('admin.activity-log.index', [
@@ -130,7 +139,7 @@ class ActivityLogController extends Controller
 		return response()
 			->json([
 				'success' => true,
-				'message' => "Successfully marked activity as suspicious"
+				'message' => "Successfully marked updated activity's reason"
 			]);
 	}
 

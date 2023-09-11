@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		@php
+		$webName = App\Settings::getValue('web-name');
+		$webDesc = App\Settings::getValue('web-desc');
+		$webLogoInstance = App\Settings::getInstance('web-logo');
+		$webLogo = $webLogoInstance->getImage(!$webLogoInstance->is_file);
+		@endphp
+
 		{{-- META DATA --}}
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -9,32 +16,32 @@
 
 		{{-- SITE META --}}
 		<meta name="type" content="website">
-		<meta name="title" content="{{ App\Settings::getValue('web-name') }}">
-		<meta name="description" content="{{ App\Settings::getValue('web-desc') }}">
-		<meta name="image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
+		<meta name="title" content="{{ $webName }}">
+		<meta name="description" content="{{ $webDesc }}">
+		<meta name="image" content="{{ asset('uploads/settings/meta-banner.png') }}">
 		<meta name="keywords" content="{{ env('APP_KEYW') }}">
-		<meta name="application-name" content="{{ App\Settings::getValue('web-name') }}">
+		<meta name="application-name" content="{{ $webName }}">
 
 		{{-- TWITTER META --}}
 		<meta name="twitter:card" content="summary_large_image">
-		<meta name="twitter:title" content="{{ App\Settings::getValue('web-name') }}">
-		<meta name="twitter:description" content="{{ App\Settings::getValue('web-desc') }}">
-		<meta name="twitter:image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
+		<meta name="twitter:title" content="{{ $webName }}">
+		<meta name="twitter:description" content="{{ $webDesc }}">
+		<meta name="twitter:image" content="{{ asset('uploads/settings/meta-banner.png') }}">
 
 		{{-- OG META --}}
 		<meta name="og:url" content="{{Request::url()}}">
 		<meta name="og:type" content="website">
-		<meta name="og:title" content="{{ App\Settings::getValue('web-name') }}">
-		<meta name="og:description" content="{{ App\Settings::getValue('web-desc') }}">
-		<meta name="og:image" content="{{ asset('uploads/settings/meta-banner.jpeg') }}">
+		<meta name="og:title" content="{{ $webName }}">
+		<meta name="og:description" content="{{ $webDesc }}">
+		<meta name="og:image" content="{{ asset('uploads/settings/meta-banner.png') }}">
 
 		{{-- FAVICON --}}
-		<link rel="icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">
-		<link rel="shortcut icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">
-		<link rel="apple-touch-icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">
-		<link rel="mask-icon" href="{{ App\Settings::getInstance('web-logo')->getImage(!App\Settings::getInstance('web-logo')->is_file) }}">
+		<link rel="icon" href="{{ $webLogo }}">
+		<link rel="shortcut icon" href="{{ $webLogo }}">
+		<link rel="apple-touch-icon" href="{{ $webLogo }}">
+		<link rel="mask-icon" href="{{ $webLogo }}">
 
-		<title>Party Color</title>
+		<title>{{ $webName }}</title>
 	</head>
 
 	<body>

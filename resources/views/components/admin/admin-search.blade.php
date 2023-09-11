@@ -1,13 +1,13 @@
 @php($etcInput = isset($etcInput) ? $etcInput : null)
 
 <div class="text-center text-md-right my-2 my-md-auto d-flex">
-	<form method="POST" action="{{ route('adminSearch', [Auth::user()->id]) }}" enctype="multipart/form-data" id="admin-search" class="form">
+	<form method="POST" action="{{ route('adminSearch', [auth()->user()->id]) }}" enctype="multipart/form-data" id="admin-search" class="form">
 		{{ csrf_field() }}
 		<input type='hidden' name="type" value='{{ $type }}' />
-		
+
 		@if ($etcInput != null)
 		@foreach($etcInput as $k => $v)
-		<input type="hidden" name="{{ $k }}" value="{{ $v }}">
+		<input type="hidden" name="etcInput[]" value="{{ $k }} => {{ $v }}">
 		@endforeach
 		@endif
 

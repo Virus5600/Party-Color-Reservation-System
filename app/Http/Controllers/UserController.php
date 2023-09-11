@@ -6,6 +6,9 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+
+use Laravel\Sanctum\Sanctum;
+
 use App\Jobs\AccountNotification;
 
 use App\PasswordReset;
@@ -15,6 +18,7 @@ use App\TypePermission;
 use App\User;
 use App\UserPermission;
 
+use Artisan;
 use DB;
 use Exception;
 use File;
@@ -87,8 +91,13 @@ class UserController extends Controller
 					Log::error($e);
 				}
 			}
-			$user->tokens()->delete();
+			
 			$token = $user->createToken('authenticated');
+			if ($expiration = config('sanctum.expiration')) {
+				$model = Sanctum::$personalAccessTokenModel;
+				$model::where('created_at', '<', now()->subMinutes($expiration))->delete();
+			}
+
 			session(["bearer" => $token->plainTextToken]);
 
 			return redirect()
@@ -205,7 +214,10 @@ class UserController extends Controller
 	protected function logout() {
 		if (auth()->check()) {
 			$auth = auth()->user();
-			$auth->tokens()->delete();
+
+			$token = $auth->currentAccessToken();
+			if ($token != null)
+				$token->delete();
 			
 			auth()->logout();
 			session()->flush();
@@ -235,7 +247,18 @@ class UserController extends Controller
 
 	// PAGES
 	protected function index(Request $req) {
-		$users = User::withTrashed()->get();
+		$search = "%" . request('search') . "%";
+
+		$users = User::withTrashed()
+			->leftJoin('types', 'users.type_id', '=', 'types.id')
+			->where('first_name', 'LIKE', $search)
+			->orWhere('middle_name', 'LIKE', $search)
+			->orWhere('last_name', 'LIKE', $search)
+			->orWhere('email', 'LIKE', $search)
+			->orWhere('types.name', 'LIKE', $search)
+			->select(['users.*'])
+			->orderBy('id', 'DESC')
+			->paginate(10);
 
 		return view('admin.users.index', [
 			'users' => $users
@@ -688,8 +711,8 @@ class UserController extends Controller
 		try {
 			DB::beginTransaction();
 
-			$userPerms = ($user->userPerms == null ? array() : $user->userPerms->pluck(['id'])->toArray());
-			$typePerms = ($user->type->permissions == null ? array() : $user->type->permissions->pluck(['id'])->toArray());
+			$userPerms = ($user->userPerms == null ? array() : $user->userPerms()->pluck('id')->toArray());
+			$typePerms = ($user->type->permissions == null ? array() : $user->type->permissions()->pluck('id')->toArray());
 
 			sort($userPerms);
 			sort($typePerms);

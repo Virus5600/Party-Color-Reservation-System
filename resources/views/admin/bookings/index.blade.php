@@ -72,7 +72,6 @@ $extensionFee = App\Settings::getValue('extension_fee');
 
 @section('meta')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<meta name="bearer" content="{{ session('bearer') }}">
 @endsection
 
 @section('css')
@@ -205,6 +204,8 @@ $extensionFee = App\Settings::getValue('extension_fee');
 	const bookingFetchOne = '{{ route('bookings.fetch-event', ['$1']) }}';
 
 	const additionalOrdersIndex = '{{ route('admin.bookings.additional-orders.index', ['$1']) }}';
+
+	const logout = '{{ route('logout') }}';
 
 	const currencySymbol = '{{ (new NumberFormatter(app()->currentLocale()."@currency=JPY", NumberFormatter::CURRENCY))->getSymbol(NumberFormatter::CURRENCY_SYMBOL) }}';
 </script>

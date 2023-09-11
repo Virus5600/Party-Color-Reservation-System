@@ -15,7 +15,13 @@ use Validator;
 class InventoryController extends Controller
 {
 	protected function index(Request $req) {
-		$items = Inventory::withTrashed()->get();
+		$search = "%" . request('search') . "%";
+		
+		$items = Inventory::withTrashed()
+			->where('item_name', 'LIKE', $search)
+			->orWhere('measurement_unit', 'LIKE', $search)
+			->orderBy('id', 'DESC')
+			->paginate(10);
 
 		return view('admin.inventory.index', [
 			'items' => $items

@@ -14,13 +14,20 @@ class MenuVariationController extends Controller
 {
 	protected function index(Request $req, $mid) {
 		$menu = Menu::withTrashed()->find($mid);
+
 		if ($menu == null) {
 			return redirect()
 				->route('admin.menu.index')
 				->with('flash_error', 'The menu either does not exists or is already deleted.');
 		}
 
-		$variations = $menu->menuVariations()->withTrashed()->get();
+		$search = "%" . request('search') . "%";
+
+		$variations = $menu->menuVariations()
+			->where('name', 'LIKE', $search)
+			->withTrashed()
+			->orderBy('id', 'DESC')
+			->paginate(10);
 
 		return view('admin.menu.variation.index', [
 			'menu' => $menu,
@@ -52,7 +59,7 @@ class MenuVariationController extends Controller
 				->with('flash_error', 'The menu either does not exists or is already deleted.');
 		}
 
-		extract(MenuVariation::validate($req));
+		extract(MenuVariation::validate($req, $menu));
 
 		if ($validator->fails()) {
 			return redirect()
@@ -165,7 +172,7 @@ class MenuVariationController extends Controller
 				->with('flash_error', 'The menu variation either does not exists or is already deleted.');
 		}
 
-		extract(MenuVariation::validate($req, $vid));
+		extract(MenuVariation::validate($req, $menu, $vid));
 
 		if ($validator->fails()) {
 			return redirect()

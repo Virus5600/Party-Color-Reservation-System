@@ -27,8 +27,8 @@ class Announcement extends Model
 	];
 
 	// Relationship Function
-	protected function user() { return $this->belongsTo('App\User', 'user_id', 'id'); }
-	protected function announcementContentImages() { return $this->hasMany('App\AnnouncementContentImage', 'announcement_id', 'id'); }
+	public function user() { return $this->belongsTo('App\User', 'user_id', 'id'); }
+	public function announcementContentImages() { return $this->hasMany('App\AnnouncementContentImage', 'announcement_id', 'id'); }
 
 	// Custom Function
 	public function getPoster() {
@@ -41,6 +41,10 @@ class Announcement extends Model
 
 	// STATIC FUNCTIONS
 	public static function showRoute($id) {
+		$announcement = Announcement::withTrashed()->find($id);
+		
+		if ($announcement == null)
+			return "javascript:SwalFlash.info(`Cannot Find Item`, `Item may already be deleted or an anonymous user.`, true, false, `center`, false);";
 		return route('admin.announcements.show', [$id]);
 	}
 }

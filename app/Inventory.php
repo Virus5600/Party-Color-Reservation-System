@@ -104,6 +104,10 @@ class Inventory extends Model
 	}
 
 	public static function showRoute($id) {
+		$inventory = Inventory::withTrashed()->find($id);
+		
+		if ($inventory == null)
+			return "javascript:SwalFlash.info(`Cannot Find Item`, `Item may already be deleted or an anonymous user.`, true, false, `center`, false);";
 		return route('admin.inventory.show', [$id]);
 	}
 }

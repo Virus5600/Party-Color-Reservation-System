@@ -19,10 +19,14 @@ use Validator;
 class MenuController extends Controller
 {
 	protected function index(Request $req) {
+		$search = "%" . request('search') . "%";
+
 		$menus = Menu::withTrashed()
+			->where('name', 'LIKE', $search)
 			->without(['menuVariations'])
 			->withCount('menuVariations')
-			->get();
+			->orderBy('id', 'DESC')
+			->paginate(10);
 
 		return view('admin.menu.index', [
 			'menus' => $menus

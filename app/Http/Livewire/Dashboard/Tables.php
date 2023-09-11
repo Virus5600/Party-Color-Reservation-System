@@ -144,13 +144,22 @@ class Tables extends Component
 					$splice[3] = count($splice) >= 4 ? $splice[3] : false;
 					
 					// Identifies if the comparison is between columns or not.
-					if ($splice[3])
-						$clazz = $clazz->whereColumn($splice[0], $splice[1], $splice[2]);
-					else
+					if ($splice[3]) {
+						$splice[3] = strtolower($splice[3]);
+
+						if ($splice[3] == 'true')
+							$clazz = $clazz->whereColumn($splice[0], $splice[1], $splice[2]);
+						else if ($splice[3] == 'date')
+							$clazz = $clazz->whereDate($splice[0], $splice[1], $splice[2]);
+					}
+					else {
 						$clazz = $clazz->where($splice[0], $splice[1], $splice[2]);
+					}
 				}
 			}
-			$data = $clazz->paginate(10);
+			
+			$data = $clazz->orderBy('id', 'DESC')
+				->paginate(10);
 		}
 		else {
 			$data = collect([]);

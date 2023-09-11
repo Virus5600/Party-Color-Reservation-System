@@ -2,6 +2,12 @@
 
 @section('title', 'Menu')
 
+@php
+$user = auth()->user();
+$editAllow = $user->hasPermission('menu_tab_edit');
+$deleteAllow = $user->hasPermission('menu_tab_delete');
+@endphp
+
 @section('content')
 <div class="container-fluid d-flex flex-column h-100">
 	<div class="row">
@@ -16,7 +22,7 @@
 				<div class="col-12 col-md-8">
 					<div class="row">
 						{{-- ADD --}}
-						@if (Auth::user()->hasPermission('menu_tab_create'))
+						@if ($user->hasPermission('menu_tab_create'))
 						<div class="col-12 col-md text-center text-md-right ml-md-auto">
 							<a href="javascript:void(0);" class="btn btn-success m-auto"
 								data-scf="Menu Name"
@@ -30,7 +36,7 @@
 						@endif
 
 						{{-- SEARCH --}}
-						@include('components.admin.admin-search', ['type' => 'menus'])
+						@include('components.admin.admin-search', ['type' => 'menu'])
 					</div>
 				</div>
 				{{-- Controls End --}}
@@ -38,7 +44,7 @@
 		</div>
 	</div>
 
-	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3" id="inner-content">
+	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3 h-100 d-flex flex-column" id="inner-content">
 		<table class="table table-striped my-0">
 			<thead>
 				<tr>
@@ -66,7 +72,7 @@
 								<a href="{{ route('admin.menu.variation.index', [$m->id]) }}" class="dropdown-item"><i class="fas fa-eye mr-2"></i>View</a>
 
 								{{-- EDIT --}}
-								@if (Auth::user()->hasPermission('menu_tab_edit'))
+								@if ($editAllow)
 								<a href="javascript:void(0);" class="dropdown-item"
 									data-scf="Menu Name"
 									data-scf-name="menu_name"
@@ -77,17 +83,12 @@
 								@endif
 								
 								{{-- DELETE --}}
-								@if (Auth::user()->hasPermission('menu_tab_delete'))
+								@if ($deleteAllow)
 									@if ($m->trashed())
 									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.menu.restore', [$m->id]) }}', undefined, 'Are you sure you want to activate this?');" class="dropdown-item"><i class="fas fa-toggle-on mr-2"></i>Set Active</a>
 									@else
 									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.menu.delete', [$m->id]) }}', undefined, 'Are you sure you want to deactivate this?');" class="dropdown-item"><i class="fas fa-toggle-off mr-2"></i>Set Inactive</a>
 									@endif
-								@endif
-
-								{{-- PERMANENT DELETE --}}
-								@if (Auth::user()->hasPermission('menu_tab_perma_delete'))
-								<a href="javascript:void(0);" onclick="confirmLeave('@{{ route('admin.menu.permaDelete', [$m->id]) }}', undefined, 'Are you sure you want to delete this?')" class="dropdown-item"><i class="fas fa-trash mr-2"></i>Delete</a>
 								@endif
 							</div>
 						</div>
@@ -95,11 +96,15 @@
 				</tr>
 				@empty
 				<tr>
-					<td class="text-center" colspan="3">Nothing to display~</td>
+					<td class="text-center" colspan="4">Nothing to display~</td>
 				</tr>
 				@endforelse
 			</tbody>
 		</table>
+
+		<div id="table-paginate" class="w-100 d-flex align-middle my-3">
+			{{ $menus->onEachSide(5)->links() }}
+		</div>
 	</div>
 </div>
 @endsection

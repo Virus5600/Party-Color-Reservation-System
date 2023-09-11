@@ -18,6 +18,10 @@ class ContactInformation extends Model
 
 	// STATIC FUNCTIONS
 	public static function showRoute($id) {
-		return route('admin.bookings.index', ['cn' => ContactInformation::find($id)->booking->control_no]);
+		$contactInformation = ContactInformation::find($id);
+
+		if ($contactInformation == null)
+			return "javascript:SwalFlash.info(`Cannot Find Item`, `Item may already be deleted or an anonymous user.`, true, false, `center`, false);";
+		return route('admin.bookings.index', ['cn' => $contactInformation->booking->control_no]);
 	}
 }

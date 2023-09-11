@@ -22,14 +22,26 @@ class AnnouncementController extends Controller
 {
 	protected function index(Request $req) {
 
+		$search = "%" . request("search") . "%";
+
 		if (($req->has('sd') && $req->sd == 1) && ($req->has('d') && $req->d == 1))
-			$announcements = Announcement::withTrashed()->get();
+			$announcements = Announcement::withTrashed();
 		else if ($req->has('sd') && $req->sd == 1)
-			$announcements = Announcement::onlyTrashed()->get();
+			$announcements = Announcement::onlyTrashed();
 		else if ($req->has('d') && $req->d == 1)
-			$announcements = Announcement::where('is_draft', '=', '1')->get();
+			$announcements = Announcement::where('is_draft', '=', '1');
 		else
-			$announcements = Announcement::where('is_draft', '=', '0')->get();
+			$announcements = Announcement::where('is_draft', '=', '0');
+
+		$announcements = $announcements->where('title', 'LIKE', $search)
+			->where(function($query) use ($search) {
+				$query->orWhere('slug', 'LIKE', $search)
+					->orWhere('summary', 'LIKE', $search)
+					->orWhere('content', 'LIKE', $search);
+			})
+			->with(['user:id,first_name,middle_name,last_name,suffix'])
+			->orderBy('id', 'DESC')
+			->paginate(10);
 
 		return view('admin.announcements.index', [
 			'announcements' => $announcements,

@@ -2,6 +2,12 @@
 
 @section('title', "Menu Variation - {$menu->name}")
 
+@php
+$user = auth()->user();
+$editAllow = $user->hasPermission('menu_var_tab_edit');
+$deleteAllow = $user->hasPermission('menu_var_tab_delete');
+@endphp
+
 @section('content')
 <div class="container-fluid d-flex flex-column h-100">
 	<div class="row">
@@ -20,14 +26,14 @@
 				<div class="col-12 col-md-8">
 					<div class="row">
 						{{-- ADD --}}
-						@if (Auth::user()->hasPermission('menu_var_tab_create'))
+						@if ($user->hasPermission('menu_var_tab_create'))
 						<div class="col-12 col-md text-center text-md-right ml-md-auto">
 							<a href="{{ route('admin.menu.variation.create', [$menu->id]) }}" class="btn btn-success m-auto"><i class="fa fa-plus-circle mr-2"></i>Add Item</a>
 						</div>
 						@endif
 
 						{{-- SEARCH --}}
-						@include('components.admin.admin-search', ['type' => 'menu_variations'])
+						@include('components.admin.admin-search', ['type' => 'menuVariation', 'etcInput' => ['mid' => $menu->id]])
 					</div>
 				</div>
 				{{-- Controls End --}}
@@ -35,7 +41,7 @@
 		</div>
 	</div>
 
-	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3" id="inner-content">
+	<div class="card dark-shadow overflow-x-scroll flex-fill mb-3 h-100 d-flex flex-column" id="inner-content">
 		<table class="table table-striped my-0">
 			<thead>
 				<tr>
@@ -75,12 +81,12 @@
 								<a href="{{ route('admin.menu.variation.show', [$menu->id, $v->id]) }}" class="dropdown-item"><i class="fas fa-eye mr-2"></i>View</a>
 
 								{{-- EDIT --}}
-								@if (Auth::user()->hasPermission('menu_var_tab_edit'))
+								@if ($editAllow)
 								<a href="{{ route('admin.menu.variation.edit', [$menu->id, $v->id]) }}" class="dropdown-item"><i class="fas fa-pencil-alt mr-2"></i>Edit</a>
 								@endif
 								
 								{{-- DELETE --}}
-								@if (Auth::user()->hasPermission('menu_var_tab_delete'))
+								@if ($deleteAllow)
 									@if ($v->trashed())
 									<a href="javascript:void(0);" onclick="confirmLeave('{{ route('admin.menu.variation.restore', [$menu->id, $v->id]) }}', undefined, 'Are you sure you want to activate this?');" class="dropdown-item"><i class="fas fa-toggle-on mr-2"></i>Set Active</a>
 									@else
@@ -98,6 +104,10 @@
 				@endforelse
 			</tbody>
 		</table>
+
+		<div id="table-paginate" class="w-100 d-flex align-middle my-3">
+			{{ $variations->onEachSide(5)->links() }}
+		</div>
 	</div>
 </div>
 @endsection

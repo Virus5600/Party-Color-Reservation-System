@@ -49,7 +49,6 @@ class BookingNotification implements ShouldQueue
 
 		$recipient = $this->booking->contactInformation()->first();
 		$subject = $this->args['subject'];
-
 		// Send email to every single one of the recipients
 		Mail::send(
 			"layouts.emails.bookings.notification",
@@ -75,6 +74,11 @@ class BookingNotification implements ShouldQueue
 	}
 
 	public function __destruct() {
-		Artisan::call('queue:work --stop-when-empty');
+		Log::info("[BookingNotification] Running Queue");
+
+		Artisan::call('queue:work', [
+			'--stop-when-empty' => true,
+			'--tries' => 3
+		]);
 	}
 }
