@@ -71,6 +71,11 @@ class BookingCancellationNotification implements ShouldQueue
 	}
 
 	public function __destruct() {
-		Artisan::call('queue:work --stop-when-empty');
+		Log::info("[BookingCancellationNotification] Running Queue");
+
+		Artisan::call('queue:work', [
+			'--stop-when-empty' => true,
+			'--tries' => 3
+		]);
 	}
 }
